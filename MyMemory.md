@@ -79,8 +79,9 @@ Collection.copy()  深
   
   .class文件的第5~第8个字节表示的是该.class文件的主次版本号，验证的时候会对这4个字节做一个验证，高版本的JDK能向下兼容以前版本的.class文件，但不能运行以后的class文件，即使文件格式未发生任何变化，虚拟机也必须拒绝执行超过其版本号的.class文件。举个具体的例子，如果一段.java代码是在JDK1.6下编译的，那么JDK1.6、JDK1.7的环境能运行这个.java代码生成的.class文件，但是JDK1.5、JDK1.4乃更低的JDK版本是无法运行这个.java代码生成的.class文件的。如果运行，会抛出java.lang.UnsupportedClassVersionError，这个小细节，务必注意。
   
-  
-## 类加载机制   
+***
+## 类加载机制
+
 对于任意一个类，都需要由加载它的类加载器和这个类本身一同确立其在Java虚拟机中的唯一性，每一个类加载器，都拥有一个独立的类名称空间。这句话表达地再简单一点就是：比较两个类是否"相等"，只有在这两个类是由同一个类加载器加载的前提下才有意义，否则即使这两个类来源于同一个.class文件，被同一个虚拟机加载，只要加载它们的类加载器不同，这两个类必定不相等。
   
   
@@ -89,9 +90,13 @@ Collection.copy()  深
   2 扩展类加载器Extension ClassLoader:由 sun.misc.Launcher$ExtClassLoader 实现，它负责用于加载JAVA_HOME/lib/ext目录中的，或者被java.ext.dirs系统变量指定所指定的路径中所有类库，者可以直接使用扩展类加载器。
   3 应用程序类加载器Application ClassLoader :这个类加载器由 sun.misc.Launcher$AppClassLoader 实现。这个类也一般被称为 系统的 类加载器.      Application ClassLoader只能加载项目bin目录下的.class文件。
   
-  ```
-  System.out.println(System.getProperty("java.ext.dirs"));   sun.misc.Launcher$AppClassLoader@546b97fdSystem.out.println(ClassLoader.getSystemClassLoader().getParent());   sun.misc.Launcher$ExtClassLoader@535ff48bSystem.out.println(ClassLoader.getSystemClassLoader().getParent().getParent());  null    Bootstrap ClassLoader以外的ClassLoader都是Java实现的，因此这些ClassLoader势必在Java堆中有一份实例在，所以Extension ClassLoader和Application ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部分，是用C/C++写的，不属于Java，自然在Java堆中也没有自己的空间，所以就返回null了。所以，如果ClassLoader得到的是null，那么表示的ClassLoader就是Bootstrap ClassLoader。
-  ```
+  
+- System.out.println(System.getProperty("java.ext.dirs"));   sun.misc.Launcher$AppClassLoader@546b97fd
+- System.out.printlngetSystemClassLoader().getParent());   sun.misc.Launcher$ExtClassLoader@535ff48b
+- System.out.println(ClassLoader.getSystemClassLoader().getParent().getParent());  null    
+```
+Bootstrap ClassLoader以外的ClassLoader都是Java实现的，因此这些ClassLoader势必在Java堆中有一份实例在，所以Extension ClassLoader和Application ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部分，是用C/C++写的，不属于Java，自然在Java堆中也没有自己的空间，所以就返回null了。所以，如果ClassLoader得到的是null，那么表示的ClassLoader就是Bootstrap ClassLoader。
+```
   
   - 双亲委派模型是在JDK1.2期间被引入的，其工作过程可以分为两步：
   ===
