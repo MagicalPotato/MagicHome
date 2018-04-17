@@ -78,3 +78,23 @@ Collection.copy()  深
   说到Java内存区域，可能很多人第一反应是“堆栈”。首先堆栈不是一个概念，而是两个概念，堆和栈是两块不同的内存区域，简单理解的话，堆是用来存放对象而栈是用来执行程序的。其次，堆内存和栈内存的这种划分方式比较粗糙，这种划分方式只能说明大多数程序员最关注的、与对象内存分配关系最密切的内存区域是这两块，Java内存区域的划分实际上远比这复杂。对于Java程序员来说，在虚拟机自动内存管理机制的帮助下，不再需要为每一个new操作去配对delete/free代码，不容易出现内存泄露和内存溢出问题。但是，也正是因为Java把内存控制权交给了虚拟机，一旦出现内存泄露和内存溢出的问题，就难以排查，因此一个好的Java程序员应该去了解虚拟机的内存区域以及会引起内存泄露和内存溢出的场景。
   
   .class文件的第5~第8个字节表示的是该.class文件的主次版本号，验证的时候会对这4个字节做一个验证，高版本的JDK能向下兼容以前版本的.class文件，但不能运行以后的class文件，即使文件格式未发生任何变化，虚拟机也必须拒绝执行超过其版本号的.class文件。举个具体的例子，如果一段.java代码是在JDK1.6下编译的，那么JDK1.6、JDK1.7的环境能运行这个.java代码生成的.class文件，但是JDK1.5、JDK1.4乃更低的JDK版本是无法运行这个.java代码生成的.class文件的。如果运行，会抛出java.lang.UnsupportedClassVersionError，这个小细节，务必注意。
+  
+  
+## 类加载机制   
+对于任意一个类，都需要由加载它的类加载器和这个类本身一同确立其在Java虚拟机中的唯一性，每一个类加载器，都拥有一个独立的类名称空间。这句话表达地再简单一点就是：比较两个类是否"相等"，只有在这两个类是由同一个类加载器加载的前提下才有意义，否则即使这两个类来源于同一个.class文件，被同一个虚拟机加载，只要加载它们的类加载器不同，这两个类必定不相等。
+  
+  
+* java的三个类加载器:
+  1 启动类加载器Bootstrap ClassLoader :一个嵌在JVM内核中的加载器。它负责加载的是JAVA_HOME/lib下的类库，属于系统级加载器,无法被Java程序直接应用
+  2 扩展类加载器Extension ClassLoader:由 sun.misc.Launcher$ExtClassLoader 实现，它负责用于加载JAVA_HOME/lib/ext目录中的，或者被java.ext.dirs系统变量指定所指定的路径中所有类库，者可以直接使用扩展类加载器。
+  3 应用程序类加载器Application ClassLoader :这个类加载器由 sun.misc.Launcher$AppClassLoader 实现。这个类也一般被称为 系统的 类加载器.      Application ClassLoader只能加载项目bin目录下的.class文件。
+  
+  ```
+  System.out.println(System.getProperty("java.ext.dirs"));   sun.misc.Launcher$AppClassLoader@546b97fdSystem.out.println(ClassLoader.getSystemClassLoader().getParent());   sun.misc.Launcher$ExtClassLoader@535ff48bSystem.out.println(ClassLoader.getSystemClassLoader().getParent().getParent());  null    Bootstrap ClassLoader以外的ClassLoader都是Java实现的，因此这些ClassLoader势必在Java堆中有一份实例在，所以Extension ClassLoader和Application ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部分，是用C/C++写的，不属于Java，自然在Java堆中也没有自己的空间，所以就返回null了。所以，如果ClassLoader得到的是null，那么表示的ClassLoader就是Bootstrap ClassLoader。
+  ```
+  
+  - 双亲委派模型是在JDK1.2期间被引入的，其工作过程可以分为两步：
+  ===
+  * 如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把这个请求委派给父类加载器去完成，每一个层次的类加载器都是如此。
+  * 只有当父加载器反馈自己无法完成这这个加载请求（它的搜索范围中没有找到所需的类）时，子加载器才会尝试自己去加载所以，其实所有的加载请求最终都应该传送到顶层的启动类加载器中。双亲委派模型对于Java程序的稳定运作很重要，因为Java类随着它的加载器一起具备了一种带有优先级的层次关系。例如java.lang.Object，存放于rt.jar中，无论哪一个类加载器要去加载这个类，最终都是由Bootstrap ClassLoader去加载,因此Object类在程序的各种类加载器环境中都是一个类。相反，如果没有双亲委派模型，由各个类自己去加载的话，如果用户自己编写了一个java.lang.Object，并放在CLASSPATH下，那系统中将会出现多个不同的Object类，Java体系中最基础的行为也将无法保证，应用程序也将会变得一片混乱。
+  ===
