@@ -18,9 +18,23 @@ setColour就会覆盖A的,实际上你用的只是B的.  有一种方式,from A
 
 * 循环内不要不断创建对象引用,应该在训话外创建对象的引用,然后在循环内去和不同的对象关联.这样对象 虽然有狠多,但是引用只有一份,省了很多引用的内存.
 ```
-Object obj = null;
-for (int i = 0; i <= count; i++)
-{    
-  obj = new Object();
-}
+    Object obj = null;
+    for (int i = 0; i <= count; i++)
+    {    
+      obj = new Object();
+    }
+```
+
+* 除非能确定一整个方法都是需要进行同步的，否则尽量使用同步代码块，避免对那些不需要进行同步的代码也进行了同步，影响了代码执行效率。
+* 实现RandomAccess接口的类实例(注意是类的实例,也就是说那个list中放的是实现了随机访问的类的实例)，假如是随机访问的，使用普通for循环效率将高于使用foreach循环；反过来，如果是顺序访问的，则使用Iterator会效率更高。可以使用类似如下的代码作判断：
+```
+    if (list instanceof RandomAccess)
+    {    
+        for (int i = 0; i < list.size(); i++){}
+    }
+    else
+    {
+        Iterator<?> iterator = list.iterable();
+        while (iterator.hasNext()){iterator.next()
+    }
 ```
