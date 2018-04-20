@@ -38,3 +38,22 @@ setColour就会覆盖A的,实际上你用的只是B的.  有一种方式,from A
         while (iterator.hasNext()){iterator.next()
     }
 ```
+
+* 把一个基本数据类型转为字符串，基本数据类型.toString()是最快的方式、String.valueOf(数据)次之、数据+""最慢:String.valueOf()方法底层调用了Integer.toString()方法，但是会在调用前做空判断;Integer.toString()方法就不说了;直接调用了i + ""底层使用了StringBuilder实现，先用append方法拼接，再用toString()方法获取字符串.  注意:循环体内不要使用"+"进行字符串拼接，而直接使用StringBuilder不断append,因为使用"+"在底层执行的时候,还是先创建新的StringBuilder对象然后再append.
+
+* 遍历map效率最高的方式:
+```
+    public static void main(String[] args)
+    {
+        HashMap<String, String> hm = new HashMap<String, String>();
+        hm.put("111", "222");
+        Set<String> keySet = hm.keySet();  //如果只遍历key,用这个最高效.  
+        Set<Map.Entry<String, String>> entrySet = hm.entrySet();
+        Iterator<Map.Entry<String, String>> iter = entrySet.iterator(); 
+        while (iter.hasNext())
+        { 
+            Map.Entry<String, String> entry = iter.next();
+            System.out.println(entry.getKey() + "\t" + entry.getValue());
+        }
+     }
+```
