@@ -13,3 +13,14 @@ setColour就会覆盖A的,实际上你用的只是B的.  有一种方式,from A
 
 * for (int i = 0, length = list.size(); i < length; i++){...}  //注意这段代码,平常写的时候都是直接写size,不会定义变量,但是实际上这种方式是会消耗多余的资源的,因为每次循环都会计算一次size的值,对于次数少的循环来说,可以
 不用管,但是对于数量级大的循环,那这个开销肯定是比较大的,所以要注意这个地方.
+
+* 尽量使用HashMap、ArrayList、StringBuilder，除非线程安全需要，否则不推荐使用Hashtable、Vector、StringBuffer，后三者由于使用同步机制而导致了性能开销.
+
+* 循环内不要不断创建对象引用,应该在训话外创建对象的引用,然后在循环内去和不同的对象关联.这样对象 虽然有狠多,但是引用只有一份,省了很多引用的内存.
+```
+Object obj = null;
+for (int i = 0; i <= count; i++)
+{    
+  obj = new Object();
+}
+```
