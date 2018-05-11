@@ -53,7 +53,7 @@
  </head> 
  <body>  
   <h1>snap shot</h1>  
-  <p title="a gentltreminder">dont forget to buy this stuff.</p>  
+  <p title="a gentlt reminder">dont forget to buy this stuff.</p>  
   <ul id="wang">
    <li>
     <a herf="pic/abc.jpg" title="A picture"> Fireworks</a>
@@ -62,8 +62,39 @@
 </html>
 ```
 
-之前
-  
-  
-666  
+	之前一直以为getElement("body")获取到的是body标签下的所有东西,直接拿个list去接,但看了getElementByTagNam("body")之后发现理解错了.无论方法的名字变成了什么,getElement最终得到的都是一个对象数组(至少在JavaScript中是如此,在Java中或许api返回的是list),假如有多个body标签,那么得到的就是多个对象,这些对象被放在数组当中.现在这个代码里只有一个body标签,那么我得到的就只有一个body对象.然后我用body.childNodes()方法就可以获得这个body标签对象下的所有子节点.这里的子节点指的就是body标签下的所有子标签.之前一直不理解,以为得到一个标签就是得到了这个标签下的所以子标签,而且以为childNodes()方法返回的是body下的所有标签.但是实际上:标签和节点原本就是两个不同的东西.节点是一个大的范围,而标签只是节点当中的一种.所以说用childNodes()方法返回的是所有的节点,包括元素节点,属性节点,文本节点,只要是这个body中的节点,都会返回.
 
+	而且还有一点要注意,假设现在你获取了p这个标签,你用childNodes()方法获取了其下的所有节点,现在这些节点都在一个数组中,数组中的第一个节点是属性节点,如果我用 node.nodeValue获取该节点的属性值,得到的是title="a gentlt reminder",第二个节点是一个文本节点,这个文本节点的nodeValue是"dont forget to buy this stuff."关键就在这里,但是如果我得到了p对象之后调用p.nodeValue实际上得到的并不是"dont forget to buy this stuff."这句话,而是null,为什么呢.原因还在于对节点的理解,p虽然是个元素节点,但是这个元素节点本身并没有nodeValue,自己没有值,但是p含有别的节点,属性节点和文本节点,属性节点.nodeValue得到的就是那一串属性值,而 文本节点.nodeValue得到的才是那段我最终想要的话.所以用childNodes()的到节点数组后,我要拿到那话应该是node[2].nodeValue.或者node.lastChild.nodeValue.    由此还能得到一个结论,所有标签节点的nodeValue都是null.因为标签节点并没有节点值(这个待验证).  一定要注意区分节点值和节点属性值(节点的属性节点的值).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+666  
