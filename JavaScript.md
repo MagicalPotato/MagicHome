@@ -44,15 +44,26 @@
   - 属性节点:标签里面用来描述这个标签属性的东西.
   - 文本节点:标签里面实际的内容
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
+```
+<!DOCTYPE html>
+<html lang="en"> 
+ <head>  
+  <meta charset="utf-8"/>  
+  <title>Image Callery</title> 
+ </head> 
+ <body>  
+  <h1>snap shot</h1>  
+  <p title="a gentltreminder">dont forget to buy this stuff.</p>  
+  <ul id="wang">
+   <li>
+    <a herf="pic/abc.jpg" title="A picture"> Fireworks</a>
+   </li>
+ </body>
+</html>
+```
+
+之前
+  
   
 666  
 
