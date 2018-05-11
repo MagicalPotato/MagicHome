@@ -21,4 +21,20 @@
  obj.age = 24;
  var obj = {name:'liling',age:'24'};   //花括号里面的实际上是JavaScript的对象.
  
+ function()
+ {
+  statement;    //方法或函数;
+ }
+ 
+ var num = Math.round(2.65);   //四舍五入
+ var data = new Data();   //获取当前日期对象
+ data.getDay();   //获取当前对象的Day,表示获取星期几
+ data.getHours();  //时间
+ data.getMonth(); //月份
+ 
 ```
+
+* 注意的点
+  - 在js中,var a=false;var b=''; 如果非严格比较,那么a和b是相等的,也就是if(a==b){这里会判断为true};如果要严格比较的话,需要用===,或!==,这样不仅比较值,而且会比较类型.
+  - 一般情况下,全局的变量在声明时不需要用var,而在局部声明的时候一定将var带上.这样能够便于区分.而且如果一旦有个局部变量和全局变量名字一样,那么可以避免局部变量误改的情况.因为如果局部没有带var则会将同名的全局变量的值改变.
+  
