@@ -21,9 +21,9 @@
  obj.age = 24;
  var obj = {name:'liling',age:'24'};   //花括号里面的实际上是JavaScript的对象.
  
- function()
+ 方法名:function()
  {
-  statement;    //方法或函数;
+  statement;    //方法或函数;注意,js中的方法定义是用关键字function(),还要将方法名称加上.类似于Java的方法,是由public等一堆关键字修饰的.
  }
  
  var num = Math.round(2.65);   //四舍五入
