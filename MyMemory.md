@@ -95,7 +95,11 @@ Collection.copy()  深
 - System.out.printlngetSystemClassLoader().getParent());   sun.misc.Launcher$ExtClassLoader@535ff48b
 - System.out.println(ClassLoader.getSystemClassLoader().getParent().getParent());  null    
 ```
-Bootstrap ClassLoader以外的ClassLoader都是Java实现的，因此这些ClassLoader势必在Java堆中有一份实例在，所以Extension ClassLoader和Application ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部分，是用C/C++写的，不属于Java，自然在Java堆中也没有自己的空间，所以就返回null了。所以，如果ClassLoader得到的是null，那么表示的ClassLoader就是Bootstrap ClassLoader。
+Bootstrap ClassLoader以外的ClassLoader都是Java实现的，因此这些ClassLoader势必在Java堆中有一份实例在，所以Extension ClassLoader和Application 
+
+ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部分，是用C/C++写的，不属于Java，自然在Java堆中也没有自己的空间，所以就返回null
+
+了。所以，如果ClassLoader得到的是null，那么表示的ClassLoader就是Bootstrap ClassLoader。
 ```
   
   - 双亲委派模型是在JDK1.2期间被引入的，其工作过程可以分为两步：  
@@ -108,7 +112,23 @@ Bootstrap ClassLoader以外的ClassLoader都是Java实现的，因此这些Class
 * join()方法会使调用join()方法的线程（也就是mt线程）所在的线程（也就是main线程）无限阻塞，直到调用join()方法的线程销毁为止，此例中main线程就会无限期阻塞直到mt的run()方法执行完毕。join()方法的一个重点是要区分出和sleep()方法的区别。join(2000)也是可以的，表示调用join()方法所在的线程最多等待2000ms，两者的区别在于：sleep(2000)不释放锁，join(2000)释放锁，因为join()方法内部使用的是wait()，因此会释放锁。看一下join(2000)的源码就知道了，join()其实和join(2000)一样，无非是join(0)而已
 * 假如事先在一个线程的构造方法中用therd.getcurrentthread.getname打印,然后在main方法中去实例化这个线程对象,那么打印结果,线程的名字是main,如果在线程的run方法中去打印,然后再main方法中让线程对象.start,那么答应的结果就是当前那个线程名字.所以得出一个结论,在一个线程类中调用getcurrentthread.getname方法得到的不一定就是当前线程的名字.也就是  在MyThread05里调用Thread.currentThread()返回回来的线程对象的引用未必就是MyThread05
 * sleep(long millis)方法的作用是在指定的毫秒内让当前"正在执行的线程"休眠（暂停执行）。这个"正在执行的线程"是关键，指的是Thread.currentThread()返回的线程。根据JDK API的说法，"该线程不丢失任何监视器的所属权"，简单说就是sleep代码上下文如果被加锁了，锁依然在，但是CPU资源会让出给其他线程。 也就是说这个线程如果休眠了,它会保留自己的所有状态,让其他的线程先去执行,等自己睡醒了再接着执行.
-* 这里有一个重要的概念。关键字synchronized取得的锁都是对象锁，而不是把一段代码或方法（函数）当作锁，哪个线程先执行带synchronized关键字的方法，哪个线程就持有该方法所属对象的锁，其他线程都只能呈等待状态。但是这有个前提：既然锁叫做对象锁，那么势必和对象相关，所以多个线程访问的必须是同一个对象。也就是说如果a线程先抢到了资源,那a就会一直执行完,就算是a在代码里休眠了,a也不会释方对象锁,b也只能一直干等着直到a睡醒了,执行完了b才会执行:  如果多个线程访问的是多个同一个类的不同对象，那么Java虚拟机就会创建多个锁，就像上面的例子一样，创建了两个ThreadDomain13对象，就产生了2个锁。既然两个线程持有的是不同的锁，自然不会受到"等待释放锁"这一行为的制约，可以分别运行addNum(String userName)中的代码,所以这种情况就是谁抢到资源谁就执行.
+* 无论synchronized关键字同步的是方法还是方法中的一部分方法块, 别的线程调用同一个对象的其他synchronized方法或者方法块的时候都是调不到的,都需要等待已经拿到锁的这个线程执行完成才能执行.  推而广之,如果用的不是synchronized(this)同步块,而是用的synchronized(另一个对象A当做监视器).假如线程a正在执行synchronized(另一个对象A当做监视器)这个块中的代码,有另一个线程b想执行A对象中的别的synchronized同步方法时也将阻塞先等待a执行完.  所以说只要一个对象与synchronized有关系的东西如果正在被一个线程执行,那么其他线程想执行和这个对象有关的其他synchronized同步方法或同步块或其他同步玩意之类的都是
+* 这里有一个重要的概念。关键字synchronized取得的锁都是对象锁，而不是把一段代码或方法（函数）当作锁，哪个线程先执行带synchronized关键字的方法，哪个线程就持有该方法所属对象的锁，其他线程都只能呈等待状态。但是这有个前提：既然锁叫做对象锁，那么势必和对象相关，所以多个线程访问的必须是同一个对象。也就是说如果a线程先抢到了资源,那a就会一直执行完,就算是a在代码里休眠了,a也不会释方对象锁,b也只能一直干等着直到a睡醒了,执行完了b才会执行:  如果多个线程访问的是多个对象，那么Java虚拟机就会创建多个锁，就像上面的例子一样，创建了两个ThreadDomain13对象，就产生了2个锁。既然两个线程持有的是不同的锁，自然不会受到"等待释放锁"这一行为的制约，可以分别运行addNum(String userName)中的代码,所以这种情况就是谁抢到资源谁就执行.
+ - 这里还有一个概念:静态同步方法和非静态同步方法持有的是不同的锁，前者是类锁，后者是对象锁。也就是说,虽然创建了多个对象,但是假如这个类中有个synchronized 的static方法,如果线程a调了这个方法,那就算线程b用的是这个类的一个新对象,那线程b也还是要等待线程a执行完才能执行这个静态的synchronized 方法.  这里再顺便提一下static这个关键字. 它代表静态,也就是说它修饰的属性是属于类的,只会在类初始化的时候初始化一次,内存也只有一份.你可以随时随地用这个类的类名来调用这些static的属性. 但如果不是属于静态的,那么就是对象级别的, 你每次创建一个对象,对象都会有各自的属性,新对象同样可以使用类属性,但是并不推荐这样做.
+```
+其实通过对synchronized 这个关键字的学习你会发现,在同一个编程体系中,很多特性都是共通的,内在都是有一套复杂但是条理清晰的逻辑.所以很多时候掌握特性的本
+
+质是很有必要的,要会通过已掌握的东西去大概推测一些没有接触过个特性.特性可以千变万化,但是分析特性的思路,解决问题的方法都是共通的.
+```
 * 假如A类中有一个方法是synchronized,另一个方法是非synchronized,我现在写两个线程ab分别取调A中的synchronized,和非synchronized,方法,这时候ab两个线程是不会相互影响的,各调各的,各自抢占cpu资源,谁抢到谁执行. 假如我现在把A类中的非synchronized也改成synchronized,那就不一样了,虽然b线程调的方法和a线程调的方法不是同一个方法,但是b依然需要等到a执行完之后才能执行.  还有一点,一个线程如果获得了synchronized对象锁,那么它可以无限次的再次获取该对象的锁.也就是一个线程调了一个对象的synchronized方法,在这个synchronized方法中又调用了这个对象的另一个synchronized方法,在这个synchronized中又掉了另一个synchronized,可以这样一直调.  这就是 锁重入的机制，也支持在父子类继承的环境中。
 * 当一个线程执行的代码出现异常时，其所持有的锁会自动释放。
+* 一个线程如何出现了运行时异常且这个异常没有被捕获的话，这个线程就停止执行了。且如果这个线程持有某个对象的监视器，那么这个对象监视器会被立即释放.
 * 无论synchronized关键字同步的是方法还是方法中的一部分方法块, 别的线程调用同一个对象的其他synchronized方法或者方法块的时候都是调不到的,都需要等待已经拿到锁的这个线程执行完成才能执行.  推而广之,如果用的不是synchronized(this)同步块,而是用的synchronized(另一个对象A当做监视器).假如线程a正在执行synchronized(另一个对象A当做监视器)这个块中的代码,有另一个线程b想执行A对象中的别的synchronized同步方法时也将阻塞先等待a执行完.  所以说只要一个对象与synchronized有关系的东西如果正在被一个线程执行,那么其他线程想执行和这个对象有关的其他synchronized同步方法或同步块或其他同步玩意之类的都是不行的.
+
+* Volatile关键字
+  - 修饰的成员变量在每次被线程访问时，都强迫从共享内存中重读该成员变量的值。而且，当成员变量发生变化时，强迫线程将变化值回写到共享内存。这样在任何时刻，两个不同的线程总是看到某个成员变量的同一个值。  
+  - Java语言规范中指出：为了获得最佳速度，允许线程保存共享成员变量的私有拷贝，而且只当线程进入或者离开同步代码块时才与共享成员变量的原始值对比。这样当多个线程同时与某个对象交互时，就必须要注意到要让线程及时的得到共享成员变量的变化。而volatile关键字就是提示VM：对于这个成员变量不能保存它的私有拷贝，而应直接与共享成员变量交互。  
+  - 建议在两个或者更多的线程访问的成员变量上使用volatile。当要访问的变量已在synchronized代码块中，或者为常量时，不必使用。由于使用volatile屏蔽掉了VM中必要的代码优化，所以在效率上比较低，因此一定在必要时才使用此关键字。
+  - volatile的作用就是这样，被volatile修饰的变量，保证了每次读取到的都是最新的那个值。线程安全围绕的是可见性和原子性这两个特性展开的，volatile解决的是变量在多个线程之间的可见性，但是无法保证原子性。 
+  - synchronized除了保障了原子性外，其实也保障了可见性。因为synchronized无论是同步的方法还是同步的代码块，都会先把主内存的数据拷贝到工作内存中，同步代码块结束，会把工作内存中的数据更新到主内存中，这样主内存中的数据一定是最新的。
+
