@@ -130,3 +130,13 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
   - 建议在两个或者更多的线程访问的成员变量上使用volatile。当要访问的变量已在synchronized代码块中，或者为常量时，不必使用。由于使用volatile屏蔽掉了VM中必要的代码优化，所以在效率上比较低，因此一定在必要时才使用此关键字。
   - volatile的作用就是这样，被volatile修饰的变量，保证了每次读取到的都是最新的那个值。线程安全围绕的是可见性和原子性这两个特性展开的，volatile解决的是变量在多个线程之间的可见性，但是无法保证原子性。 
   - synchronized除了保障了原子性外，其实也保障了可见性。因为synchronized无论是同步的方法还是同步的代码块，都会先把主内存的数据拷贝到工作内存中，同步代码块结束，会把工作内存中的数据更新到主内存中，这样主内存中的数据一定是最新的。
+
+
+* 线程的sleep()方法
+
+  看例子的时候经常看到自己写的mythread类中用了个Thread.sleep(100)或者this.sleep(100),又或者mythread.sleep(100),然后在测试的main方法中也有Thread.sleep(500),但是main方法中的基本都是Thread.sleep(500),没有类似于自己的线程类中那么多变体,原因如下:
+  - sleep方法是Thread类的静态方法.
+  - MyThread 中sleep前不用写Thread。是因为MyThread 继承了Thread类.
+  - sleep(1000) 前面没有加类名或者对象名，表示默认当前对象的方法，mythread当前就是一个Thread所以可以不写，也可以写成this.sleep(1000)
+  - 而TestInterrupt与Thread类无任何关系，所以必须使用Thread.sleep().如果在test类中直接用sleep(200),实际上指的是被调用的那个线程而不是主线程,所以必须明确的指明是主线程也就是main线程,所以是Thread.sleep().
+  
