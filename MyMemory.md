@@ -139,4 +139,9 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
   - MyThread 中sleep前不用写Thread。是因为MyThread 继承了Thread类.
   - sleep(1000) 前面没有加类名或者对象名，表示默认当前对象的方法，mythread当前就是一个Thread所以可以不写，也可以写成this.sleep(1000)
   - 而TestInterrupt与Thread类无任何关系，所以必须使用Thread.sleep().如果在test类中直接用sleep(200),实际上指的是被调用的那个线程而不是主线程,所以必须明确的指明是主线程也就是main线程,所以是Thread.sleep().
+
+* this.interrupted():测试当前线程是否已经是中断状态,执行后具有将中断状态标识清除的功能,也就是说假如这个你在这个线程中用if(interrupted)判断了当前线程的中断状态是true,那么当前线程的中断状态就被清除了,你再次用if(interrupted)判断时,就会是false.
+* this.isinterrupted():判断当前线程是否是中断状态,但是并不清除中断标识.
+
+* 用于强制停止线程的stop()方法已经被废弃,因为如果强制停止线程有可能使得一些清理性的工作得不到完成.另外就是stop()会强制解锁已经被锁定的对象,有可能导致对象的数据得不到同步出现数据不一致问题.
   
