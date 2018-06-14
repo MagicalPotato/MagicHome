@@ -147,3 +147,5 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
 
 * 停止线程可以用如下方法: if(this.isiInterrupted) .....return; ,也可以用if(this.interrupted).....throw new interruptedException(); 推荐使用第二种,因为抛出异常之后异常能够被外层的代码捕获到,那么异常可以扩散,从而容易发现.
   
+### 锁重入机制
+* 当一个线程得到一个对象的锁之后,可以再次得到这个对象的锁.就是说一个对象中有三个同步方法,在A中可以继续调用该对象的B,B中又可以继续调用C.如果没有锁重入机制,就会造成死锁.可重入锁机制支持在父子类继承的环境中.
