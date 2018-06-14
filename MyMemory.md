@@ -144,4 +144,6 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
 * this.isinterrupted():判断当前线程是否是中断状态,但是并不清除中断标识.
 
 * 用于强制停止线程的stop()方法已经被废弃,因为如果强制停止线程有可能使得一些清理性的工作得不到完成.另外就是stop()会强制解锁已经被锁定的对象,有可能导致对象的数据得不到同步出现数据不一致问题.
+
+* 停止线程可以用如下方法: if(this.isiInterrupted) .....return; ,也可以用if(this.interrupted).....throw new interruptedException(); 推荐使用第二种,因为抛出异常之后异常能够被外层的代码捕获到,那么异常可以扩散,从而容易发现.
   
