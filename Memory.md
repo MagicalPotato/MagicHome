@@ -62,6 +62,75 @@ setColour就会覆盖A的,实际上你用的只是B的.  有一种方式,from A
 
 * list和StringBuild底层都是数组,但是他们分配空间的方式和大小是不同的,当内存不够的时候,SB是将当前的数组直接扩大一倍,然后复制老数组并添加新字符串,但是list是把当前数组的大小先拿到,然后把当前数组大小的二进制表示向右移了一位得到一个值然后把这个值和老数组的大小相加得到新数组的大小.左移几是乘以2的几次方,右移几是除以2的几次方,相当于是额外增加了老数组的一半大小. 无论是SB的数组还是list的数组,底层存的都是对象,并没有区分放进去的东西的类型.我们使用时要指定泛型,只是Java提供的语法,这样会避免很多问题.
 
+* 将一个字符串压缩
+```
+ public static void main(String[] args)
+ {
+        String str = "fffffffhg";
+        StringBuffer result = new StringBuffer();  
+        char temp = str.charAt(0);  
+        int sum = 1;  
+        for (int i = 1; i < str.length(); i++)  {  
+            char c = str.charAt(i);  
+            if (temp == c)  
+            {  
+                sum++;  
+                continue;  
+            } 
+            else
+            {
+             result.append(sum).append(temp);  
+             temp = c;  
+             sum = 1;  
+            }
+        }  
+        result.append(sum).append(temp);  
+        System.out.println(result.toString());  
+ }
+```
+
+* PO和POJO的区别: ＰＯ和ＰＯＪＯ都是持久化的对象．也就是我们平常在代码里见到的那种里面只有属性和ｇｅｔ，ｓｅｔ方法的类产生的对象．我们通常用这种对象来存储数据,然后将这个对象的字段对应到数据库的表字段上，这样就能直接将这个对象里的数据入库．但是两者也有区别．ＰＯＪＯ相对于ＰＯ来说更简洁，POJO是代码来管理的,ＰＯＪＯ对象是你在代码里创建和使用，用的是ｎｅｗ关键字，最后由ＧＣ来回收．而PO是数据库来管理,PO中会增加一些用来管理数据库entity状态的属性和方法。创建和管理都不是程序，而是数据库，在ｉｎｓｅｒｔ的时候创建一个ＰＯ对象，在ｄｅｌｅｔｅ的时候这个对象被删除，基本和数据库的生命周期相关．另外ＰＯ对象往往只能存在一个数据库Connection之中，Connnection关闭以后，持久对象就不存在了，而POJO只要不被GC回收，总是存在的。
+
+* 使用集合转数组的方法，必须使用集合的```toArray(T[] array)```，传入的是类型完全一样的数组，大小就是list.size()。
+说明：使用toArray带参方法，入参分配的数组空间不够大时，toArray方法内部将重新分配内存空间，并返回新数组地址；如果数组元素个数大于实际所需，下标为```[ list.size() ]```的数组元素将被置为null，其它数组元素保持原值，因此最好将方法入参数组大小定义与集合元素个数一致.
+```
+    正例:
+    List<String> list = new ArrayList<String>(2);
+    list.add("guan");
+    list.add("bao");
+    String[] array = new String[list.size()];
+    array = list.toArray(array);
+    反例：直接使用toArray无参方法存在问题，此方法返回值只能是Object[]类，若强转其它类型数组将出现ClassCastException错误。
+```
+
+* 使用工具类Arrays.asList()把数组转换成集合时，不能使用其修改集合相关的方法，它的add/remove/clear方法会抛出UnsupportedOperationException异常。
+ 说明：asList的返回对象是一个Arrays内部类，并没有实现集合的修改方法。Arrays.asList体现的是适配器模式，只是转换接口，后台的数据仍是数组。
+```
+    String[] str = new String[] { "you", "wu" }; 
+    List list = Arrays.asList(str); 
+    第一种情况：list.add("yangguanbao"); 运行时异常。 
+    第二种情况：str[0] = "gujin"; 那么list.get(0)也会随之修改。
+```
+
+* 不要在foreach循环里进行元素的remove/add操作。remove元素请使用Iterator方式，如果并发操作，需要对Iterator对象加锁。
+```
+    List<String> list = new ArrayList<>();
+    list.add("1");
+    list.add("2");
+    Iterator<String> iterator = list.iterator();
+    while (iterator.hasNext()) {
+        String item = iterator.next();
+        if (删除元素的条件) {
+            iterator.remove();
+        }
+    }
+```
+
+* 集合初始化时，指定集合初始值大小。 说明：HashMap使用HashMap(int initialCapacity) 初始化。hashMap在赋值时会先判断给定容量是否大于最大容量2的30次方，1<<30 =（1073741824,1左移30位就是2的30次方），如果大于此数初始化容量赋值为1<<30，如果小于此数，调用tableSizeFor方法使用位运算将初始化容量修改为2的次方数，都是向大的方向运算.比如输入13，小于2的4次方，那面计算出来桶的初始容量就是16.所以说只要输入小于16的初始容量,最终都会被初始化成16的容量.如果不指定初始容量,默认分配的就是16 (1<<4,1左移4位,相当于2的4次方)当指定的容量大于16时候,最好先估计大小,然后一次性指定,不然重新resize是很耗费内存的操作.指定为0完全就是个废物操作.
+
+* hashMap的ReSize不是简单的把长度扩大，而是经过一下两个步骤： 
+  1. 扩容:    创建一个新的Entry空数组，长度是原hashMap数组的2倍； 
+  2. ReHash:  因为长度变长，Hash的规则也随之改变了。所以要遍历原Entry数组，把所有的Entry重新Hash到新的数组。
 
 
 
