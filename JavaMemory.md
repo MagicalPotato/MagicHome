@@ -109,7 +109,7 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
 ---
 
 ## 多线程
-* join()方法会使调用join()方法的线程（也就是mt线程）所在的线程（也就是main线程）无限阻塞，直到调用join()方法的线程销毁为止，此例中main线程就会无限期阻塞直到mt的run()方法执行完毕。join()方法的一个重点是要区分出和sleep()方法的区别。join(2000)也是可以的，表示调用join()方法所在的线程最多等待2000ms，两者的区别在于：sleep(2000)不释放锁，join(2000)释放锁，因为join()方法内部使用的是wait()，因此会释放锁。看一下join(2000)的源码就知道了，join()其实和join(2000)一样，无非是join(0)而已 .  假设在main线程中调用了另一个线程,另一个线程在执行了start之后又执行了join方法,那么main线程就会一直等待另一个线程执行完毕自己才会执行.可以这样来理解,线程都是cpu的儿子,他们都相互争抢cpu资源互不相让,当mt线程执行了start之后,mt开始执行,此时main千方百计想要让自己继续执行,但是mt线程执行了join方法,这就等同于告诉main线程,你想在我执行的时候进来插一脚那是不可能的,因为我用了join,join内部是wait,而wait是释放锁的,但是如果理解成mt释放锁,那不就很矛盾吗.所以,这儿的join虽然是mt调用的,但是实际上作用受体是main,也就是main被join了,也就是main被wait了.join相当于join(0),就是说main线程你一秒都别想插进来执行. 理解起来有点绕,可以直接记住结论,但是原理还是要想一想.
+* join()方法会使调用join()方法的线程（也就是mt线程）所在的线程（也就是main线程）无限阻塞，直到调用join()方法的线程销毁为止，此例中main线程就会无限期阻塞直到mt的run()方法执行完毕。join()方法的一个重点是要区分出和sleep()方法的区别。join(2000)也是可以的，表示调用join()方法所在的线程最多等待2000ms，两者的区别在于：sleep(2000)不释放锁，join(2000)释放锁，因为join()方法内部使用的是wait()，因此会释放锁。看一下join(2000)的源码就知道了，join()其实和join(2000)一样，无非是join(0)而已 .  假设在main线程中调用了另一个线程,另一个线程在执行了start之后又执行了join方法,那么main线程就会一直等待另一个线程执行完毕自己才会执行.可以这样来理解,线程都是cpu的儿子,他们都相互争抢cpu资源互不相让,当mt线程执行了start之后,mt开始执行,此时main千方百计想要让自己继续执行,但是mt线程执行了join方法,这就等同于告诉main线程,你想在我执行的时候进来插一脚那是不可能的,因为我用了join,join内部是wait,而wait是释放锁的,但是如果理解成mt释放锁,那不就很矛盾吗.所以,这儿的join虽然是mt调用的,但是实际上作用受体是main,也就是main被join了,也就是main被wait了.join相当于join(0),就是说main线程你一秒都别想插进来执行. 理解起来有点绕,可以直接记住结论,但是原理还是要想一想.  join和sleep的区别:join在内部的实现是wait,也就是说会释放锁,而sleep执行了之后并不释放锁,别的方法想要执行得等这个sleep的线程最终执行完之后才能获得执行权.
 * 假如事先在一个线程的构造方法中用therd.getcurrentthread.getname打印,然后在main方法中去实例化这个线程对象,那么打印结果,线程的名字是main,如果在线程的run方法中去打印,然后再main方法中让线程对象.start,那么答应的结果就是当前那个线程名字.所以得出一个结论,在一个线程类中调用getcurrentthread.getname方法得到的不一定就是当前线程的名字.也就是 在main 在MyThread05里调用Thread.currentThread()返回回来的线程对象的引用未必就是MyThread05
 * sleep(long millis)方法的作用是在指定的毫秒内让当前"正在执行的线程"休眠（暂停执行）。这个"正在执行的线程"是关键，指的是Thread.currentThread()返回的线程。根据JDK API的说法，"该线程不丢失任何监视器的所属权"，简单说就是sleep代码上下文如果被加锁了，锁依然在，但是CPU资源会让出给其他线程。 也就是说这个线程如果休眠了,它会保留自己的所有状态,让其他的线程先去执行,等自己睡醒了再接着执行.
 * 这里有一个重要的概念。关键字synchronized取得的锁都是对象锁，而不是把一段代码或方法（函数）当作锁，哪个线程先执行带synchronized关键字的方法，哪个线程就持有该方法所属对象的锁，其他线程都只能呈等待状态。但是这有个前提：既然锁叫做对象锁，那么势必和对象相关，所以多个线程访问的必须是同一个对象。也就是说如果a线程先抢到了资源,那a就会一直执行完,就算是a在代码里休眠了,a也不会释方对象锁,b也只能一直干等着直到a睡醒了,执行完了b才会执行:  如果多个线程访问的是多个对象，那么Java虚拟机就会创建多个锁，就像上面的例子一样，创建了两个ThreadDomain13对象，就产生了2个锁。既然两个线程持有的是不同的锁，自然不会受到"等待释放锁"这一行为的制约，可以分别运行addNum(String userName)中的代码,所以这种情况就是谁抢到资源谁就执行.
@@ -159,5 +159,67 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
 * 使用wait和notify构建的生产消费模型,如果用于很多个生产和消费线程,很有可能出现假死状态,就是说notify有可能通知了本类的线程,比如一个生产者执行完赋值notify之后,恰好唤醒的不是一个消费者而是另一个生产者,另一个生产者发现东西并没有被消费,就会等待,而本来要消费东西的消费者由于拿不到要消费的东西,也会逐渐全都进入到等待状态,最终所有线程都会进入等待状态导致全局假死.解决办法就是使用notifyall方法,每次都唤醒所有的线程而不是随机唤醒某一个. 这样可以确保全局不会假死,但是每次notifyall也是一个不小的内存消耗,这个后续再改进.
 * Java提供了四个类可以使得线程间可已进行通信而不需要借助类似于临时文件之类的东西: 用于字节的 PipedInputStream 和 PipedOutputStream; 用于字符的PipedReader和PipedWriter.
 
+### ThreadLocal类
+* public修饰的变量所有当前执行的线程都可以使用,但是如果我想让每个线程使用自己的共有变量而不和别的线程分享,那么就需要使用ThreadLocal类.在使用的时候
+先建立一个工具类,里面建类属性 public static ThreadLocal t = new ThreadLocal(),然后在不同的线程中分别调用这个类的t然后往t中set自己的值,然后在使用的时候get,会发现,每个线程get到的都只是自己set进去的值而拿不到别的线程set的值.
 
+### java.util.concurrent.locks.Lock  java.util.concurrent.locks.Condition
+* synchronized结合wait()和notify()/notifyAll()可以实现等待通知模型.后续的jdk出现了比synchronized更灵活的可以使得线程进行异步互斥的关键字lock,通过lock中的ReentrantLock和condition结合也可以实现等待通知模型.这种方式更精确,因为用notify实现的唤醒是JVM随机唤醒,而这种方式可以对某个线程进行选择性通知.
+*
+```
+  public class TestLockAndCondition{
+    private Lock lock = new ReentrantLock();
+    private Condition con = lock.newConditon();
+    
+    public void testAwait(){
+      lock.lock();   //当有个线程要进入这个方法执行里面的内容时,先要获取当前这个方法的锁.
+      ............   //获取了锁之后开始执行需要执行的逻辑代码
+      ............
+      condition.await();   //当代码逻辑执行的差不多的时候,当前方法需要告诉别人一些信息,当满足了发消息的条件之后,当前方法await,
+      //相当于是当前方法说我已经干完我的事情了,我这会开始休息.但是有一点注意,await和object类中的wait不同,await没有释放锁的能力
+      lock.unlock();    在用lock方式实现等待通知模型的时候,锁是显示地由lock进行释放的,也就是await之后必定要unlock.
+    }
+    
+    public void testSignal(){
+      lock.lock();
+      ..........
+      ........... //业务逻辑代码
+      condition.signal(); //相当于是object类中的notify()
+      lock.unlock();
+    }
+  }
 
+  public class ThreadA extend Thread{
+  
+    private TestLockAndCondition t;
+    public ThreadA(TestLockAndCondition t){
+      super();
+      this.t = t;
+    }
+  
+    @override
+    public void run(){
+      t.testAwait();
+    }
+  }
+
+  public class ThreadB extend Thread{
+    .......
+    .......
+    
+    @override
+    public void run(){
+      t.testSignal();     //另一个线程,其他逻辑一样,只是在run中调用的方法不同.
+    }
+  }
+  
+  public static void main(String[] args){
+    TestLockAndCondition t = new TestLockAndCondition();
+    ThreadA a = new ThreadA(t);
+    ThreadB b = new ThreadB(t);
+    a.start();
+    b.start();
+  }
+```
+  
+  
