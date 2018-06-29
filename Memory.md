@@ -132,6 +132,31 @@ setColour就会覆盖A的,实际上你用的只是B的.  有一种方式,from A
   1. 扩容:    创建一个新的Entry空数组，长度是原hashMap数组的2倍； 
   2. ReHash:  因为长度变长，Hash的规则也随之改变了。所以要遍历原Entry数组，把所有的Entry重新Hash到新的数组。
 
+* 合理利用好集合的稳定性(order)和有序性(sort)，稳定性指集合每次遍历的元素次序是一定的。有序性是指遍历的结果是按某种比较规则依次排列的。
+  * ArrayList是order/unsort  固序遍历,乱序保存
+  * HashMap是unorder/unsort  乱序遍历,乱序保存
+  * TreeSet是order/sort      固序遍历,固序保存
+
+* 线程资源必须通过线程池提供，不允许在应用中自行显式创建线程。
+* 执行时间开销很大的方法或者需要极高稳定性和可用性的方法的时候最好提前进行参数校验.因为参数校验时间几乎可以忽略不计，但如果因为参数错误导致中间执行回退，或者错误，那得不偿失.
+* Math.random() 这个方法返回是double类型，取值的范围 0≤x<1(能够取到零值，注意除零异常)如果想获取整数类型的随机数，不要将x放大10的若干倍然后取整，直接使用Random对象的nextInt或者nextLong方法。
+* 任何数据结构的构造或初始化，都应指定大小，避免数据结构无限增长吃光内存。
+*  HashMap在容量不够进行resize时由于高并发可能出现死链，导致CPU飙升，在开发过程中可以使用其它数据结构或加锁来规避此风险。
+
+*  java中hashMap的默认大小为什么是2的幂次: 在hashmap的源码中。put方法会调用indexFor(int h, int length)方法，这个方法主要是根据key的hash值
+找到这个entry在table中的位置.注意最后return的是h&(length-1)。如果length不为2的幂，比如15。那么length-1的2进制就会变成1110。在hashcode为随机数的情况下，和1110做&操作。尾数永远为0。那么0001、1001、1101等尾数为1的位置就永远不可能被entry占用。这样会造成浪费，不随机等问题。源码如下：
+```
+    static int indexFor(int hashCode, int length) {
+        return hashCode & (length-1);
+    }
+```
+
+* 不要使用count(列名)或count(常量)来替代count(_*_)，count(_*_)是SQL92定义的标准统计行数的语法，跟数据库无关，跟NULL和非NULL无关。但是注意count(_*_)会统计值为NULL的行，而count(列名)不会统计此列为NULL值的行。
+
+* 禁止使用存储过程，存储过程难以调试和扩展，更没有移植性。
+* 不要写一个大而全的数据更新接口。传入为POJO类，不管是不是自己的目标更新字段，都进行update 这是不对的。执行SQL时，不要更新无改动的字段，一是易出错；二是效率低；三是增加binlog存储。
+
+
 
 
 
