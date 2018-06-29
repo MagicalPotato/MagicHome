@@ -171,6 +171,11 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
     private Lock lock = new ReentrantLock();
     private Condition con = lock.newConditon();
     
+    //private Condition con2 = lock.newCondition();  //之所以说Condition可以精准唤醒,就在于一个锁可以绑定多个Condition.这样
+    //在类中的方法中使用Condition的时候就可选择性地将不同的方法进行组合.比如当前这个例子中我的testAwait方法和testSignal方法中用的是con
+    //那么可以另外有两个方法中用的是con2这样在main中A线程调用了testAwait,这时候只有和testAwait用了同一个Condition的方法才能和其
+    //进行消息的通知.
+    
     public void testAwait(){
       lock.lock();   //当有个线程要进入这个方法执行里面的内容时,先要获取当前这个方法的锁.
       ............   //获取了锁之后开始执行需要执行的逻辑代码
