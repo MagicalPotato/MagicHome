@@ -182,6 +182,11 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
       ............
       condition.await();   //当代码逻辑执行的差不多的时候,当前方法需要告诉别人一些信息,当满足了发消息的条件之后,当前方法await,
       //相当于是当前方法说我已经干完我的事情了,我这会开始休息.但是有一点注意,await和object类中的wait不同,await没有释放锁的能力
+      
+      // condition.signal();//如果我在方法中先判断一个条件,然后await,然后再执行一些逻辑之后在这里signal,那么这就是个生产和消费
+      //模型.比如我判断一个str是不是空,如果是空,我就await,条件出来之后给str赋值然后signal.另一个方法中我也判断str是不是空,不是
+      //则await,然后将str清空再signal. 这样启两个线程分别调用两个方法,就可实现生产消费模型.
+      
       lock.unlock();    在用lock方式实现等待通知模型的时候,锁是显示地由lock进行释放的,也就是await之后必定要unlock.
     }
     
