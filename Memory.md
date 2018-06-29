@@ -173,7 +173,39 @@ while(1){
 }
 ```
 
+* 如果在主线程中创建一个子线程，默认情况下这两个线程同属于一个线程组，如果子线程发生异常，主线程可以直接使用try catch捕获的到。同样是在主线程中创建
+一个子线程，如果声明了这个子线程是另一个线程组的，即调用了new Thread(ThreadGroup group, Runnable target)，则主线程中是无法直接捕获到子线程的发生
+的异常的，不过可以通过声明一个线程组重写uncaughtException，然后把子线程放进去。但是不管怎么说，在主线程中捕获子线程的异常一般是不推荐的，线程设计
+的理念：“线程的问题应该线程自己本身来解决，而不要委托到外部。”
 
+* 大批量数据入库优化:
+ 
+  1. 合并插入
+```
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0325', '0326', '0327', 1);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0425', '0426', '0427', 2);
+修改成:
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', 'userid_0', 'content_0', 0), 
+('1', 'userid_1','content_1', 1),('2', 'userid_2','content_2', 2);
+修改后的插入操作能够提高程序的插入效率。这里第二种SQL执行效率高的主要原因是合并后日志量（MySQL的binlog和innodb的事务让日志）减少了，
+降低日志刷盘的数据量和频率，从而提高效率。通过合并SQL语句，同时也能减少SQL语句解析的次数，减少网络传输的IO。
+```
+  2. 在事务中进行插入处理
+```
+START TRANSACTION;
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('0', 'userid_0', 'content_0', 0);
+INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `type`) VALUES ('1', 'userid_1', 'content_1', 1);
+...
+COMMIT;
+使用事务可以提高数据的插入效率，这是因为进行一个INSERT操作时，MySQL内部会建立一个事务，在事务内才进行真正插入处理操作。通过使用事务可以减少创建事务
+的消耗，所有插入都在执行后才进行提交操作。
+```
+  3. 有序插入:由于数据库插入时，需要维护索引数据，无序的记录会增大维护索引的成本。我们可以参照InnoDB使用的B+tree索引，如果每次插入记录都在索引的最后
+  面，索引的定位效率很高，并且对索引调整较小；如果插入的记录在索引中间，需要B+tree进行分裂合并等处理，会消耗比较多计算资源，并且插入记录的索引定位效
+  率会下降，数据量较大时会有频繁的磁盘操作。
+  4. 总结:合并数据+事务的方法在较小数据量时，性能提高是很明显的，数据量较大时（1千万以上），性能会急剧下降，这是由于此时数据量超过了innodb_buffer的
+  容量，每次定位索引涉及较多的磁盘读写操作，性能下降较快。而使用合并数据+事务+有序数据的方式在数据量达到千万级以上表现依旧是良好，在数据量较大时，有
+  序据索引定位较为方便，不需要频繁对磁盘进行读写操作，所以可以维持较高的性能。
 
 
 
