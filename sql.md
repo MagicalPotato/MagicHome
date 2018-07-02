@@ -28,7 +28,9 @@ SELECT name,id from tab1 where name LIKE 'Fisk%' ;
 '%Fisk bean%'也可以通配  通配的大小写是根据数据库来的.有的区分有的不区分.
 --%可以匹配0个1个或多个字符.  如果一个字符串'fisk      '后面跟了很多空格,则用'f%k'来匹配它肯定不行,
 后面的空格就没了,更好的是'f%k%'  下划线_只匹配一个字符
+```
 
+```
 select clustername || '(' || cellid || ')' as aaa FROM volte.t_volte_predictresult;
 -- sql中的连字符,跟代码中的字符串连接符 + 效果相同 ,实际上有的数据库用的就是+  当用别名时,写as是很好的习惯.ALTER
 
