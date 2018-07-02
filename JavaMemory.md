@@ -240,4 +240,25 @@ ClassLoader都能打印出内容来。但是Bootstrap ClassLoader是JVM的一部
 ### 定时器Timer
 * 定时器的使用主要是对Timer类中一些方法的熟悉.Timer类中定义了一些常用的定时任务的方法,包括循环执行,延时执行,延时循环执行等等等等.....但是定时类Timer和任务类TimerTask是两个不同的类.Timer里面有这一大堆用于对任务定时的方法,但是你的任务类必须要继承自TimerTask类,比如MyClass extends TimerTask
 ,你在使用的时候先new MyClass(),然后再Timer timer = new Timer() ,然后把MyClass对象传给timer对象,和其他一些别的参数,这样来完成一个定时类和任务的编写.
+* schedule(TimerTask task, Date time)  在指定的日期执行某一次任务.如果你的时间早于系统当前时间,则任务立即执行,如果晚于,则到指定时间开始执行.
+```
+MyClass my = new MyClass();
+SimpleDataFormat sdf = new SimpleDataFormat("yyyy-MM-dd HH:mm:ss");
+Data date = sdf.parse("某个时间");
+Timer timer = new Timer(); //这个构造方法中如果传入true,则这个线程就是个守护线程
+timer.schedule(my, data);
+// 守护线程顾名思义就是要守护某个线程的线程,你的task类是一个用线程执行的类,而timer对象也是一个线程,
+它就是来管理你的task线程类的,就是你task类的保姆,当你的task类执行完之后,守护线程发现没有类可以守护了,那么它就自动强制
+退出了,如果你不把它设置为守护线程,那么当你的task类执行完了,但是timer线程还是在的并没有销毁,这时你就发现尽管你的task类执行
+完了但是控制台的那个按钮还是红色的,那就是因为守护线程在运行.  所有的线程类都可以手动set为守护还是非守护,但是一般普通的类并
+不需要设置为守护,因为你的代码逻辑又没有东西让你守护你闲的蛋疼设置那玩意干啥.
+```
+* schedule(TimerTask, Data data, Long period) 在指定日期后,按某个间隔循环执行任务. 这个指定日期也要早于系统立即执行,晚于则到时候执行.
+* TimerTask类和Timer类都有个cancle()方法,但是Timertask的cancle是将自身从任务队列移除,而Timer的则是取消整个任务队列.Timer是可以将很多个任务加到队列中进行执行的,会按照添加的先后顺序执行.
+* schedule(TimerTask task, Long delay, Long period) 以当前时间为基准,延迟指定的毫秒,再以某个时间间隔无限循环.
+* 剩下一些乱七八糟的方法在用到的时候再具体查看.
+
+
+
+
 
