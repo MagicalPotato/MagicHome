@@ -77,7 +77,9 @@ TRUNCATE from tab1;   --delete table 是删除表中的所有行,但是不删除
 update和delete都可以直接跟表名就行,但是强烈建议带上from,保持语法完整性和可移植性.
 
 DROP TABLE tab1;   --删除表结构和表中的所有数据.
+```
 
+```
 CREATE table tab1 
 (
    nename  CHAR(100) NULL,
