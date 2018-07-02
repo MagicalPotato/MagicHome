@@ -258,7 +258,59 @@ timer.schedule(my, data);
 * schedule(TimerTask task, Long delay, Long period) 以当前时间为基准,延迟指定的毫秒,再以某个时间间隔无限循环.
 * 剩下一些乱七八糟的方法在用到的时候再具体查看.
 
+### 单例模式和多线程
+* DCL双检查锁机制 目前比较好的单例和多线程结合的处理方式
+```
+public class MyClass{     //自己的业务类
+  private volatile static MyClass myClass;    //注意这里用了volatile
+  private MyClass(){}     //构造方法
+  
+  public static MyClass getInstance(){  //获取类对象的方法
+    if(MyClass != null){
+      .........
+      }else{
+        synchronized(MyClass.class){   //在这里只对这个对象加锁.如果对整个方法都加锁那么效率肯定很低下
+          if(MyClass == null){
+            MyClass = new MyClass()
+          }
+        }   
+      }
+      return myClass;
+    }
+}
 
+public class MyThread extends Thread{    //自己的业务线程类,当中用到了上面类的对象
+  @override
+  public void run{
+    .................//具体的业务逻辑.
+    System.out.print(MyClass.getInstance().hashCode())  //在这里我们只是打印了获取到的单例类对象的哈希值
+  }
+}
 
+在main方法中创建多个线程: MyThread t1  = new MyThread();........然后t1.start().......tn.start();
+打印结果是对个线程拿到的对象的哈希值都是一样的.  这种方式实现的单例模式也称为延迟模式或者懒汉模式,这样叫是因为
+这个单例的对象是在你get的时候才创建的,你没get的时候这个就没有.还有一种是立即模式,就是在创建类的时候直接就new了
+一个对象,后续检查一下这个对象是不是null,不是的话就直接使用.
+```
+* 静态内部类实现单例模式
+```
+public class Myclass{
+  private static class MyStaticClass{
+    private static MyClass aaa = new MyClass();  //直接在这个静态内部类中创建外部类的单例对象
+  }
+  .........//省略外部类的构造方法
+  
+  public static MyClass getInstance(){
+    return MyStaticClass.aaa;  //在外部类的获取单例对象的方法中直接返回内部类定义的单例对象.
+  }
+}
+.......//线程类也是打印获取到的单例对象的哈希值
+.......//main方法中同样创建多个线程并启动
 
-
+//静态内部类可以很好的避免线程安全问题,但是如果你的这个MyClass实现了序列化,在反序列化的时候还是会出问题.就不能再用
+getInstance那种方式直接返回了,而是要用反序列化的readResolve()方法,这个方法具体回头再看看,先掌握非序列化情况下的
+静态内部类单例. 
+```
+* 使用静态代码块实现单例
+静态代码块中的代码在类加载的时候就执行了,所以也可以用来实现单例.先在类中定义类对象的变量aaa = null;然后再static{aaa = new AAA();}就行了
+* 也可以利用枚举类的特性来实现单例模式. 枚举类的构造方法在枚举类被加载的时候就会被执行,和static类似,所以可以利用这个特性来实现单例.具体遇到再说.
