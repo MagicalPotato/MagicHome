@@ -24,6 +24,7 @@
 >>> s = 'supercalifragilisticexpialidocious'  # Python的字符串长度方法是len()
 >>> len(s)
 
-
+>>> u'Hello\u0020World !'  # 前面加u表示这会创建一个 Unicode 字符串。在其中包含特殊字符，可以这样.  \u0020表示Unicode的空格
+u'Hello World !'
 
 ```
