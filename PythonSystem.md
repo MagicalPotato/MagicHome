@@ -27,4 +27,18 @@
 >>> u'Hello\u0020World !'  # 前面加u表示这会创建一个 Unicode 字符串。在其中包含特殊字符，可以这样.  \u0020表示Unicode的空格
 u'Hello World !'
 
+>>> str(u"abc") # str方法默认将一个其他编码的str转成ASCII，ASCII只能接受 0 到 127 这个范围的编码，否则报错。
+'abc'
+>>> u"盲枚眉"  
+u'\xe4\xf6\xfc'
+>>> str(u"盲枚眉")  #可以看到这个装换失败
+Traceback:UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)
+
+>>> u"盲枚眉".encode('utf-8') #将一个Unicode转成其他类型
+>>> unicode('\xc3\xa4\xc3\xb6\xc3\xbc', 'utf-8')  # 将一个其他类型转成Unicode
+
+
+
+
+
 ```
