@@ -37,6 +37,8 @@ Traceback:UnicodeEncodeError: 'ascii' codec can't encode characters in position 
 
 >>> u"盲枚眉".encode('utf-8') #将一个Unicode转成其他类型
 >>> unicode('\xc3\xa4\xc3\xb6\xc3\xbc', 'utf-8')  # 将一个其他类型转成Unicode
+
+# r'dddddd\r\nxxx' 有的字符串前面会加一个r,这表示不对字符串中的内容进行转义,里面是啥就是啥
 ```
 
 ##### part2
@@ -200,5 +202,34 @@ class Reverse:
 >>> glob.glob('*.py')
 ['primes.py', 'random.py', 'quote.py']
 
+>>> import random
+>>> random.choice(['apple', 'pear', 'banana'])
+'apple'
+>>> random.sample(xrange(100), 10)   # sampling without replacement  # xrange()是range()的进化版,返回的是一个对象而不是直接的列表,你可以再
+[30, 83, 16, 4, 8, 81, 41, 50, 18, 33]       #遍历对象来取值.由于不需要一次性开辟一块很大的内存,所以性能比range()高.
+>>> random.random()    # random float
+0.17970987693706186
+>>> random.randrange(6)    # random integer chosen from range(6)
+4
 
+# 这是一个python多线程的例子
+import threading, zipfile
+
+class AsyncZip(threading.Thread):
+    def __init__(self, infile, outfile):
+        threading.Thread.__init__(self)
+        self.infile = infile
+        self.outfile = outfile
+    def run(self):
+        f = zipfile.ZipFile(self.outfile, 'w', zipfile.ZIP_DEFLATED)
+        f.write(self.infile)
+        f.close()
+        print 'Finished background zip of:', self.infile
+
+background = AsyncZip('mydata.txt', 'myarchive.zip')
+background.start()
+print 'The main program continues to run in foreground.'
+
+background.join()    # Wait for the background task to finish
+print 'Main program waited until background was done.'
 ```
