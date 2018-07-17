@@ -1,4 +1,4 @@
-###　Python3
+### Python
 #### part1
 ```
 int(x) 将x转换为一个整数。
