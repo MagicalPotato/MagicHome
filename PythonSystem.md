@@ -164,4 +164,41 @@ json.dump(x, f) # x为一个数据对象,f是一个写入模式的文件对象, 
 x=json.load(f)  # f是读模式的文件对象.  load会将里面的数据再反序列化出来. 
 
 # try ... except 语句可以带有一个 else子句 ，该子句只能出现在所有 except 子句之后。当 try 语句没有抛出异常时，需要执行一些代码，可以使用这个子句
+>>> def divide(x, y):
+...     try:
+...         result = x / y
+...     except ZeroDivisionError:
+...         print "division by zero!"
+...     else:
+...         print "result is", result
+...     finally:
+...         print "executing finally clause"
+# 不管有没有发生异常，finally子句 在程序离开 try 后都一定会被执行。当 try 语句中发生了未被 except 捕获的异常(或者它发生在 except 或 else 子句中)，在 finally 子句执行完后它会被重新抛出。try 语句经由 break，continue 或 return 语句退出也一样会执行 finally 子句
+```
+
+#### part3
+```
+# python类中的_init_方法其实就相当于是java中的构造函数,在创建新对象的时候这个构造函数被调用,你的构造函数有几个参数那么你在创建对象的时候就可以传入
+几个参数. 类变量和实例变量都和java类似.  注意 类变量,实例变量,方法变量的区别 .. python中可以定义很多拥有不同特性的特殊方法,只要是以两个下划线开始和结束的方法__xxx__都属于特殊方法,每一个被创造的类对象 都可以使用这些特殊方法,特殊方法用于完成一些特定的操作.比如java中的Object类有个toString()方法,
+你新建的类如果要更改toString的行为,那么你在你的类中就要覆写原始类的toString方法,python中的下划线方法的作用就和这种类似.  下面这个例子给类添加一个迭代器,定义一个 __iter__() 方法，使其返回一个带有 next() 方法的对象。如果这个类已经定义了 next()，那么 __iter__() 只需要返回 self
+class Reverse:
+    """Iterator for looping over a sequence backwards."""
+    def __init__(self, data):
+        self.data = data
+        self.index = len(data)
+    def __iter__(self):
+        return self
+    def __next__(self):
+        if self.index == 0:
+            raise StopIteration
+        self.index = self.index - 1
+        return self.data[self.index]
+        
+# class A(B) 这种写法表示类A继承自类B   继承的用法和java类似
+
+>>> import glob
+>>> glob.glob('*.py')
+['primes.py', 'random.py', 'quote.py']
+
+
 ```
