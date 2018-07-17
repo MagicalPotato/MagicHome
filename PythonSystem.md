@@ -1,4 +1,4 @@
-### Python
+### Python 2
 ##### part1
 ```
 >>> 5 ** 2  # 5 squared
@@ -136,4 +136,38 @@ if __name__ == "__main__":
 # 一个python包中可以包含很多模块,包中必须要有个空_init_文件以用来标识这是一个包
 import sound.effects.echo  #导入包中的echo, 但是使用时必须用全名sound.effects.echo.echofilter(input, output, delay=0.7, atten=4)
 from sound.effects import echo  #用这种方式导入可以直接用echo.echofilter()这种方式调用
+from sound.effects.echo import echofilter #这种方式可以这从模块导入函数直接使用
+
+>>> print 'We are the {1} who say "{0}!"'.format('knights', 'Ni') # python中的format方法,字符串中是用大括号进行占位.大括号中
+We are the ni who say "knights!"                                  #可以自己定义要展示哪一个字符串,根据位置进行判断.
+>>> print('The value of PI is approximately {0:.3f}.'.format(math.pi))  #字段名后允许可选的 ':' 和格式指令。下例将 Pi 转为三位精度
+The value of PI is approximately 3.142.   
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 7678} # 在字段后的 ':' 后面加一个整数会限定该字段的最小宽度，这在美化表格时很有用
+>>> for name, phone in table.items():    #这里从字典中取出每一个键值对
+...     print '{0:10} ==> {1:10d}'.format(name, phone)  #打印的时候我先打印键值对中的第一个数值,也就是key,长度是10,然后打印了个==>
+...                                                    # 最后打印了键值对中的位置为1的数据,也就是value,长度是10个字符而格式是数字.
+Jack       ==>       4098
+Dcab       ==>       7678
+Sjoerd     ==>       4127
+
+>>> f = open('workfile', 'w') #第一个参数是文件路径,第二个是模式. 模式有：'r'，只读；'w'，只写(对于同名文件，该操作使原有文件被覆盖),
+>>> print f                  # 'a'，以追加方式打开文件；'r+'，以读写方式打开文件；如果没有指定，默认为 'r' 模式。
+#在 Windows 平台上，'b' 模式以二进制方式打开文件，所以可能会有类似于 'rb'， 'wb'， 'r+b' 等等模式组合。Windows 平台上文本文件与二进制文件是有区别的，读写文本文件时，行尾会自动添加行结束符。这种后台操作方式对 ASCII 文本文件没有什么问题，但是操作 JPEG 或 EXE 这样的二进制文件时就会产生破坏。在操作这些文件时一定要记得以二进制模式打开。在unix上这样加个'b'也无害,可以用.
+# 要读取文件内容，需要调用 f.read(size)，该方法读取若干数量的数据并以字符串形式返回其内容，size 是可选的数值，指定字符串长度。如果没有指定 size 或者指定为负数，就会读取并返回整个文件。当文件大小为当前机器内存两倍时，就会产生问题。反之，会尽可能按比较大的 size 读取和返回数据。如果到了文件末尾，f.read() 会返回一个空字符串(''); f.readline()读取一行,每读取一行会给一行后加一个换行符\n,如果文件中途有空行,会返回一个只包含换行符'\n'的字符串,
+否则如果返回的是一个真正的空串'',那说明文件已经读完了.  readlines()读入文件的所有行并返回一个列表.
+# f.write('xxx') 将数据写入文件并返回写入的字符串长度,其他非字符串数据要写入也必须先转换成字符串. str()
+>>> with open('/tmp/workfile', 'r') as f: #用关键字 with 处理文件对象是个好习惯。它的先进之处在于文件用完后会自动关闭，就算发生异常也没关系。
+...     read_data = f.read()              # 它是 try-finally 块的简写
+>>> f.closed
+
+json.dump(x, f) # x为一个数据对象,f是一个写入模式的文件对象, 用这个方法可将x系列化到f中
+x=json.load(f)  # f是读模式的文件对象.  load会将里面的数据再反序列化出来. 
+
+# try ... except 语句可以带有一个 else子句 ，该子句只能出现在所有 except 子句之后。当 try 语句没有抛出异常时，需要执行一些代码，可以使用这个子句
+
+
+
+
+
+
 ```
