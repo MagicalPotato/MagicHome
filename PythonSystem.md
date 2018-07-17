@@ -178,7 +178,7 @@ x=json.load(f)  # f是读模式的文件对象.  load会将里面的数据再反
 # 不管有没有发生异常，finally子句 在程序离开 try 后都一定会被执行。当 try 语句中发生了未被 except 捕获的异常(或者它发生在 except 或 else 子句中)，在 finally 子句执行完后它会被重新抛出。try 语句经由 break，continue 或 return 语句退出也一样会执行 finally 子句
 ```
 
-#### part3
+#### part4
 ```
 # python类中的_init_方法其实就相当于是java中的构造函数,在创建新对象的时候这个构造函数被调用,你的构造函数有几个参数那么你在创建对象的时候就可以传入
 几个参数. 类变量和实例变量都和java类似.  注意 类变量,实例变量,方法变量的区别 .. python中可以定义很多拥有不同特性的特殊方法,只要是以两个下划线开始和结束的方法__xxx__都属于特殊方法,每一个被创造的类对象 都可以使用这些特殊方法,特殊方法用于完成一些特定的操作.比如java中的Object类有个toString()方法,
@@ -215,7 +215,7 @@ class Reverse:
 # 这是一个python多线程的例子
 import threading, zipfile
 
-class AsyncZip(threading.Thread):
+class AsyncZip(threading.Thread):       # 直接继承线程类
     def __init__(self, infile, outfile):
         threading.Thread.__init__(self)
         self.infile = infile
