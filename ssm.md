@@ -63,9 +63,12 @@
  </listener>
 
 
- <!-- 这就是spring的核心控制器DispatcherServlet,也是前端控制器 -->
+ <!-- 这就是spring的核心控制器DispatcherServlet,也是前端控制器 ,这个控制器在加载的时候需要一个springMVC的配置文件,这个配置文件默认是放在
+ WEN-INF根目录,如果你的文件不是放在根目录,那么init-param标签就是用来指定你这个配置文件的路径的.注意这里的servlet-name一定要和配置文件的名称
+ 保持一致. lode-on-startup这个标签的作用是告知服务器啥时候创建servlet实例,如果值>=0,那么就是在web服务启动时就初始化这个servlet,数字越小
+ 创建时间越早,小于0或者不指定时,表明在使用的时候才初始化.-->
  <servlet>
-  <servlet-name>myservlet</servlet-name>
+  <servlet-name>springmvc</servlet-name>
   <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
   <init-param>
    <param-name>contextConfigLocation</param-name>
@@ -257,7 +260,11 @@
  <!-- 加载属性文件 -->
  <context:property-placeholder location="classpath:resource.properties" />
  
- <!--配置扫描器.自动扫描你在这里配的包中使用了注解的类.这个base-package属性就是表示要进行自动扫描的包-->
+ <!--配置扫描器.自动扫描你在这里配的包中使用了注解的类.这个base-package属性就是表示要进行自动扫描的包.spring会自动去扫描你配的那个包或者其
+ 子包中的java文件,如果扫描到带有@controller或@service或@component等注解的类,则把这些类注册为bean,这里配的是指只扫@controller的,注意自动扫描
+ 的配置是下面那一行配置,应该把下面那个简化的配置放到这个配置上面比较合适,虽然放哪都没错. 如果我们从浏览器要访问一个web资源,请求会先被servlet拦截,
+ 然后servlet去扫描配置的路径下有@controller的类,然后你的方法里肯定还有个@requestmapping的参数,里面配了你页面访问的那个资源到底对应到哪个方法.
+ 只要你有自动扫描的配置,在代码里和url中也正确的把映射关系整对了,那就会自动去找到正确的方法.-->
  <context:component-scan base-package="com.company.ssm.crm.controller" />
  
  <!--  会自动注册spring分发请求所必须的三个bean,这三个bean是@Controllers分发请求所必须的，相当于是你不做处理时的一种默认配置.
@@ -265,6 +272,7 @@
  只要加了这个配置就会默认初始化这三个bean,以便于让用户更方便的实现自定义的实现类。实际上这是一种简写方式, 完全可以用原始的配置
  方式来更改这三个bean,比如下一个标签就用原始方式重新配置了一个视图解析器,这样在初始化的时候前两个就会用默认,而视图解析用你配的上-->
  <mvc:annotation-driven />
+ 
  <!-- 配置了一个自己的视图解释器 专门用来解析jsp -->
  <bean id="jspViewResolver"
   class="org.springframework.web.servlet.view.InternalResourceViewResolver">
