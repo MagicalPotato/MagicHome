@@ -14,3 +14,7 @@
   - ctrl + / 批量注释 
   - ctrl ➕ - 折叠某个方法     ctrl + shift ➕ - 全部代码折叠    打开是 ➕ + 
 * 选中一个文件,右键有个copy path,然后把这个路径粘贴在文件中,这个路径就是这个文件的全路径. 右键 show in explorer 会直接在文件夹中打开该文件
+* 消除告警
+  * settings-editor-inspections 将所有PEP8的选项去除对勾(用于def函数的命名检查和导包时候的检查)
+  * settings-editor-inspections 找到spelling选项,下面就一项typo,把typo的对勾去除(去除部分变量的命名)
+  * settings-editor-color scheme-general-errors and warnings 把其中的weak warning选中,然后把右边的对勾去掉(还是消除变量命名的告警)
