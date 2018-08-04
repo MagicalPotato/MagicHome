@@ -20,16 +20,16 @@
 
 
 
-技能:
-熟练使用java,python编程语言.
-熟练使用sql,能对sql进行优化. 
-熟练使用 svn,maven 版本和项目管理工具. 
-熟练使用eclipse,pycharm集成开发环境.
+##### 技能:
+* 熟练使用java,python编程语言.
+* 熟练使用sql,能对sql进行优化. 
+* 熟练使用 svn,maven 版本和项目管理工具. 
+* 熟练使用eclipse,pycharm集成开发环境.
 
-熟悉spring ,mybatis框架.
-熟悉ant,git版本项目工具. 
-会用hbase数据库,了解其原理.
-会用kafka消息队列,能够用java线程实现简单消息队列.
-能看懂 JavaScript,html,css代码. 
-会使用linux,了解一些简单的命令,目前正在加强这一块.
-
+* 熟悉spring ,mybatis框架.
+* 熟悉ant,git版本项目工具. 
+* 会用hbase数据库,了解其原理.
+* 会用kafka消息队列,能够用java线程实现简单消息队列.
+* 会用linux,了解常见命令,目前正在加强这一块.
+* 了解http,tcp等常见网络协议.
+* 能看懂 JavaScript,html,css代码. 
