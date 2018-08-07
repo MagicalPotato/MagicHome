@@ -36,6 +36,13 @@ sysfs文件系统集成了下面3种文件系统的信息：针对进程信息�
   - 假设我当前在/root/ 目录下,我创建了一个新的目录 mkdir xxx,如果使用绝对路径法切换到xxx目录的话是这样: cd /root/xxx/  ,如果使用相对路径就是这样:
 cd ./xxx/   ,如果返回上一级就是 cd ..  ,返回root 目录是 cd ~
   - mkdir test 在你cd到的那个目录下创建test目录   mkdir -p test1/test2test3/ 递归创建所有目录  mkdir -m 777 test 创建目录并指定权限
+  - rmdir test 删除空目录test,非空删不掉  rm test 删除非空目录test
+  - 用 root 身份，将 root 目录下的 .bashrc 复制到 /tmp 下，并命名为 bashrc    cp ~/.bashrc /tmp/bashrc  
+  带i参数会询问是否覆盖原有的 cp -i ~/.bashrc /tmp/bashrc  一般-i在很多场景下都是询问是否操作,-r一般都是递归操作
+  - cp ~/.bashrc xxx 复制一文件并指定新的名字xxx,  mv xxx mvtest  把xxx移动到mvtest这个目录中去, mv a a2,a重命名实际上就是移动到一个新名字a2
+  - cat /etc/issue 查看issue这个文件内容,从第一行开始显示  tac /etc/issue  也是查看不过从最后一行开始显示 , nl /etc/issue  也是查看,不过显示每行的行号, more /etc/xxx.txt  打开文档后可以使用enter翻行,空格翻页,q退出,其余自查,   less /etc/xxx.txt  less和more类似,不过用page up和page down
+翻页,q退出,其他自查,  head -n 20 /etc/xxx.txt ,显示文档头几行, 不加-n 20 默认显示10行. tail显示后几行,用法相同
+* **在Linux系统中,一切皆文件,啥都是文件,哪怕是一个链接也是一个文件,内核会为每一个新创建的文件分配一个唯一的Inode(索引结点).文件属性会被保存在索引结点里，在访问文件时，会先将索引结点被复制到内存在，从而实现文件的快速访问。硬链接是啥意思呢,硬链接就是为xxx.txt这个文件创建的多个指针,每个指针指向的都是xxx.txt这个文件本身,这个指针可以叫不同的名字,相当于xxx.txt这文件有a,b,c三个别名,也就是三个硬链接,这个三个硬链接都是别人在使用的,但是他们都最终指向的是xxx.txt这个文件,当有个用户删了a这个链接之后,xxx.txt并不会被真实的删除,只有当abc三个链接都被删除之后,xxx.txt才真正被删除. 而软链接并不是一个指向真实文件的指针,它是一个新文件,这个新文件里写了xxx.txt这个文件的地址,所以是个软链接,软链接就是不直接指向文件,而是自己保存了文件的地址,你需要根据软链接文件中保存的地址去访问xxx.txt这个文件,所以软链接有不同的节点号,而硬链接节点号都是一样的**
 * useradd user  #新添加一个用户,任何版本都通用
 * passwd  # 给用户设置密码,linux系统在任何场景下设置密码光标都不会有任何反应
 * userdel # 删除某个用户,有个-r的选项,可以一并删除该用户的home目录,root下要慎用,不但杀人还抄家.linux的每个用户都有一个home目录,存放着个用户的东西
