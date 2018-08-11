@@ -78,6 +78,21 @@ funWithReturn(){        #所有函数在使用前必须定义。这意味着必�
 funWithReturn
 echo "输入的两个数字之和为 $? !"        #  函数返回值在调用该函数后通过 $? 来获得,调用函数仅使用其函数名即可。 
 ```
+* 重定向
+```
+command > file 将输出重定向到 file。  # file内的已经存在的内容将被新内容替代。如果要将新内容添加在文件末尾，请使用>>操作符
+command < file将输入重定向到 file。
+command >> file将输出以追加的方式重定向到 file。
+n > file将文件描述符为 n 的文件重定向到 file。      # 文件描述符 0 通常是标准输入（STDIN），1 是标准输出（STDOUT），2 是标准错误输出（STDERR）
+n >> file将文件描述符为 n 的文件以追加的方式重定向到 file。
+n >& m将输出文件 m 和 n 合并。
+n <& m将输入文件 m 和 n 合并。
+<< tag将开始标记 tag 和结束标记 tag 之间的内容作为输入。
+
+$ who > users  # who 命令将完整的输出重定向在用户文件中users, 执行后，并没有在终端输出信息，因为输出已被从终端重定向到文件
+$ cat users  #可以使用cat命令来查看文件中的内容
+command1 < infile > outfile  # 同时替换输入和输出，执行command1，从文件infile读取内容，然后将输出写入到outfile中。
+```
 
 
 
