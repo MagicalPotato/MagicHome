@@ -99,6 +99,10 @@ $ command > /dev/null  # 如果希望执行某个命令，但又不希望在屏�
 如果希望屏蔽 stdout 和 stderr，可以这样写： $ command > /dev/null 2>&1
 ```
 
+* 如果有两个脚本a.sh和b.sh,那么在b中引用a可以这样写, . ./a.sh , 注意第一个点表示引用文件,之后有个空格,然后./a.sh代表当前目录下你的a.sh文件,
+还有另一种引用方式, source ./a.sh
+
+
 
 
 
