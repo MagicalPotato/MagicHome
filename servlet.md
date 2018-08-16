@@ -47,8 +47,9 @@ public class HelloForm extends HttpServlet
 
 * String name =new String(request.getParameter("name").getBytes("ISO8859-1"),"UTF-8");一般代码中我们获取前台传来的参数都是这样获取的,但是这样
 有可能会导致中文全成了乱码或者全是问号.说到这里那就有必要再说一下编码问题,getBytes()这个方法可以带参数,也可以不带参数,不带参数呢就是说我用平台默认的编码字符集将从电路里传过来的信息搞搞成一个字节数组,注意这里是指平台,意思是说,加入你前台传来了一串a编码的信息,但是现在整个环境用的编码是b,那getBytes把这串信息取过来之后就自动把这串信息转换成b编码了. 而带参数的getBytes("ISO8859-1")意思是不管当前平台用的是什么编码,也不管你传来的信息是什么编码,我都是用参数指定的编码格式把这串信息搞成一个字节数组.  那么现在问题来了,tomcat8默认的编码是utf8,一般平台指的就是你的后台服务器,也就是指你的tomcat,那么现在页面是部署在tomcat上,所以整个环境的默认编码就是utf-8,那么前台传过来的信息自然也就是utf-8,可是你用getBytes解码的时候却用的别的编码格式来解,这就肯定会出错.可能有的人会问了,解完码之后不是又用把信息转换成了utf-8的字符串了吗,这不就是又转回utf-8了吗,转过来转过去都是utf8啊,咋还会乱码呢? 所以说你还是不理解编码的本质, 你前台传来的信息是utf8,你解析自然得用utf8才能解出来,你用了别的编码来解析,但是别的编码里面不一定就有你这个码啊,假如你的utf8里面'傻'这个字是用1002这串数字来表示,但是在ISO里面可能人家根本没这个字,可能也没有1002这串码,那你的这串码最终不就被丢弃了吗,丢弃了之后你的码不就少了吗,原本是5555 1002 3699 8888,结果编成ISO之后码成了5555 3699 8888,因为new String的时候是不是就会少一个字,少了一个字那么有可能取码的时候位置就发生了错乱,然后整个信息都屌了,成了乱码或者问号.  所以说,你用什么码编的信息,你就用什么码来解,这样就不会错,平台现在默认就是utf8的编码,那你就自然没有必要再去转换一遍,String name =new String(request.getParameter("name"));直接用默认的码去取就行了. 很多人不理解编码的原理,所以用ISO去解结果自然就屌了. 还有啊,即便以后遇到需要转换编码的场景,也一定要养成习惯要用unicode去编和解,因为Unicode是最全的码,即便以后有人要用你的东西不知道你用的什么码,至少尝试一下还是有希望试出来的,不然你用个乱七八糟的码别人想试也试不出来.
-* 获取http请求中信息的部分常用方法注意下:
+* 获取http请求中信息的部分方法和往response中设置信息的部分方法注意下:
 ```
+从request中获取信息:
 Cookie[] getCookies()  返回一个数组，包含客户端发送该请求的所有的 Cookie 对象
 HttpSession getSession() 返回与该请求关联的当前 session 会话，或者如果请求没有 session 会话，则创建一个。
 Locale getLocale() 基于 Accept-Language 头，返回客户端接受内容的首选的区域设置
@@ -57,4 +58,46 @@ String getCharacterEncoding() 返回请求主体中使用的字符编码的名�
 String getHeader(String name) 以字符串形式返回指定的请求头的值。
 String getParameter(String name) 这个最常用,以字符串形式返回请求参数的值，或者如果参数不存在则返回 null。
 String[] getParameterValues(String name) 返回一个字符串对象的数组，包含所有给定的请求参数的值，如果参数不存在则返回 null。
+往response中设置信息:
+void addCookie(Cookie cookie)  把指定的 cookie 添加到响应。
+void addHeader(String name, String value) 添加一个带有给定的名称和值的响应报头。
+void setCharacterEncoding(String charset)  设置被发送到客户端的响应的字符编码（MIME 字符集）例如，UTF-8。
+void setHeader(String name, String value)  设置一个带有给定的名称和值的响应报头。
+void setStatus(int sc)  为该响应设置状态码。
+一个例子: 当服务启动,通过地址调用了这个servlet之后页面会显示时间日期并且每隔5秒刷新一次时间日期.
+public class Refresh extends HttpServlet {
+      public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException
+      {
+          response.setIntHeader("Refresh", 5);  // 设置刷新自动加载时间为 5 秒
+          response.setContentType("text/html;charset=UTF-8"); // 设置响应内容类型
+          Calendar cale = Calendar.getInstance();  //使用默认时区和语言环境获得一个日历    
+          Date tasktime=cale.getTime();  //将Calendar类型转换成Date类型  
+          SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");   //设置日期输出的格式  
+          String nowTime = df.format(tasktime);     //格式化输出  
+          
+          PrintWriter out = response.getWriter();  // 把信息通过打印的方式传回页面
+          String title = "这是一个展示时间没隔5秒自动刷新的例子";
+          String docType = "<!DOCTYPE html>\n";
+          out.println(docType +
+            "<html>\n" +
+            "<head><title>" + title + "</title></head>\n"+
+            "<body bgcolor=\"#f0f0f0\">\n" +
+            "<h1 align=\"center\">" + title + "</h1>\n" +
+            "<p>当前时间是：" + nowTime + "</p>\n");
+      }
+}
+<?xml version="1.0" encoding="UTF-8"?>  
+<web-app>  
+  <servlet>  
+     <!-- 类名 -->  
+    <servlet-name>Refresh</servlet-name>  
+    <!-- 所在的包 -->  
+    <servlet-class>com.runoob.test.Refresh</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>Refresh</servlet-name>  
+    <!-- 访问的网址 -->  
+    <url-pattern>/TomcatTest/Refresh</url-pattern>    //这里就是能调到这个servlet的部分地址,前面再拼上协议,ip和端口就是一个完整的地址
+    </servlet-mapping>  
+</web-app>
 ```
