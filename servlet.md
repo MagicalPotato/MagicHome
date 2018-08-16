@@ -123,7 +123,26 @@ public class Refresh extends HttpServlet {
 
 这里是一个servlet的配置,省略.......... 虽然过滤器和servlet之间并无顺序,但是约定俗成先配过滤器后配servlet
 
-可以看出来web.xml其实也没多少东西,主要就这几个 <filter> <filter-mapping> <servlet> <servlet-mapping>
+可以看出来web.xml其实也没多少东西,主要就这几个 <filter> <filter-mapping> <servlet> <servlet-mapping>,当然还有异常,
+顺便在这里举个异常的例子:
+<servlet>
+        <servlet-name>ErrorHandler</servlet-name>
+        <servlet-class>com.runoob.test.ErrorHandler</servlet-class>  //事先写好处理异常的servlet
+</servlet>
+<!-- servlet mappings -->
+<servlet-mapping>
+        <servlet-name>ErrorHandler</servlet-name>
+        <url-pattern>/TomcatTest/ErrorHandler</url-pattern>  //当正常请求报错之后请求会被重定向到这个异常请求
+</servlet-mapping>       //这个异常请求就会交给ErrorHandler这个servlet去处理
+<error-page>
+    <error-code>404</error-code>
+    <location>/TomcatTest/ErrorHandler</location>  
+</error-page>
+<error-page>
+    <exception-type>java.lang.Throwable</exception-type >  //这里表示无论出了任何异常都是用ErrorHandler这个servlet去处理
+    <location>/ErrorHandler</location>   //你可以在这里根据不同的异常指定不同的servlet去处理.
+</error-page>
+
 
 -------------下面是个过滤器----------
 public class LogFilter implements Filter   // 过滤器要实现javax.servlet.Filter 接口,里面就三个方法
