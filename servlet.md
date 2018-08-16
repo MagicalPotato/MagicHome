@@ -26,7 +26,7 @@ localhost:8080/xxxTomcat/xxx.html, 这个地址的意思是你本地启了一个
   </servlet>  #对这个请求作出的各种操作的功能逻辑代码.
   <servlet-mapping>
     <servlet-name>HelloForm</servlet-name>  # 而localhost:8080/task/HelloForm中的/task/HelloForm,指的就是mapping标签中的/task/HelloForm
-    <url-pattern>/task/HelloForm</url-pattern> #也就是说地址里的这一串东西/task/HelloForm,会在文件中会被映射成一个叫HelloForm的servlet
+    <url-pattern>/task/HelloForm</url-pattern> #也就是说/task/HelloForm这个地址,会在文件中会被映射成一个叫HelloForm的servlet
   </servlet-mapping> # 而这个叫HelloForm的servlet就是上面com.runoob.test包下的那个HelloForm.java,
 </web-app>
 ```
@@ -47,3 +47,14 @@ public class HelloForm extends HttpServlet
 
 * String name =new String(request.getParameter("name").getBytes("ISO8859-1"),"UTF-8");一般代码中我们获取前台传来的参数都是这样获取的,但是这样
 有可能会导致中文全成了乱码或者全是问号.说到这里那就有必要再说一下编码问题,getBytes()这个方法可以带参数,也可以不带参数,不带参数呢就是说我用平台默认的编码字符集将从电路里传过来的信息搞搞成一个字节数组,注意这里是指平台,意思是说,加入你前台传来了一串a编码的信息,但是现在整个环境用的编码是b,那getBytes把这串信息取过来之后就自动把这串信息转换成b编码了. 而带参数的getBytes("ISO8859-1")意思是不管当前平台用的是什么编码,也不管你传来的信息是什么编码,我都是用参数指定的编码格式把这串信息搞成一个字节数组.  那么现在问题来了,tomcat8默认的编码是utf8,一般平台指的就是你的后台服务器,也就是指你的tomcat,那么现在页面是部署在tomcat上,所以整个环境的默认编码就是utf-8,那么前台传过来的信息自然也就是utf-8,可是你用getBytes解码的时候却用的别的编码格式来解,这就肯定会出错.可能有的人会问了,解完码之后不是又用把信息转换成了utf-8的字符串了吗,这不就是又转回utf-8了吗,转过来转过去都是utf8啊,咋还会乱码呢? 所以说你还是不理解编码的本质, 你前台传来的信息是utf8,你解析自然得用utf8才能解出来,你用了别的编码来解析,但是别的编码里面不一定就有你这个码啊,假如你的utf8里面'傻'这个字是用1002这串数字来表示,但是在ISO里面可能人家根本没这个字,可能也没有1002这串码,那你的这串码最终不就被丢弃了吗,丢弃了之后你的码不就少了吗,原本是5555 1002 3699 8888,结果编成ISO之后码成了5555 3699 8888,因为new String的时候是不是就会少一个字,少了一个字那么有可能取码的时候位置就发生了错乱,然后整个信息都屌了,成了乱码或者问号.  所以说,你用什么码编的信息,你就用什么码来解,这样就不会错,平台现在默认就是utf8的编码,那你就自然没有必要再去转换一遍,String name =new String(request.getParameter("name"));直接用默认的码去取就行了. 很多人不理解编码的原理,所以用ISO去解结果自然就屌了. 还有啊,即便以后遇到需要转换编码的场景,也一定要养成习惯要用unicode去编和解,因为Unicode是最全的码,即便以后有人要用你的东西不知道你用的什么码,至少尝试一下还是有希望试出来的,不然你用个乱七八糟的码别人想试也试不出来.
+* 获取http请求中信息的部分常用方法注意下:
+```
+Cookie[] getCookies()  返回一个数组，包含客户端发送该请求的所有的 Cookie 对象
+HttpSession getSession() 返回与该请求关联的当前 session 会话，或者如果请求没有 session 会话，则创建一个。
+Locale getLocale() 基于 Accept-Language 头，返回客户端接受内容的首选的区域设置
+Object getAttribute(String name) 以对象形式返回已命名属性的值，如果没有给定名称的属性存在，则返回 null。
+String getCharacterEncoding() 返回请求主体中使用的字符编码的名称
+String getHeader(String name) 以字符串形式返回指定的请求头的值。
+String getParameter(String name) 这个最常用,以字符串形式返回请求参数的值，或者如果参数不存在则返回 null。
+String[] getParameterValues(String name) 返回一个字符串对象的数组，包含所有给定的请求参数的值，如果参数不存在则返回 null。
+```
