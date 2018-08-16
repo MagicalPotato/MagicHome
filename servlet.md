@@ -21,14 +21,14 @@ localhost:8080/xxxTomcat/xxx.html, 这个地址的意思是你本地启了一个
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app>
   <servlet>
-    <servlet-name>HelloForm</servlet-name>   # 这个HelloForm对应了com.runoob.test包下的一个类,类名叫HelloForm,且一定extends HttpServlet,对应
-    <servlet-class>com.runoob.test.HelloForm</servlet-class> #的文件就是该包下的HelloForm.java. 这个类就是你这个项目处理请求的servlet,里面写了
+    <servlet-name>HelloForm</servlet-name>  # 这个HelloForm对应了com.runoob.test包下的一个类,类名叫HelloForm,且一定extends HttpServlet,对应
+    <servlet-class>com.runoob.test.HelloForm</servlet-class> #的文件就是该包下的HelloForm.java. 该类就是你这个项目处理请求的servlet,里面写了
   </servlet>  #对这个请求作出的各种操作的功能逻辑代码.
   <servlet-mapping>
-    <servlet-name>HelloForm</servlet-name>  # 而localhost:8080/task/HelloForm中的/task/HelloForm,指的就是mapping标签中的/task/HelloForm
-    <url-pattern>/task/HelloForm</url-pattern> #也就是说/task/HelloForm这个地址,会在文件中会被映射成一个叫HelloForm的servlet
-  </servlet-mapping> # 而这个叫HelloForm的servlet就是上面com.runoob.test包下的那个HelloForm.java,
-</web-app>
+    <servlet-name>HelloForm</servlet-name>  # localhost:8080/task/HelloForm中的/task/HelloForm,指的就是这个mapping标签中的url-pattern,当
+    <url-pattern>/task/HelloForm</url-pattern> #浏览器访问/task/HelloForm这个地址时,后台会让HelloForm这个servlet来处理这个请求,这个servlet必
+  </servlet-mapping> # 须要被定义,上面<servlet>标签就是用来定义servlet的,也就是说,<servlet-mapping>和<servlet>标签并无先后顺序和位置顺序,只要
+</web-app> # 你的mapping中用的servlet你定义了就行. mapping会根据你写的名称去找对应的servlet来处理这个请求.
 ```
 * 随着项目的不断发展,你页面要调用的借口肯定也越来越多,那么这么多的接口你也都得配置到web.xml这个文件中才行,不然页面还是个找不到,如果你有一千个方法
 那么你的配置得配到多长那真是难以想象,而且改起来也是个麻烦事.为了解决这种麻烦事,框架被发明出来了,页面所有的请求都统一交给框架去处理了,web.xml也清净了,
@@ -64,7 +64,9 @@ void addHeader(String name, String value) 添加一个带有给定的名称和�
 void setCharacterEncoding(String charset)  设置被发送到客户端的响应的字符编码（MIME 字符集）例如，UTF-8。
 void setHeader(String name, String value)  设置一个带有给定的名称和值的响应报头。
 void setStatus(int sc)  为该响应设置状态码。
-一个例子: 当服务启动,通过地址调用了这个servlet之后页面会显示时间日期并且每隔5秒刷新一次时间日期.
+```
+#### 一个例子: 当服务启动,通过地址调用了这个servlet之后页面会显示时间日期并且每隔5秒刷新一次时间日期.
+```
 public class Refresh extends HttpServlet {
       public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException
       {
@@ -100,4 +102,51 @@ public class Refresh extends HttpServlet {
     <url-pattern>/TomcatTest/Refresh</url-pattern>    //这里就是能调到这个servlet的部分地址,前面再拼上协议,ip和端口就是一个完整的地址
     </servlet-mapping>  
 </web-app>
+```
+#### 过滤器
+* 过滤器,或者叫做拦截器,实际上做的工作相当于一个门卫,可以对请求或响应(Request、Response)统一设置编码或者逻辑判断(通常是用户校验)，以此简化操作.如用户是否已经登陆、有没有权限访问该页面等等工作。它是随你的web应用启动而启动的，只初始化一次，以后就可以拦截相关请求，只有当你的web应用停止或重新部署的时候才销毁。无论是过滤器还是servlet,都是对目标而言的,比如当前这个配置是拦截所有请求,那我如果改成<url-pattern>/index.jsp<url-pattern>,那么就是只拦截发到index.jsp这个页面的请求.servlet也是一样.
+```
+<?xml version="1.0" encoding="UTF-8"?>  
+<web-app>  
+<filter>
+  <filter-name>LogFilter</filter-name>
+  <filter-class>com.runoob.test.LogFilter</filter-class>  # LogFilter拦截器实际上就是test包下的LogFilter.java类
+  <init-param>
+    <param-name>Site</param-name>
+    <param-value>在拦截器初始化的时候可以通过指定方法来获取到这个标签中的值,动态配置可以少写重复代码</param-value>
+  </init-param>
+</filter>
+<filter-mapping>
+  <filter-name>LogFilter</filter-name>  # 在用filter 的mapping之前也是要先在上面定义filter
+  <url-pattern>/*</url-pattern>  #所有请求都要先给LogFilter这个拦截类先处理一遍
+</filter-mapping>  # 注意了!!!!! servlet的映射没有顺序,但是拦截器有顺序,假设你配置了多个拦截器,会按照配置从上到下去执行.
+
+这里是一个servlet的配置,省略.......... 虽然过滤器和servlet之间并无顺序,但是约定俗成先配过滤器后配servlet
+
+可以看出来web.xml其实也没多少东西,主要就这几个 <filter> <filter-mapping> <servlet> <servlet-mapping>
+
+-------------下面是个过滤器----------
+public class LogFilter implements Filter   // 过滤器要实现javax.servlet.Filter 接口,里面就三个方法
+{
+    public void  init(FilterConfig config) throws ServletException {
+        String site = config.getInitParameter("Site");  // 这个就是在配置中你配的那个参数,可以通过参数名称取到值      
+        System.out.println("网站名称: " + site);  // 用参数的代码. 一般参数都是用来初始化的 
+    }
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+        throws IOException, ServletException {     // doFilter 里面就是你拦截了请求之后要干的事情
+        //http://localhost:8080/servlet_demo/helloword?name=123
+        String name = req.getParameter("name");  // 比如你在这里取出了地址中的名称然后去校验
+        if("123".equals(name)){
+            // 把请求传回过滤链
+            chain.doFilter(req, resp); //这段话其实就是放行请求,并不是说又去调用了个别的doFilter,调这个就表示请求继续往下走
+        }else{
+            resp.setContentType("text/html;charset=GBK"); //设置返回内容类型
+            PrintWriter out = resp.getWriter();  // 验证失败则返回页面新的失败信息
+            out.print("<b>name不正确，请求被拦截，不能访问web资源</b>");
+            System.out.println("name不正确，请求被拦截，不能访问web资源");
+    }
+    public void destroy( ){
+        // 在 Filter 实例被 Web 容器从服务移除之前调用 ,比如一些资源保存之类的善后工作.
+    }
+}
 ```
