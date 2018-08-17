@@ -236,7 +236,7 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) thro
         String userIDKey = new String("userID");
         String userID = new String("Runoob");
     
-        if (session.isNew()){         // 检查网页上是否有新的访问者
+        if (session.isNew()){         // isNew() 方法来检查该 session 会话是否已点击过相同页面
             title = "一个session的例子";
             session.setAttribute(userIDKey, userID);
         } else {
@@ -335,4 +335,15 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) thro
 }
 ```
 ##### 一点小总结
-* 从最开始的单个页面的servlet,到后面在页面上添加其他的功能,再到最后的上传下载,可以发现,页面的每个操作都对应着后台的一个servlet来处理,这样就有个麻烦,如果页面要做的功能特别多的话,那你后台的servlet肯定也分门别类地要配置多个才行,这样的话肯定繁琐不堪.所以这也是spring这种框架诞生的一个原因,把所有的请求都交给spring的一个总的servlet去处理,然后该servlet再根据请求去找适配器,并最终找到能处理这个请求的处理器.这样的话原始的结构和框架的运作机制大致上就很清晰了.
+* 从最开始的单个页面的servlet,到后面在页面上添加其他的功能,再到最后的上传下载,或者说后续的发邮件,听歌看电影等等,可以发现,页面的每个操作都对应着后台的一个servlet来处理,只要你后台写好了处理对应操作的servlet,然后把servlet在web.xml中注册好,前台按要求调用就行了.但是这样也会有麻烦,如果页面要做的功能特别多的话,那你后台的servlet肯定也分门别类地要配置多个才行,这样的话肯定繁琐不堪.所以这也是spring这种框架诞生的一个原因,把所有的请求都交给spring的一个总的servlet去处理,然后该servlet再根据请求去找适配器,并最终找到能处理这个请求的处理器.这样的话原始的结构和框架的运作机制大致上就很清晰了.
+* 由于一次网页点击就是一个新的session会话,所以有时候我们可以通过计数的方式来统计某个网页被点击了多少次.在servlet类中定义一个全局变量,在初始化方法中赋值为0,然后每次处理一次doGet或者doPost方法计数就加1,这样当你不断刷新页面这个数字就不断增加,在servlet的destory方法中你可以把这个计数值写入文件或者保存到数据库中去. 同样的道理可以用来对整个网站的访问次数进行统计,只需要搞一个过滤器,把有的请求都交给过滤器去处理,还是定义全局变量,然后每次调用doFilter的时候计数加1,这样就可以对网站的整体访问进行计数.
+* Apache Tomcat 是一个开源软件，实现了对 Java Servlet 和 JSP（JavaServer Pages）技术的支持。相当于一个servlet容器.
+* 国际化的一些东西:不同的地区肯定有差异,但是无论啥差异,都可以先从请求中获取到当地的信息,然后根据当地信息去格式化和处理诸如日期,数字,货币,语言等等的各种信息:
+```
+Locale locale = request.getLocale();
+String language = locale.getLanguage();
+String country = locale.getCountry();
+
+response.setHeader("Content-Language", "es"); //设置语言
+String date = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT, locale).format(new Date( )); 格式化日期
+```
