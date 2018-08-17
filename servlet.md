@@ -169,3 +169,54 @@ public class LogFilter implements Filter   // 过滤器要实现javax.servlet.Fi
     }
 }
 ```
+#### cookie
+* Cookie 是存储在**客户端计算机**上的**文本文件**，用来保存各种跟踪信息.在浏览器首次访问服务器脚时,服务器会向该浏览器发送一组 Cookie。例如：姓名、年龄或识别号码等,浏览器将这些信息存储在本地计算机上，当下一次浏览器向 Web 服务器发送任何请求时，浏览器会把这些 Cookie 信息发送到服务器，服务器将使用这些信息来识别用户。看一个在doGet方法中处理cookie的例子:
+```
+public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        // 如果操作的cookie涉及到中文那么需要进行编码和转码
+        String   str   =   java.net.URLEncoder.encode("中文"，"UTF-8");            //编码
+        String   str   =   java.net.URLDecoder.decode("编码后的字符串","UTF-8");   // 解码
+
+        // 以下是在response中设置一个cookie的例子,注意,创建cookie的键值对时,无论是key还是值，都不应该包含特殊字符
+        Cookie name = new Cookie("name", URLEncoder.encode(request.getParameter("name"), "UTF-8")); // 创建名字 Cookie
+        Cookie url = new Cookie("url", request.getParameter("url")); //创建地址cookie
+        name.setMaxAge(60*60*24);  // 为两个 Cookie 设置过期日期为 24 小时后. 
+        url.setMaxAge(60*60*24);  //把过期时间设置成0相当于删除了该cookie
+        response.addCookie( name );  
+        response.addCookie( url );   // 把cookie添加到响应中
+        
+        // 这个是设置相应当中的内容格式和编码
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        String title = "一个设置cookie的例子";
+        String docType = "<!DOCTYPE html>\n";
+        out.println(docType +
+                "<html>\n" +
+                "<head><title>" + title + "</title></head>\n" +
+                "<body bgcolor=\"#f0f0f0\">\n" +
+                "<h1 align=\"center\">" + title + "</h1>\n" +
+                "<ul>\n" +
+                "  <li><b>站点名：</b>："
+                + request.getParameter("name") + "\n</li>" +
+                "  <li><b>站点 URL：</b>："
+                + request.getParameter("url") + "\n</li>" +
+                "</ul>\n" +
+                "</body></html>");
+                
+        // 通过HttpServletRequest 的 getCookies( ) 方法得到一个Cookie数组。然后循环遍历数组，并使用 getName() 和 getValue()
+           方法来访问每个 cookie 和关联的值。以下是在返回response之前获取cookie并进行一些操作的例子:
+        Cookie cookie = null;  
+        Cookie[] cookies = request.getCookies(); // 获取与该域相关的 Cookie 的数组
+         
+        if( cookies != null ){
+            for (int i = 0; i < cookies.length; i++){
+               cookie = cookies[i];
+               if((cookie.getName( )).compareTo("name") == 0 ){
+                    cookie.setMaxAge(0); //执行操作cookie的逻辑
+                    .............                    
+               }
+            }  
+         }       
+    }
+```
