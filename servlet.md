@@ -220,3 +220,41 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) thro
          }       
     }
 ```
+#### session
+* HTTP是一种"无状态"协议，这意味着客户端每次浏览服务器的资源，都会单独打开一个和服务器的连接，用完之后服务器都不会保留客户端的任何记录.cookie和session都是用来保持客户端和服务端回话的技术.Servlet 容器使用HttpSession 接口来创建一个 HTTP 客户端和 HTTP 服务器之间的 session 会话。会话持续一个指定的时间段，跨多个连接或页面请求(注意到没,这就是回话的一个很重要作用,假如你登陆了一个网站浏览了一个页面,现在你要浏览另一个同网站的网页,如果不使用回话保持技术,那你这个回话连接在上一个回话完了就断了,你得重新新建一个连接,然后你就又得登录一遍.......真是可怕!!)。一个例子:
+```
+public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        HttpSession session = request.getSession(true); // 参数为true表示,如果当前不存在session会话，则创建一个session对象
+        Date createTime = new Date(session.getCreationTime()); // 获取 session 创建时间
+        Date lastAccessTime = new Date(session.getLastAccessedTime()); // 获取该网页的最后一次访问时间        
+        SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  //设置日期输出的格式
+    
+        String title = "一个session的例子";
+        Integer visitCount = new Integer(0);
+        String visitCountKey = new String("visitCount");
+        String userIDKey = new String("userID");
+        String userID = new String("Runoob");
+    
+        if (session.isNew()){         // 检查网页上是否有新的访问者
+            title = "一个session的例子";
+            session.setAttribute(userIDKey, userID);
+        } else {
+             visitCount = (Integer)session.getAttribute(visitCountKey);
+             visitCount = visitCount + 1;
+             userID = (String)session.getAttribute(userIDKey);
+        }
+        session.setAttribute(visitCountKey,  visitCount);
+    
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        String docType = "<!DOCTYPE html>\n";
+        out.println(docType + ......页面输出的内容省略.......)
+    }
+    
+  <session-config>
+    <session-timeout>15</session-timeout>  # 可以在web.xml中设置session回话的过期时间,这个是以分钟为单位
+  </session-config>  # 通过Servlet的getMaxInactiveInterval()方法会返回session会话的超时时间，以秒为单位。当前这个例子返回 900。
+   # 当然也可以通过 invalidate() 方法来丢弃整个 session 会话。或者通过setMaxInactiveInterval(int interval) 方法设置会话超时。
+
+```
