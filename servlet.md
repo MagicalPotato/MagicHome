@@ -256,5 +256,83 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) thro
     <session-timeout>15</session-timeout>  # 可以在web.xml中设置session回话的过期时间,这个是以分钟为单位
   </session-config>  # 通过Servlet的getMaxInactiveInterval()方法会返回session会话的超时时间，以秒为单位。当前这个例子返回 900。
    # 当然也可以通过 invalidate() 方法来丢弃整个 session 会话。或者通过setMaxInactiveInterval(int interval) 方法设置会话超时。
-
 ```
+#### 一个上传和下载的servlet的例子
+```
+@WebServlet("/UploadServlet")
+public class UploadServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private static final String UPLOAD_DIRECTORY = "D:\\upload";   // 上传文件存储目录
+    private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 设置内存临界值 3MB
+    private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 上传文件最大限制 40MB
+    private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50; // 整个请求最大限制 50MB
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (!ServletFileUpload.isMultipartContent(request)) {  
+            PrintWriter writer = response.getWriter();    // 检测是否为多媒体上传,不是的话进入这个分支,返回信息
+            writer.println("Error: 表单必须包含 enctype=multipart/form-data");
+            writer.flush();
+            return;
+        }
+        DiskFileItemFactory factory = new DiskFileItemFactory(); // 构造磁盘工厂对象      
+        factory.setSizeThreshold(MEMORY_THRESHOLD); // 为磁工厂对象设置内存临界值 - 超过后将产生临时文件并存储于临时目录中
+        factory.setRepository(new File(System.getProperty("java.io.tmpdir"))); // 设置临时存储目录
+        
+        ServletFileUpload upload = new ServletFileUpload(factory);  // 创建上传servlet对象并将磁盘工厂赋给该对象 
+        upload.setFileSizeMax(MAX_FILE_SIZE); // 设置最大文件上传值
+        upload.setSizeMax(MAX_REQUEST_SIZE); // 设置最大请求值 (包含文件和表单数据)
+        upload.setHeaderEncoding("UTF-8");  // 这只请求头的编码
+
+        // 构造临时路径来存储上传的文件 // 这个路径取的是当前工程的路径
+        String uploadPath = request.getServletContext().getRealPath("./") + File.separator + UPLOAD_DIRECTORY;        
+        File uploadDir = new File(uploadPath); // 如果目录不存在则创建
+        if (!uploadDir.exists()) {
+            uploadDir.mkdir();
+        }
+        try {    // 解析请求的内容提取文件数据
+            @SuppressWarnings("unchecked")
+            List<FileItem> formItems = upload.parseRequest(request);
+            if (formItems != null && formItems.size() > 0) {
+                for (FileItem item : formItems) {
+                    if (!item.isFormField()) {
+                        String fileName = new File(item.getName()).getName();
+                        String filePath = uploadPath + File.separator + fileName;
+                        File storeFile = new File(filePath);
+                        item.write(storeFile); // 保存文件到硬盘
+                        request.setAttribute("message", "文件上传成功!");
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            request.setAttribute("message", "错误信息: " + ex.getMessage());
+        }
+        // 跳转到上传成功的uploadSuccess.jsp
+        request.getServletContext().getRequestDispatcher("/uploadSuccess.jsp").forward(request, response);
+    }
+}
+######另一个版本
+public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    String filename=request.getParameter("name"); //获取要下载的文件名
+    filename=new String(filename.getBytes("iso-8859-1"),"utf-8"); //防止读取name名乱码
+    //设置文件MIME类型  也就是给文件指定默认程序, 当该扩展名文件被访问的时候，浏览器会自动使用指定应用程序来打开。
+    response.setContentType(getServletContext().getMimeType(filename)); 
+    //服务端向客户端游览器发送文件时，如果是浏览器支持的文件类型，一般会默认使用浏览器打开，比如txt、jpg等.如果需要提示用户保存，
+    就要利用Content-Disposition进行一下处理. 就是下面这个,用来弹框问你是打开还是保存.
+    response.setHeader("Content-Disposition", "attachment;filename="+filename);
+    ServletContext context=this.getServletContext(); //获取要下载的文件绝对路径，我的文件都放到WebRoot/download目录下
+    String fullFileName=context.getRealPath("/download/"+filename);
+    
+    InputStream is=new FileInputStream(fullFileName); //输入流为项目文件，输出流指向浏览器
+    ServletOutputStream os =response.getOutputStream();
+    
+    int len=-1;
+    byte[] b=new byte[1024];  // 这里相当于设置了一个1024的缓冲区
+    while((len=is.read(b))!=-1){  // 只要缓冲区还有东西就往os中写
+        os.write(b,0,len);
+    }
+    is.close();
+    os.close()
+}
+```
+##### 一点小总结
+* 从最开始的单个页面的servlet,到后面在页面上添加其他的功能,再到最后的上传下载,可以发现,页面的每个操作都对应着后台的一个servlet来处理,这样就有个麻烦,如果页面要做的功能特别多的话,那你后台的servlet肯定也分门别类地要配置多个才行,这样的话肯定繁琐不堪.所以这也是spring这种框架诞生的一个原因,把所有的请求都交给spring的一个总的servlet去处理,然后该servlet再根据请求去找适配器,并最终找到能处理这个请求的处理器.这样的话原始的结构和框架的运作机制大致上就很清晰了.
