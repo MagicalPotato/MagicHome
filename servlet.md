@@ -236,7 +236,7 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) thro
         String userIDKey = new String("userID");
         String userID = new String("Runoob");
     
-        if (session.isNew()){         // isNew() 方法来检查该 session 会话是否已点击过相同页面
+        if (session.isNew()){         // isNew() 用来检验该session是不是一个新的session,也就是当前回话是不是一个新回话
             title = "一个session的例子";
             session.setAttribute(userIDKey, userID);
         } else {
