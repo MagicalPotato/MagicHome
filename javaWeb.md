@@ -4,3 +4,79 @@
 3. Servlet的运行需要容器的支持,但是JavaEE本身没有提供Servlet Container,这样做是有好处的,因为容器就是环境,servlet不和某个确定的容器相关,意味着Servlet可以跑在任何一个Container当中，避免了对Runtime环境的依赖。比较常见的支持Servlet Container的外部Server软件有 Apache Tomcat，Glassfish，JBoss，Jetty 等等。
 4. EJB全称Enterprise JavaBean，它也是JavaEE的一个组件，面向更加复杂的企业业务开发。对于Web来说,EJB不是必须。且和 Servlet 类似，运行EJB也需要专门的 EJB Container。但并不是所有的外部Server软件都支持EJB。Tomcat就不支持EJB，而JBoss提供了对EJB的支持。**后续了解下**
 5. Spring是一个非常庞大的框架，包括SpringMVC，SpringBoot以及SpringCloud等用于Web开发的工具.Spring不需要完整的JavaEE内容,仅仅依赖最基础的 Servlet，也不需要EJB Container，只用普通的Servlet Container就可以运行。Spring和JavaEE不是一个层面上的东西。Spring 仅依赖了JavaEE的API 标准，最新版的Spring甚至进一步隔绝了JavaEE的API。开发者可以完全不关心Servlet或者JavaEE等概念，也可以进行Java Web开发。Spring不是唯一的Java Web框架，还有Structs,Spark等
+6. 做web开发必须的两大元素:JDK和tomcat,JDK可以用JavaSE的JDK,标准版的JDK也是大家使用最多的JDK版本。当然还需要下载一个Tomcat.注意jdk的版本和tomcat的版本要尽量匹配,如果jdk用的是1.8的,那么tomcat也用8.0的,这样能避免以后很多莫名其妙的问题.
+7. 一般创建一个工程之后都会有src目录,里面放了实现功能的代码,要跑这些代码,我们需要把它部署到Tomcat上。首先在src目录隔壁，创建一个WEB-INF目录（注意名字一定要正确），然后在里面创建一个 web.xml文件,里面会配置请求和处理请求的servlet的信息. web.xml的作用是告诉Tomcat，我们想使用哪个Servlet 来处理对应的请求。Tomcat通过web.xml找到对应的Servlet完成请求以及响应过程。然后到Tomcat的目录，其中有一个webapps文件夹，这个里面相当于就是放一个个的web工程,在里面创建一个新的MyFirstServlet文件夹(就是你刚建的工程)，然后把整个WEB-INF文件夹拷到这个文件夹里面,最后再把代码编译出来的class拷贝到如图对应的目录下:
+```
+webapps              # 看到没,其实一个简单的web项目用到的最基本的东西就这么一点.
+  - MyFirstServlet   # 一个tomcat,一个web.xml,然后是你的工程编译出来的class.
+    - WEB-INF        # 由此可以引申到java的一次编译到处运行的概念. 不同的tomcat相当于不同的环境,一次编译出来的
+      - classes      # class文件只要部署到对应的tomcat上就可以运行了.
+        - com
+          - skyline
+            - MyFirstServlet.class
+      - web.xml
+```
+8. 工程所需要的东西都在tomcat中部署好之后,工程和tomcat其实就没关系了,相当于你的工程已经放到了环境上,然后启动tomcat,那么你这个tomcat就成了一个单独的环境,就可以被外部进行访问了.启动tomcat用其bin目录下的start脚本. 会遇到环境变量没配置或者端口冲突等问题,自行查找解决.
+9. **注意了,重新整理下思路,看下面这个例子:这才是真正的技术演变**
+```
+public class MyFirstServlet implements Servlet {  # 最原始的时候我们是实现了Servlet这个接口,然后重写其中的一些方法
+    public void init(ServletConfig config) throws ServletException {
+        System.out.println("Init");
+    }
+    public void service(ServletRequest request, ServletResponse response)
+            throws ServletException, IOException {
+        System.out.println("From service");
+        PrintWriter out = response.getWriter();
+        out.println("Hello, Java Web.");    #  service方法里的东西最终会被展示到页面上
+    }
+    public void destroy() {
+        System.out.println("Destroy");
+    }
+    public String getServletInfo() {
+        return null;
+    }
+    public ServletConfig getServletConfig() {
+        return null;
+    }
+}
+    <servlet>
+        <servlet-name>MyFirstServlet</servlet-name>
+        <servlet-class>com.skyline.MyFirstServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MyFirstServlet</servlet-name>
+        <url-pattern>/hello</url-pattern>  #在web.xml中我们是这样配置的,让/hello这个资源能够索引到我们的MyFirstServlet上
+    </servlet-mapping>
+    
+这是调用地址 http://localhost:8080/MyFirstServlet/hello,可以看到这时候我们是直接访问写好的servlet,这是在web.xml中配置的
+
+这是另一种实现方式
+public class MyFirstServlet extends HttpServlet { # 现在是继承HttpServlet类了
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 这里实现处理逻辑
+        
+        response.getWriter().write("<html>");  //下面这些都是要返回的结果,但是在代码中写
+        response.getWriter().write("<body>");  // 这么一大堆response.getWriter()明显很啰嗦又复杂且不易维护
+        response.getWriter().write("<h2>");
+        response.getWriter().write(LocalDateTime.now().toString());
+        response.getWriter().write("</h2>");
+        response.getWriter().write("</body>");
+        response.getWriter().write("</html>");
+    }
+}
+可以看到，直接使用 Servlet生成网页，你就得写一大堆response.getWriter().write(""),不仅代码写起来困难，可维护性也不高。
+为了把HTML这些非逻辑的部分抽离出来，出现了JSP技术。JSP全称JavaServer Pages,可以理解成一种高度抽象的Servlet。
+事实上JSP在运行期间会被编译成Servlet，因此JSP和Servlet可以认为没有本质上的差异，只不过写起来容易了很多.
+Tomcat支持JSP 技术。下面我们使用 JSP 重写上面的程序,把这个文件保存成date.jsp并放在和WEB-INF平行的目录下
+<%@ page import="java.time.LocalDateTime" %>
+<html>
+<body>
+<h2>
+<%
+out.write(LocalDateTime.now().toString()); // 这里的实现逻辑是打印当前时间
+%>       // jsp里可以用代码直接实现逻辑,然后这些动态逻辑和静态页面的东西在运行时会被编译servlet
+</h2>    // 也就是会被编译成那一大堆的response.getWriter().........
+</body>
+</html>
+这时候我们的调用地址变成了这样 http://localhost:8080/MyFirstServlet/data.jsp
+```
