@@ -125,5 +125,9 @@ public class MyFirstSpringController {  //通过@RequestMapping和@ResponseBody�
         <bean class="com.skyline.MyFirstSpringController"/> 
 </beans>
 
-controller编写完,配置也配好之后,还是像之前那样将controller编译成class文件并放在WEB-INF/classes对应的目录下,同时由于引入了依赖，我们还需要将 Spring 以及之前提到的 common-logging jar 包拷贝到 WEB-INF/lib,然后启动tomcat,在页面调用 http://localhost:8080/MyFirstServlet/hello,因为你的controller中Hello方法已经用注解指定了调用的地址是/hello,方式是get: @RequestMapping(value = "/hello", method = RequestMethod.GET)
+controller编写完,配置也配好之后,还是像之前那样将controller编译成class文件并放在WEB-INF/classes对应的目录下,同时由于引入了依赖，我们还需要将
+Spring 以及之前提到的 common-logging jar 包拷贝到 WEB-INF/lib,然后启动tomcat并调用 http://localhost:8080/MyFirstServlet/hello即可展示内容.
+因为你的controller中Hello方法已经用注解指定了调用的地址是/hello,方式是get: @RequestMapping(value = "/hello", method = RequestMethod.GET).
+到此为止,一个前后台的交互流程就从简单的servlet演进到httpServlet + web.xml的形式并最终演进到spring框架.
+
 ```
