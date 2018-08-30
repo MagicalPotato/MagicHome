@@ -80,3 +80,49 @@ out.write(LocalDateTime.now().toString()); // 这里的实现逻辑是打印当�
 </html>
 这时候我们的调用地址变成了这样 http://localhost:8080/MyFirstServlet/data.jsp
 ```
+10. Spring框架实际上就是一堆jar包,直接下载下来放入工程jar包路径下就可以,同时还需下载Apache出品的common-logging,因为Spring依赖它.
+11.  SpringMVC是构建在Servlet基础之上的,它对外提供了一个名为DispatchServlet的类，这个类是SpringMVC和Servlet API的一个交界点,也是 SpringMVC 当中对于请求处理的一个分发器,它将Servlet传递过来的请求根据URL分发给对应的Controller。在前面的内容中我们可以看到,通过在web.xml当中配置url-pattern也可以起到分发请求的作用，不过当大量的URL都需要在web.xml当中进行配置的时候，整个web.xml就变成了一个灾难。**因此广大 Web 框架都选择避免 web.xml，并在web.xml之上构建自己的请求分发机制**,当web.xml的url请求被Spring托管之后,我们便有了Spring的配置文件,这个配置文件中关于请求分发的就变成了这样:
+```
+    <servlet>
+        <servlet-name>MyFirstServlet</servlet-name>  # 而用于请求处理的servlet被配置成了Spring的Servlet
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>  # 全jar包路径引用
+        <load-on-startup>1</load-on-startup>  # 多了这个配置,意思是告诉Container容器在启动的时候(而不是请求发过来的时候)就加载这个Servlet
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MyFirstServlet</servlet-name>
+        <url-pattern>/*</url-pattern>    # 这里拦截了所有的请求.
+    </servlet-mapping>
+    
+Sprint接收到请求之后会把请求交给对应的执行类,而这些执行类就是我们通常所指的controller类:相比直接使用Servlet API,编写 Controller 可以说是容易了太多。这里创建一个MyFirstSpringController类,这个类还是在原来的工程src下,至于包名叫什么你可以自己定义,之前我们用的是直接编写servlet类的方式,所以我们建的是servlet类,但是现在我们要改成controllor类了:
+package com.skyline;  //你的工程包
+import org.springframework.stereotype.Controller;  //这里导入了框架的controller注解包
+import org.springframework.web.bind.annotation.RequestMapping;  //下面这三个也是框架里用来表示不同意义的包,Spring的一大优点就是
+import org.springframework.web.bind.annotation.RequestMethod;  // 使用一些Annotation(注解)来简化代码的编写 
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller   // 通过 @Controller 我们将一个普通 Java 类标记成一个 Controller 类
+public class MyFirstSpringController {  //通过@RequestMapping和@ResponseBody我们将一个普通函数标记成可以处理GET请求并返回字符串的Handler。
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)  //handler就相当于一个处理器
+    public @ResponseBody String Hello() {
+        return "Hello, SpringMVC.";
+    }
+}
+
+当我们编写了一个Controller 之后,怎么样让Spring的DispatchServlet找到我们编写的Controller呢？依然是通过配置。在WEB-INF文件夹下,也就是web.xml同目录,创建一个MyFirstServlet-servlet.xml（注意命名）,注意,这个配置实际上就是Spring的配置,所以可以起包含Spring,servlet等字眼的名字,最好把你的工程名也加上.配置内容如下:
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+        //  在这里我们将MyFirstSpringController加入了beans列表，SpringMVC就能找到我们的Controller并且进行初始化了,上面那一堆暂且不知道
+        // 是干啥的也先不管. Spring后续提供了自动扫描并创建bean的功能,也就不需要手动去配置controller了,最初的版本还是需要配置的.
+        <bean class="com.skyline.MyFirstSpringController"/> 
+
+</beans>
+```
