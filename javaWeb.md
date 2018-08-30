@@ -129,5 +129,19 @@ controller编写完,配置也配好之后,还是像之前那样将controller编�
 Spring 以及之前提到的 common-logging jar 包拷贝到 WEB-INF/lib,然后启动tomcat并调用 http://localhost:8080/MyFirstServlet/hello即可展示内容.
 因为你的controller中Hello方法已经用注解指定了调用的地址是/hello,方式是get: @RequestMapping(value = "/hello", method = RequestMethod.GET).
 到此为止,一个前后台的交互流程就从简单的servlet演进到httpServlet + web.xml的形式并最终演进到spring框架.
-
 ```
+12. Java本身就自带了一些注解,例如@Override用来标记方法是一个重载方法,@Deprecated用于标记代码为废弃。注解不会对源代码产生任何影响,但是我们可以
+通过在**编译器**或者**运行期**检查代码中的注解,为代码引入更多的功能。
+13. Java本身就自带框架属性,为了使用java的框架功能,需要继承特定的类,实现特定的接口,就比如我们刚刚写的那个MyFirstServlet类,这个类就是继承了接口HttpServlet,事实上这样做会加大代码的耦合度.像这样通过继承或者实现java原生接口产生的类我们一般认为其依赖比较重,后来有了框架,比如Spring出现之后,
+出现了POJO这种概念,它的全称是Plain Old Java Object,即普通的Java对象,我们随便建一个类new出来的对象实际上都可以称之为POJO,但是这个概念在框架出来
+之后用来特指那些能够尽量脱离java原生框架束缚的松耦合的类,就比如上面演进到框架之后的那个controller类,那个类我们没有去继承java原生框架任何东西,而是
+用一些注解来实现额外的功能.注解刚也提到了,并不会对代码产生影响,既然不影响代码,但又能实现一些功能,又脱离了java原生框架,降低了耦合,何乐而不为!所以
+POJO这个概念是在历史发展的特定环境下产生的一种概念,是给老概念赋予了新的意义; 同样,JavaBean也是这样一种概念,最开始的时候,JavaBean是对用 Java
+编写数据Model层类的一种叫法,这些model类一般要有如下特点：1有无参的构造器,2所有的成员都是private,对外暴露getter和setter,3实现Serializable.但是
+后来随着历史进程框架兴起JavaBean这个概念也逐渐的泛化,不再局限于Model类,出现了所谓的业务Bean等,对于Serializable的要求也可有可无,刚刚那个controller
+类,它不仅仅是一个POJO,也是一个 JavaBean。再到后来,Spring 把很多东西包括自己的一些**组件**也都称为Bean,可以看成是对JavaBean进一步的泛化。
+14. spring_servlet.xml中我们把controller配置成了一个Spring的bean组件,那么Spring在运行的时候就会去加载这个controller,然后在Controller类中,
+我们又用@RequestMapping做了标记, 这样在初始化Controller的时候，SpringMVC对@RequestMapping注解当中的信息进行处理,就可以得到这些信息并把请求分发
+到对应的Controller中. @ResponseBody 表明函数的返回值应该被用作HTTP返回的body处理。SpringMVC用我们返回的字符串生成HTTP响应并最终返回给了客户端。
+这就是SpringMVC大体的工作流程,可以看到SpringMVC通过Annotation以一种低侵入性的方式,提供了一套简洁好用的Web开发的API。
+
