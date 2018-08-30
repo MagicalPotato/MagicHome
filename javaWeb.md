@@ -17,7 +17,7 @@ webapps              # 看到没,其实一个简单的web项目用到的最基�
       - web.xml
 ```
 8. 工程所需要的东西都在tomcat中部署好之后,工程和tomcat其实就没关系了,相当于你的工程已经放到了环境上,然后启动tomcat,那么你这个tomcat就成了一个单独的环境,就可以被外部进行访问了.启动tomcat用其bin目录下的start脚本. 会遇到环境变量没配置或者端口冲突等问题,自行查找解决.
-9. **注意了,重新整理下思路,看下面这个例子:这才是真正的技术演进,从单独的servlet到servlet和jsp的结合,后续会演进到Spring框架**
+9. **注意了,重新整理下思路,看下面这个例子:这才是真正的技术演进,从单独的servlet到servlet和jsp的结合,在第11条会演进到Spring框架**
 ```
 public class MyFirstServlet implements Servlet {  # 最原始的时候我们是实现了Servlet这个接口,然后重写其中的一些方法
     public void init(ServletConfig config) throws ServletException {
@@ -123,6 +123,7 @@ public class MyFirstSpringController {  //通过@RequestMapping和@ResponseBody�
         //  在这里我们将MyFirstSpringController加入了beans列表，SpringMVC就能找到我们的Controller并且进行初始化了,上面那一堆暂且不知道
         // 是干啥的也先不管. Spring后续提供了自动扫描并创建bean的功能,也就不需要手动去配置controller了,最初的版本还是需要配置的.
         <bean class="com.skyline.MyFirstSpringController"/> 
-
 </beans>
+
+controller编写完,配置也配好之后,还是像之前那样将controller编译成class文件并放在WEB-INF/classes对应的目录下,同时由于引入了依赖，我们还需要将 Spring 以及之前提到的 common-logging jar 包拷贝到 WEB-INF/lib,然后启动tomcat,在页面调用 http://localhost:8080/MyFirstServlet/hello,因为你的controller中Hello方法已经用注解指定了调用的地址是/hello,方式是get: @RequestMapping(value = "/hello", method = RequestMethod.GET)
 ```
