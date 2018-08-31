@@ -431,9 +431,9 @@ public class MyComponent {
 @Autowired
 @Qualifier("Mike") //我标记了我要用Mike那个 
 private Person person;
----------------------------------拿个真实项目的例子来看-----------------------
-controller被页面调用,在调用的过程中会注入一个service,service里面又注入一个dao完成相应功能:
-
+```
+22. 拿个真实项目的例子来看,controller被页面调用,在调用的过程中会注入一个service,service里面又注入一个dao完成相应功能:
+```
 @RestController
 @RequestMapping("/import")
 public class AlarmImportControllor
