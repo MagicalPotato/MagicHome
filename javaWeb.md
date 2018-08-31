@@ -238,7 +238,10 @@ public class MyServiceImpl implements MyService {
     <bean id="myService" class="com.skyline.service.MyServiceImpl">  // 然后确定了service实现类
       <constructor-arg ref="aPerson"/>  // 最后用一个特定的标签引用了那个person类
       // <constructor-arg type="java.lang.String" value="Hello"/> 如果还有别的属性,也可以这样来给它赋值,但是属性多的话也是个麻烦,先记住
-    </bean>  //通过这样的方式,Spring会先初始化aPerson,然后使用它初始化myService。运行代码,结果和之前是一样的。
+    </bean>  //通过这样的方式,Spring会先初始化aPerson,然后使用它初始化myService.还是运行刚刚那个main容器的代码,
+    //结果是一样的.容器会先去初始化一个person,然后再用person去初始化service实现类.用了ref这种方式相当于是把person传入了
+    //service的构造方法.注意到配置的标签了没,constructor-arg就是说这是一个构造方法的参数,这个参数应用了一个person对象,
+    //下面还有一个构造方法参数,类型是个String,值是hello. 
 ```
 17. 进一步简化配置,还是刚刚那个类,我们用注解的方式来引用:
 ```
@@ -255,9 +258,45 @@ public class MyServiceImpl implements MyService {
     <bean id="aPerson" class="com.skyline.model.Person">
       <property name="name" value="Chester"/>
     </bean>
-    <bean id="myService" class="com.skyline.service.MyServiceImpl"> //虽然现在配置了实现类,但是并没有用ref去引用上面的person类
-      <property name="greeting" value="Hello"/>      //真正的引用我们交给了注解,看下面代码:
+    <bean id="myService" class="com.skyline.service.MyServiceImpl"> //虽然现在配置了实现类,但是并没有用构造方法参数
+      <property name="greeting" value="Hello"/>  //标签,也没有用ref去引用上面的person类,真正的引用换成了代码中的注解
     </bean>
 </beans>
+//这是换了注解的代码,由于我们不用构造方法来传参了,所以配置没用构造方法参数标签,代码中也没用构造方法,
+但是用注解的方式代码中也是可以用构造方法的,并不是说你用了注解代码里就不能写构造方法那种了,你用get,set
+给service实现类赋属性和你用构造方法然后传入对象的方式给它赋属性都是一样的.这个例子就没用构造方法
+public class MyServiceImpl implements MyService {
+    private Person person;   
+    private String greeting; 
+    public Person getPerson() { 
+        return person; 
+    }
+
+    @Autowired // 新增
+    public void setPerson(Person person) {   //这里新增了一个注解,自动依赖,这也是依赖注入的原型
+        this.person = person;  //当容器初始化实现类的时候,先初始化了一个person,并给person的name属性赋了值
+    } //而后又初始化了一个service实现类对象,并并给greeting属性赋了值,但没有在配置中标明person和实现类的关系
+    //关系在类中用Autowired这个注解来标注了.当代码运行的时候,那个被初始化的person对象就被自动的赋给service实现类.
+    public String getGreeting() {
+        return greeting;
+    }
+    public void setGreeting(String greeting) {
+        this.greeting = greeting;
+    }
+    @Override    //也就是说在这种方式下,容器只是初始化了所有需要的对象,但是对象的依赖关系并未确定,而是在代码
+    public String sayHello() {   //执行的时候再去根据确定不同的类之间的依赖关系.
+        return this.greeting + " " + this.person.getName();
+    }
+}
+
+// 你当然可以把注解用在构造方法上
+    @Autowired
+    public MyServiceImpl(Person person)
+    {
+        this.person = person;
+    }
+// 还可以直接用在实例属性上,几种用法都是可以的.
+    @Autowired
+    private Person person;
 ```
 
