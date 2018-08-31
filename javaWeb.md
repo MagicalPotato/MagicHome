@@ -142,5 +142,64 @@ Spring 以及之前提到的 common-logging jar 包拷贝到 WEB-INF/lib,然后�
 我们又用@RequestMapping做了标记, 这样在初始化Controller的时候，SpringMVC对@RequestMapping注解当中的信息进行处理,就可以得到这些信息并把请求分发
 到对应的Controller中. @ResponseBody 表明函数的返回值应该被用作HTTP返回的body处理。SpringMVC用我们返回的字符串生成HTTP响应并最终返回给了客户端。
 这就是SpringMVC大体的工作流程,可以看到SpringMVC通过Annotation以一种低侵入性的方式,提供了一套简洁好用的Web开发的API。
-15. 
+15. Sprint最常被提及的几个特性是控制反转,依赖注入还有面向切面,单纯的去解释这些概念实在很笼统,我们来从一个具体例子看看到底什么是控制反转,谁控制了谁,谁反转了谁以及谁依赖了谁,又注入了什么玩意,看完这个例子或许你对这些概念会有一种全新的认识: 我们平常所说的ioc,实际上是一个动词,指的是一系列的动作,事实上ioc这个动作是有主语的,它的主语是Spring的IoC Container,也就是Spring的控制反转容器,很多人根本不理解本质,张嘴就说控制反转,到底反转了啥,反转了谁又是一头雾水.现在你可以试试这种理解方式:Spring框架有个容器,这个容器能够完成一些控制权转换的动作,我们把Spring容器的这种能力称为控制反转.**首先要说明的是,在编程领域,无论听起来是多么高大上的名称,最终都是一堆代码,Spring的容器是个啥?没错,它就是一堆代码.这堆代码被组织成了一些固定的方法,或者被打成了一个固定的jar包,我们往这个jar包中传入一些配置进去,然后这些配置在jar包里会发生各种变化,所以后来人们称这一堆代码或这个jar包为容器,这堆代码属于Spring,所以叫它Spring的容器,main方法就可以称为一个容器,你在main方法里面可以写各种调试或者临时验证问题的方法,那这个main不就像一个平台吗,一个小平台你叫他容器也没错啊**,下面我们就用一个main方法来进行一个角色扮演,让他扮演Spring中的容器,你刚不是在你的工程里建了一个controller类吗,你在建另外一个类,这个类里面有个main方法,类名可以随便起,类名我们就叫MySpringContainer吧,但你要记住这个是假装的container:
+```
+public class MySpringContainer {  // 这就是我们要假装它是Spring容器的类
+    public static void main(String[] args) {  // 现在容器里我们啥也没干,待会我们会添加一些东西
+    }
+}
+在往里面添加东西之前,我们先了解一下Spring IoC当中的几个概念：
+1.Spring当中的IoC Container被称为Context,代码上体现为ApplicationContext接口.Spring自带了若干实现，
+例如 ClassPathXmlApplicationContext 和 FileSystemXmlApplicationContext 等。
+2.Spring的Container依赖于Configuration metadata（也就是配置文件）去初始化对象。
+3.被Spring的容器Container 管理的对象，称为 Bean。根据Sun公司文档的定义,把可重用的Java组件称为Bean,
+但在Spring里面,这个bean的意义发生了变化,注意不要和之前理解的定义混淆。
+
+看第二条可以发现,在Spring最开始的概念中,容器是靠配置文件去初始化对象的,都是xml文件.
+后来会逐渐演进到不用xml,但是我们先从用xml来开始:定义一个service接口和实现类:
+public interface MyService {   // 这是接口类
+    String sayHello();  //接口类里就定义了一个简单的接口
+}
+
+public class MyServiceImpl implements MyService {  //接口的实现类
+    private String name;    //里面有个属性并且属性有get和set方法,由这个类new出来的对象我们
+    public String getName() {  //实际上就可以称之为一个javaBean,也就是一个简单的java对象
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    @Override
+    public String sayHello() {
+        return "Hello " + name;   //实现类中的操作
+    }
+}
+
+以前的时候你要用这个service实现类的对象,你的先new这个对象,然后再在代码里去用,但是Spring用
+配置文件来初始化这个service实现类,不需要你在代码里去new了,在你的src包同级,建一个service.xml,
+配置文件名称随意,但是你是要初始化service实现类,当然你的配置文件也就叫service.xml比较好,看到没
+这里就会发现弊端,如果初始化的类特别多,配置文件肯定是个灾难,不过现在我们先不关注这个,先看配置文件:
+<?xml version="1.0" encoding="UTF-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd">  //上面这一堆我们暂且不管
+    
+    <bean id="myService" class="com.skyline.MyServiceImpl">  这里我们用一个id:myService和一个包路径唯一确定了我们的那个实现类
+      <property name="name" value="Chester"/>  // 然后我们给那个实现类里面的name属性赋了个值,叫Chester
+    </bean>  //这里再次发现了配置的弊端,加入一个类有一百个属性,那你配一百次也是个灾难
+</beans>
+
+当类准备好了,配置文件也准备好了,现在我们让我们的main容器去初始化这个service实现类:
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext; //会用到的框架包
+
+public class MySpringContainer {
+    public static void main(String[] args) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("services.xml");
+        MyServiceImpl service = context.getBean("myService", MyServiceImpl.class);
+        System.out.println(service.sayHello());  //看到没,容器自己去找了工程路径下的services.xml配置
+    } //然后根据这个配置初始化了你的service实现类,最后say了个Hello
+}
+```
 
