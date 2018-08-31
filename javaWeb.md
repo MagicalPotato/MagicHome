@@ -326,7 +326,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component //这个注解说明这个类可以被spring注册成一个组件,这个组件是专门用来生产对象的
-public class MyPersonComponent {
+public class MyComponent {
     @Bean("aPerson")  //相当于是配置文件中的那个唯一id
     public Person testPerson() {   //原本是在配置中配置了这个person类的信息,让spring去初始化
         Person aPerson = new Person(); //现在不在配置中配了,而是直接在代码的一个类中用一个方法
@@ -338,8 +338,54 @@ public class MyPersonComponent {
         MyServiceImpl service = new MyServiceImpl();
         service.setGreeting("Hello");  //但是原来这个实现类还依赖了person的,为啥没把person也
         return service;  //set上呢,是因为person上有个@Autowired注解,还在起作用呢.只要加了自动 
-    }  //依赖注解,无论是什么类,只要初始化的时候用到了person类,那么都会自动依赖过去.
-}
+    }  //依赖注解,无论是什么类,只要初始化的时候用到了person类,那么都会自动依赖过去.这样在用的时候
+}      //才去依赖注入,明显降低了耦合度.
 通过这样的方式,我们就把原本在配置中配置的依赖关系转移到了java类中,在java类中统一生产那些用到的对象
 ```
+19. 上面的例子中我们把Bean和Bean的依赖关系都通过Annotation来表达,但还是没有彻底去掉service.xml这个古老的配置文件,虽然一再的演进精简,但最终还是在.这个例子我们就来去掉这个配置文件,完全使用Java代码进行配置。首先我们需要创建一个配置类,叫 AppConfig：
+```
+import org.springframework.context.annotation.ComponentScan; //原本的组件扫描配置被搞成了jar包导入
+import org.springframework.context.annotation.Configuration; // 当然还导入了必要的配置包
+
+@Configuration  //@Configuration是指示该类为Bean配置的源头,就跟service.xml一个作用。
+@ComponentScan("com.skyline") //这个就是配置中组件自动扫描的注解,要把你要扫描的包配进去
+public class AppConfig {
+}
+// 注意:只有标记了@Configuration的类当中才能出现类似XML中的Bean之间互相依赖关系,这个注解也继承自@Component,因此也可以用于自动扫描。
+然后我们来修改我们的main容器类:
+package com.skyline;  //你的包名
+import com.skyline.service.MyServiceImpl; //你用到的实现类
+import org.springframework.context.ApplicationContext;  //spring的容器接口
+import org.springframework.context.annotation.AnnotationConfigApplicationContext; //自动配置容器的实现
+
+public class MySpringContainer {
+    public static void main(String[] args) {  //可以看到,以前我们是在容器里加载配置文件,现在加载配置类
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        MyServiceImpl service = context.getBean("myService", MyServiceImpl.class);  //然后获取了一个bean
+        System.out.println(service.sayHello());  //运行我们的容器类,结果没变.
+    } // 到现在为止,我们就可以完全去掉那个原始的services.xml配置文件了.但是我们发现在配置类中根本啥也没写啊,这是因为
+} //我们再配置类中配置了自动扫描注解,当加载配置类的时候,就会去扫描你配置的包,然后在包里会找到你的加了@component注解
+//的MyComponent组件类,然后组件类中的各个bean就继续初始化,最终当你在容器中用context来getBean的时候就可以拿到对象了.
+
+事实上,那个组件类是完全可以去掉的,我们完全可以把组件类中的内容移到配置类中,只要能完成功能,随你折腾,你写哪里都行
+@Configuration
+@ComponentScan("com.skyline")
+public class AppConfig {
+    @Bean   //看到没,我把组件类的代码全都移到了配置类,这完全可以,流程没有任何影响
+    public Person aPerson() {
+        Person aPerson = new Person();
+        aPerson.setName("Chester");
+        return aPerson;
+    } //有个注意点:我们用了简化的@Bean定义,这样Spring会直接把函数名称aPerson和myService作为Bean的名称,运行后结果没变。
+    @Bean  //前面那个组件类中我们是指定了bean的名称.各有各的好处,你在容器中getBean的时候注意就行了
+    public MyServiceImpl myService() {
+        MyServiceImpl service = new MyServiceImpl();
+        service.setGreeting("Hello");
+        return service;
+    }
+}
+```
+20. 到此为止,我们从最简单的一个项目开始,一路演进,从单纯的使用java提供的servlet接口到使用框架,框架中又从有配置演进到没配置...当然后续可能还会有各种新奇的玩意,我们姑且不去管.当前来看,大多的项目还是停留在框架 + 配置的阶段.使用XML的好处在于更新Bean之后不需要重新编译代码，同时有利于将若干Bean组织
+在一个文件里,方便集中管理。缺点在于xml书写很繁琐,也很容易写错。使用代码的好处在于更加简洁清晰,不容易出错,缺点在于Bean的配置会分散在各个文件当中,以
+及改了文件之后需要重新编译代码才能更新配置。从Spring本身的发展来看,使用代码（即 Annotation）进行配置逐渐取代了XML成为主流的配置方式,到最新的SpringBoot框架,XML已经基本不见踪影,因为随着各种版本管理工具诸如maven的不断进化,改个代码并编译一下实际上变得越来越简单.
 
