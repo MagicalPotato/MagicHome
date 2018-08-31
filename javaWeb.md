@@ -388,4 +388,48 @@ public class AppConfig {
 20. 到此为止,我们从最简单的一个项目开始,一路演进,从单纯的使用java提供的servlet接口到使用框架,框架中又从有配置演进到没配置...当然后续可能还会有各种新奇的玩意,我们姑且不去管.当前来看,大多的项目还是停留在框架 + 配置的阶段.使用XML的好处在于更新Bean之后不需要重新编译代码，同时有利于将若干Bean组织
 在一个文件里,方便集中管理。缺点在于xml书写很繁琐,也很容易写错。使用代码的好处在于更加简洁清晰,不容易出错,缺点在于Bean的配置会分散在各个文件当中,以
 及改了文件之后需要重新编译代码才能更新配置。从Spring本身的发展来看,使用代码（即 Annotation）进行配置逐渐取代了XML成为主流的配置方式,到最新的SpringBoot框架,XML已经基本不见踪影,因为随着各种版本管理工具诸如maven的不断进化,改个代码并编译一下实际上变得越来越简单.
+21. spring在初始化一个bean的时候实际上是有一些隐藏操作的:
+```
+@Bean  //当我们指定了一个bean后,实际上这个bean是有个默认的注解的,就是单例注解
+// @Scope("singleton") // 这是默认的,也就是说如果未加干涉,所有的bean都只会生成一份,这也是为啥改了类要重新编译的原因
+// @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)   //这是单例的另一种写法
+// @Scope("prototype") //而这个就是多例了,如果显示地配了多例模式,那么你改了bean的东西就不需要刻意去编译,加载的时候自动会去搞一个全新的
+public Person aPerson() {
+    Person aPerson = new Person();
+    aPerson.setName("Chester");
+    return aPerson;
+}
+还有一个问题也注意下:还是刚刚那个组件类,加入组件里有两个person类,spring如何去自动依赖呢,事实上当容器开始加载的时候这种会报错,
+No qualifying bean of type 'com.skyline.model.Person' available: expected single matching bean but found 2: aPerson,bPerson
+不像xml中使用id来引用对象, @Autowired依赖注入从本质上就是一种基于类型的依赖机制,就是说是根据返回类型来判断的,如果有了同样类型的对象
+那么就屌了,找不到了.
+@Component
+public class MyComponent {
+    @Bean
+    // @Primary 一种解决方式是在组件中定义优先级
+    // @Qualifier("Chester") 另一种方式是像xml那样定义id,这个叫chester
+    public Person aPerson() {
+        Person aPerson = new Person();
+        aPerson.setName("Chester");
+        return aPerson;
+    }
+    @Bean
+    // @Qualifier("Mike")  这个叫Mike
+    public Person bPerson() {
+        Person aPerson = new Person();
+        aPerson.setName("Mike");
+        return aPerson;
+    }
+    @Bean("myService")
+    public MyServiceImpl testService() {
+        MyServiceImpl service = new MyServiceImpl();
+        service.setGreeting("Hello");
+        return service;
+    }
+}
+然后在你的service实现类中用到person的地方用你刚加的那个id来标记
+@Autowired
+@Qualifier("Mike") //我标记了我要用Mike那个 
+private Person person;
+```
 
