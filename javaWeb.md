@@ -434,5 +434,16 @@ private Person person;
 
 这跟你在一个controller类中去依赖一个service类一个道理:
 @Autowired
-```
+@Qualifier("alarmServiceImpl")  //控制类需要依赖一个名字叫alarmServiceImpl的组件类,然后spring就去扫描整个包找这个类
+private IAlarmService alarmServiceImpl; //这样的话接口实际上就可以省略了,直接用实现类的类型就可以,因为注入是根据类型来识别的
 
+@Service("alarmServiceImpl")  //实现类用注解表明自己是一个可以被容器初始化的组件bean,并且名字是alarmServiceImpl
+public class AlarmServiceImpl implements IAlarmService
+
+@Autowired                 //service里面又去依赖dao
+@Qualifier("coreNetNeDao")
+public CoreNetNeDao coreNetNeDao;
+
+@Repository(value = "coreNetNeDao")  //而dao最后就用这个注解来唯一标识自己,可以看出service用@Service,而dao用@Repository
+public interface CoreNetNeDao        // Service在注解括号中直接指定名称,而Repository则是用了键值对的方式,最终殊途同归
+```
