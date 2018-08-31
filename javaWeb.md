@@ -264,7 +264,8 @@ public class MyServiceImpl implements MyService {
 </beans>
 //这是换了注解的代码,由于我们不用构造方法来传参了,所以配置没用构造方法参数标签,代码中也没用构造方法,
 但是用注解的方式代码中也是可以用构造方法的,并不是说你用了注解代码里就不能写构造方法那种了,你用get,set
-给service实现类赋属性和你用构造方法然后传入对象的方式给它赋属性都是一样的.这个例子就没用构造方法
+给service实现类赋属性和你用构造方法然后传入对象的方式给它赋属性都是一样的.只不过构造方法是public,
+而get和set是private,你根据你的类的情况选择就可以了.这个例子就没用构造方法
 public class MyServiceImpl implements MyService {
     private Person person;   
     private String greeting; 
@@ -298,5 +299,47 @@ public class MyServiceImpl implements MyService {
 // 还可以直接用在实例属性上,几种用法都是可以的.
     @Autowired
     private Person person;
+```
+18. 上面的例子里用注解来指导Bean的依赖关系,然而Bean本身的定义还是写在XML当中,下面我们换种方式,直接在代码中创建出 Bean,这种方法的官方叫法是 Component-Scan,component的意思是组件,构件,元件,零件等.那这种叫法就可以叫做组件扫描.
+```
+<?xml version="1.0" encoding="UTF-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context  
+        http://www.springframework.org/schema/context/spring-context.xsd">
+        //上面这一大堆配置到底是干啥的后续一定要搞清楚!!!
+    <context:component-scan base-package="com.skyline"/>  //这就是组件自动扫描的配置
+</beans> //有了自动扫描,那些乱七八糟的类的关系就不用配置了.注意我们还去掉了
+// <context:annotation-config>就是那个自动注解的配置,因为组件扫描默认会开启自动注解
+
+Spring 中定义了若干用于注册Bean的Annotation,包括@Component以及继承自@Component的@Service和@Repository。
+所谓的component-scan也就是告诉Spring去扫描加了这些注解的类,并把他们实例化成bean对象. Spring中推荐使用
+@Service和@Component标示逻辑和服务层的组件,推荐使用@Repository标示持久层的组件。实际上@Service和@Repository
+都继承自@Component,因此在Bean实例化的层面,它们没有本质上的区别,也就是说在初始化类的时候你用任何一种注解都可以,
+不过@Repository在持久层会有一个exception转换的作用,先暂且放下后续再看.现在我们来新建一个类;
+
+import com.skyline.model.Person;  //这个类中用到了我们之前建的person类
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+@Component //这个注解说明这个类可以被spring注册成一个组件,这个组件是专门用来生产对象的
+public class MyPersonComponent {
+    @Bean("aPerson")  //相当于是配置文件中的那个唯一id
+    public Person testPerson() {   //原本是在配置中配置了这个person类的信息,让spring去初始化
+        Person aPerson = new Person(); //现在不在配置中配了,而是直接在代码的一个类中用一个方法
+        aPerson.setName("Chester");  //来真实的new这样一个对象,并给对象赋值,然后返回这个对象.
+        return aPerson;
+    }
+    @Bean("myService")  //这个也是一样,原本在配置中配的现在都写在代码里
+    public MyServiceImpl testService() {  
+        MyServiceImpl service = new MyServiceImpl();
+        service.setGreeting("Hello");  //但是原来这个实现类还依赖了person的,为啥没把person也
+        return service;  //set上呢,是因为person上有个@Autowired注解,还在起作用呢.只要加了自动 
+    }  //依赖注解,无论是什么类,只要初始化的时候用到了person类,那么都会自动依赖过去.
+}
+通过这样的方式,我们就把原本在配置中配置的依赖关系转移到了java类中,在java类中统一生产那些用到的对象
 ```
 
