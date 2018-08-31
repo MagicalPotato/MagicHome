@@ -200,6 +200,64 @@ public class MySpringContainer {
         MyServiceImpl service = context.getBean("myService", MyServiceImpl.class);
         System.out.println(service.sayHello());  //看到没,容器自己去找了工程路径下的services.xml配置
     } //然后根据这个配置初始化了你的service实现类,最后say了个Hello
+}  //现在只要直接运行你的这个容器类,那么这个sayHello的动作就可正常完成.很多让你就会有疑问了,你在你的main容器
+中直接new一个service的实现类不是更方便吗,为啥非要再搞个配置文件多此一举呢? 很多东西啊不能只看表面,new一个对象
+确实方便,但实际中我们的这个对象几乎不可能就只是say个hello就完事了,很多情况下都是在容器里构造出一堆对象之后把
+这些对象给别的类去用,你如果在原本用这些类的那个类中去new,那么用的类和被用的类之间耦合度是不是一下就上去了,后续你要
+改动一下那很可能你整个流程都或多或少得动一动,动完之后呢你又得重新编译重新打重新部署...所以啊,每个时期每种技术的出现
+都是有它的背景和意义的,等到后续你会发现,其实配置也有很多弊端,到SpringBoot,我们连配置也不用了.但整个过程都是一点一点
+慢慢演进的,并非一蹴而就,只有先了解了历史,后续你才能知道如何去修正历史.
+```
+16. 有了上面的基础,那后续也就好理解了,最开始容器只是初始化了一个类干了一件事,现在我们有了多个类,这多个类之间还有了依赖关系,那这个咋办呢,还是靠配置,假设现在我们的service实现类sayHello的时候它不say自己的name了,它要say另一个类的name,假设这个类叫Person类,那么原始情况下service实现类肯定是先在自己
+的类中new一个person,然后取出person的属性,最后say这个属性.现在来看容器咋做:
+```
+public class Person {   // 这是个service实现类依赖的person类
+    private String name;
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
 }
+public class MyServiceImpl implements MyService {  
+    private Person person;   //现在它有个别的类的属性
+    // private String xxx   //假设自己的属性也还在,这个属性也可以在配置中配置
+    public MyServiceImpl(Person person){  //这个service类初始化的时候它要传入一个person对象
+        this.person = person;            //并赋给自己的person属性
+    }
+    @Override
+    public String sayHello() {
+        return "Hello " + this.person.getName();  //然后这里say的是传入的那个对象的属性
+    }
+}
+//配置文件上面那一堆先省略,只看用到的
+    <bean id="aPerson" class="com.skyline.model.Person"> // 首先是唯一确定了person类
+      <property name="name" value="Chester"/>   //然后给person类的属性赋了值
+    </bean>
+    <bean id="myService" class="com.skyline.service.MyServiceImpl">  // 然后确定了service实现类
+      <constructor-arg ref="aPerson"/>  // 最后用一个特定的标签引用了那个person类
+      // <constructor-arg type="java.lang.String" value="Hello"/> 如果还有别的属性,也可以这样来给它赋值,但是属性多的话也是个麻烦,先记住
+    </bean>  //通过这样的方式,Spring会先初始化aPerson,然后使用它初始化myService。运行代码,结果和之前是一样的。
+```
+17. 进一步简化配置,还是刚刚那个类,我们用注解的方式来引用:
+```
+<?xml version="1.0" encoding="UTF-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" <!-- 新增 -->
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd"> <!-- 新增 -->
+
+    <context:annotation-config/>      //在配置文件中加入这个标签就说明打开了根据注解自动识别的动能
+    <bean id="aPerson" class="com.skyline.model.Person">
+      <property name="name" value="Chester"/>
+    </bean>
+    <bean id="myService" class="com.skyline.service.MyServiceImpl"> //虽然现在配置了实现类,但是并没有用ref去引用上面的person类
+      <property name="greeting" value="Hello"/>      //真正的引用我们交给了注解,看下面代码:
+    </bean>
+</beans>
 ```
 
