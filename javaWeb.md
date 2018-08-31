@@ -431,5 +431,8 @@ public class MyComponent {
 @Autowired
 @Qualifier("Mike") //我标记了我要用Mike那个 
 private Person person;
+
+这跟你在一个controller类中去依赖一个service类一个道理:
+@Autowired
 ```
 
