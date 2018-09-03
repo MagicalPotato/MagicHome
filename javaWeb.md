@@ -520,3 +520,14 @@ public class PersonController {
 public class AppConfig {
 }
 ```
+25. 看下面这两个依赖就能够很容易的理解maven的gropuid和artifactid了
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId> // 这两个依赖都是spring-boot框架的
+    <artifactId>spring-boot-starter-data-jpa</artifactId>  //这是框架中的一部分
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-rest</artifactId>  //这是框架中的另一部分
+</dependency> //代码正在像模块化的方向发展,所以依赖也有不同的模块,但是很多模块可能同属一个组,所以有了这种管理方式.
+```
