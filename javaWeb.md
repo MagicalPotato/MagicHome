@@ -474,7 +474,7 @@ public class PersonController {
     }
 }
 ```
-24. 一般情况下我们自己的工程都需要手动去各个地方下载项目依赖的jar包,如果使用了maven来管理的话,很多jar包我们就不需要自己去下载了,而是交给maven来管理.通过maven的配置文件,可以自动帮我们到指定的仓库中去下载.
+24. 一般情况下我们自己的工程都需要手动去各个地方下载项目依赖的jar包,如果使用了maven来管理的话,很多jar包我们就不需要自己去下载了,而是交给maven来管理.通过maven的配置文件,可以自动帮我们到指定的仓库中去把依赖的包下载到本地仓库.如果你的服务是部署在maven的tomcat上,你就不需要再去往tomcat的lib目录下再去拷贝相应的jar包了,但是如果你的服务是单独的部署在某个环境上,那么你还是得把需要的jar包拷贝到 那个tomcat的lib下去.
 ```
 在工程名字上右键，选择“Add Framework Support”。在打开的对话框中，勾选 Maven,确定之后工程会出现一个pom.xml
 的配置文件夹,这就告诉现在我们要让maven来管理我们的工程了.
@@ -515,7 +515,7 @@ public class PersonController {
 </project>
 
 @Configuration
-@EnableWebMvc  //@EnableWebMvc会帮我们配置好JSON有关的响应Handler,如果没配,是不能返回JSON响应的。
+@EnableWebMvc  //@EnableWebMvc是Spring MVC新版本所推荐用法,它会帮我们做很多配置工作包括配好JSON有关的响应Handler,如果没加,是不能返回JSON响应的。
 @ComponentScan("com.skyline")
 public class AppConfig {
 }
