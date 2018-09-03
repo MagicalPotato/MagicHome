@@ -461,3 +461,62 @@ public interface CoreNetNeDao        // Service在注解括号中直接指定名
     ...............  //dao里没有可以依赖的了
 }
 ```
+23. restful风格.所谓的restful,就是在原来的注解基础上添加新的东西来简化代码的编码,比如以前我们编写一个controller类,我们需要给类添加@controller注解,然后我们还要给类中的方法添加@responseBody注解来确定方法的返回值.现在我们可以简化这些操作了,因为我们把方法的返回值注解直接合并到了@restController注解中,所以我们只需要在controller类上直接使用这个注解就行了,其他的一些注解就可以省略了.总之,restful风格就是通过restful的注解,来简化更多的操作.
+```
+@RestController  //这里使用restful的注解
+@RequestMapping("/person")
+public class PersonController {
+    @RequestMapping(method = RequestMethod.GET)  //可以单独为各个方法指定请求方式
+    public List<Person> getAllPerson() {
+        List<Person> l = new ArrayList<>();
+        l.add(new Person(1, "Chester"));
+        return l;
+    }
+}
+```
+24. 一般情况下我们自己的工程都需要手动去各个地方下载项目依赖的jar包,如果使用了maven来管理的话,很多jar包我们就不需要自己去下载了,而是交给maven来管理.通过maven的配置文件,可以自动帮我们到指定的仓库中去下载.
+```
+在工程名字上右键，选择“Add Framework Support”。在打开的对话框中，勾选 Maven,确定之后工程会出现一个pom.xml
+的配置文件夹,这就告诉现在我们要让maven来管理我们的工程了.
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>  //描述maven的版本等信息
+
+    <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+    </properties>
+
+    <groupId>MyJavaWebProject</groupId>  // 项目组编号
+    <artifactId>MyJavaWebProject</artifactId>  // 项目编号
+    <version>1.0-SNAPSHOT</version>  //版本
+
+    <dependencies>
+        <dependency>  //可以看到,maven对jar包的管理和依赖,实际上就是对该项目的工程描述
+            <groupId>org.springframework</groupId>  // 大框架
+            <artifactId>spring-webmvc</artifactId>  // 大框架下的小模块
+            <version>4.3.8.RELEASE</version>  //小模块的版本
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId> // 大概念是servlet
+            <artifactId>servlet-api </artifactId>  // 用到了大概念下的或者就是大概念对应的jar包
+            <version>2.5</version>// jar包版本
+        </dependency>
+       // 一个大概念+一个小概念+一个版本就可以在仓库中唯一确定一个你要用的依赖
+       <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId> //spring本身不带json功能,就是如果你要给前台的返回值是
+            <artifactId>jackson-databind</artifactId> //json的话就需要引入外部依赖,这里我们引入了jackson这个依赖
+            <version>2.7.3</version>
+        </dependency>
+    </dependencies>
+</project>
+
+@Configuration
+@EnableWebMvc  //@EnableWebMvc会帮我们配置好JSON有关的响应Handler,如果没配,是不能返回JSON响应的。
+@ComponentScan("com.skyline")
+public class AppConfig {
+}
+```
