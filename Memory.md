@@ -225,6 +225,20 @@ echo [%JRE_HOME%]
 
 * 使用==比较时,java的integer变量默认比较的是地址值.integer内部维护了一个-128~127的常量池,所以这个范围的integer都是一样的,如果超过了这个范围,那就是一个新的对象,地址肯定不一样. 但是如果比较的某一边有表达式,那就比较的是具体数值. integer本质上是对象,所以用了表达式之后相当于是对对象进行了操作,这样的话用==比较实际上是用equel比较,比较的自然是具体值.  对于long类型来说,使用equel比较的都是数值,long的equel会自动判断这个数值是不是long.
 
+* parseInt和ValueOf的区别:如果是想要一个int直接用parseInt,如果是想要一个int对象,那就用valueOf.很多情况下我们实际上不会注意到这些,想到哪个就用哪个,如果用了valueOf,那要注意直接赋值给一个int类型时候要注意判断空,因为int对象是可以自动拆箱成int类型的,不会报错,也就是说你可以将一个integer直接赋给一个int变量,这是没问题的,问题在于隐含的null值,如果这个integer是个null,那就麻烦了.
+```
+public static int parseInt(String var0) throws NumberFormatException {  //返回基本类型
+   return parseInt(var0, 10);
+}
+public static Integer valueOf(String var0) throws NumberFormatException { //返回包装对象类型,且内部是调用了parseInt
+   return valueOf(parseInt(var0, 10));
+}
+基本数据类型：int, short, long, double, byte, char, float, boolean
+对应包装类型：Integer, Short, Long, Double, Byte, Character, Float, Boolean
+```
+
+* 大型网站如果使用了多服务器,Session就需要进一步处理.因为可能会出现这次的请求是被A应用服务处理，但是下一次就会被B应用服务器处理，应用Http是无状态，所以需要借助Session实现有状态，但是显然这里Session无法完成这个“艰巨”的任务。针对这个问题，解决方法较多。比如可以在请求和服务器之间加一个负载均衡器,让负载均衡器维系请求和服务器之间的对应关系，如果发现是张三发来的请求那就扔到服务器A上处理，如果是李四的就扔到服务器B上处理。还有一种处理方法是添加加一个同步操作，在两个服务器之间完成Session同步，这样不管服务器A还是B都会有全集的Session集合了，那么谁处理就显得不重要了。还有一点,随着网站壮大,服务器和数据库放在一起肯定不行了,慢慢就会拆开,拆开之后也有可能随着访问量增长数据库扛不住的情况,那么就应该考虑数据库的读写分离,有个主库,一个读库和一个写库,当有些操作的时候要及时将写的东西同步到读库和主库中.因为一般服务器大多用来读,所以搞多个读库是可以的.
+
 
 
 
