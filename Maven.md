@@ -71,7 +71,8 @@
         <system>jira</system>    <!--问题管理系统（例如jira）的名字， -->
         <url>http://jira.baidu.com/banseon</url>  <!--该项目使用的问题管理系统的URL -->
     </issueManagement>
-    
+```
+``` 
     <!--项目持续集成信息 -->
     <ciManagement>
         <system />    <!--持续集成系统的名字，例如continuum -->
@@ -162,8 +163,8 @@
         <name>demo</name>  <!--组织的全名 -->        
         <url>http://www.baidu.com/banseon</url>  <!--组织主页的URL -->
     </organization>
-    
-    
+```
+``` 
     <!--构建项目需要的信息 -->
     <build>        
         <sourceDirectory />  <!--项目源码目录，当构建项目的时候，构建系统会编译目录里的源码。该路径是相对于pom.xml的相对路径。 -->        
@@ -262,8 +263,8 @@
             </plugin>
         </plugins>
     </build>
-    
-    
+```
+```        
       <!--在列的项目构建profile，如果被激活，会修改构建处理.里面详细的配置内容参考上面已经配置过的 -->
     <profiles>        
         <profile>  <!--根据环境参数或命令行参数激活某个构建处理 -->            
@@ -361,8 +362,8 @@
             <properties />
         </profile>
     </profiles>
-    
-    
+```
+``` 
     <!--模块（有时称作子项目） 被构建成项目的一部分。列出的每个模块元素是指向该模块的目录的相对路径 -->
     <modules />    
     <repositories>  <!--发现依赖和扩展的远程仓库列表。 --> 
@@ -447,8 +448,8 @@
             </plugin>
         </plugins>
     </reporting>
-    
-    
+```
+``` 
     <!-- 继承自该项目的所有子项目的默认依赖信息。-->
     <dependencyManagement>
         <dependencies>            
