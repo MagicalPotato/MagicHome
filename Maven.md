@@ -16,4 +16,20 @@
   2. maven有本地仓库和远程仓库,远程仓库又包含中央仓库和私服还有一些开源的地址.当你在本地装好maven后,你的本地仓库默认是在C盘\用户\.m2\repositories,但是这个.m2\repositories在你还没有执行任何maven命令之前你是看不到的.你必须得随便执行一个maven命令这个文件夹才会出现,出现之后你需要手动拷贝一个settings.xml文件放到.m2下,然后执行更新仓库的命令之后repository文件夹就被默认创建并且所有需要的资源也被更新到这个目录下了.但是实际开发中并不建议将仓库放C盘,假如重装系统那你这些东西就没了,你又得重搞一遍.最主要的是这个路径刚开始你看不到,还得执行命令,初学者一不小心就执行错了,然后搞得一团糟.所以直接把仓库换一个地方. 在D盘下新建一个MAVEN文件夹,这个名字可以随意起,然到你下载的apache-maven-3.5.4文件夹,里面的conf文件夹下有个settings.xml,打开这个文件并找到localRepository标签,把标签中的路径改成 D:\MAVEN  就是你刚新建那个路径,保存之后把这个文件拷贝一份到 D:\MAVEN下. 改完拷贝完之后打开eclipse并选择Window--preferences--Maven--User settings 这时候弹框中会有一个global setting和一个user setting, global就是全局设置,所以使用这个电脑的人都是这个设置,而user 就是个人的setting,个人的setting会覆盖全局的,所以假如选择了个人的文件路径,那么全局的选不选都无所谓,但是两个都选还是按照个人的进行,update setting那个按钮的作用就是去覆盖全局setting.xml,为啥maven会多此一举呢,主要是因为,当maven进行升级的时候,全局的setting.xml里面的所有东西都会被清除,所以这就是我们最开始把apache-maven-3.5.4下conf中的setting拷贝了一份到MAVEN下的原因.不拷完全可以,你就把
   apache-maven-3.5.4下的conf下的setting改了,把仓库路径改成MAVEN,啥也不用再配置就可以用了,在进行user setting设置的时候直接选全局变量就可以了,但是假如有一天你升级了maven,那你这个全局变量就被清了,假如你只改了几行还好,万一改的多那你就哭去吧,所以我们复制了一份用的是user settings.
   事实上,maven并不会自己自动进行升级,上面所指的升级是人为手动升级,也就是把这个版本的包删了然后下了一个别的版本的包放在之前那个目录下了,这样你的setting.xml肯定就不在了啊,所以提前往MAVEN文件夹中拷贝一份就是这个道理.
+* 另一些注意事项
+  - Maven 提倡使用一个共同的标准目录结构,也就是约定优于配置,大家尽量约定好一个统一的路径,以减少配置文件.
+  ```
+  ${basedir} 存放pom.xml和所有的子目录
+  ${basedir}/src/main/java 项目的java源代码
+  ${basedir}/src/main/resources 项目的资源,比如说property文件，springmvc.xml
+  ${basedir}/src/test/java 项目的测试类，比如说Junit代码
+  ${basedir}/src/test/resources 测试用用的资源
+  ${basedir}/src/main/webapp/WEB-INF web应用文件目录，web项目的信息，比如存放web.xml、本地图片、jsp视图页面
+  ${basedir}/target 打包输出目录
+  ${basedir}/target/classes 编译输出目录
+  ${basedir}/target/test-classes 测试编译输出目录 
+  Test.java Maven只会自动运行符合该命名规则的测试类
+  ~/.m2/repository Maven默认的本地仓库目录位置
+  ```
+  - Maven 3.3 要求 JDK 1.7 或以上,Maven 3.2 要求 JDK 1.6 或以上,Maven 3.0/3.1 要求 JDK 1.5 或以上.否则无法运行.
 
