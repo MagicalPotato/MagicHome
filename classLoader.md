@@ -12,7 +12,8 @@ C:\Windows\Sun\Java\lib\ext                 //这个文件夹下所有
 
 String c = System.getProperty("java.class.path");  //系统类加载器
 System.out.println(c.replace(";", "\n"));
-系统类加载器加载的就多了:
+系统类加载器加载你配置的环境变量classpath下的jar和.class--- .;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar
+注意到这个变量里面的那个点路径没,代表当前目录,所以系统类加载器加载的就是如下这些:
 1. 首先当前这个类所在的上层目录直到classes目录下的所有,例如D:\某个路径\某个微服务下\build\classes  //这个路径下的全加载
 2. 然后是你当前这个工程的lib文件夹下的所有.jar都加载
 3. 如果你的这个服务部署在某个容器中比如tomcat,那么你那个容器的工程lib文件夹下的所有.jar都会加载
