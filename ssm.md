@@ -191,48 +191,55 @@
   <property name="basePackage" value="com.company.ssm.crm.dao" />
  </bean>
  
- 
- 
- 
  ----------以下配置可以单独配成applicatonContext-service.xml   开头部分三个通用
  //这个和上面那个标签一样,作用和原理还不太理解,不过肯定是分别用于扫描项目的dao层和service层.上面那个应该是个原始标签,下面是个简写
  <context:component-scan base-package="com.company.ssm.crm.service" />
  
- 
- 
  -----------以下配置可以单独配成applicatonContext-transaction.xml  开头部分三个通用
- <!--4.配置事务管理器  :事务就是一系列的动作，它们被当作一个单独的工作单元。这些动作要么全部完成，要么全部不起作用
+ <!--4.配置事务管理器  :事务就是一系列的动作，它们被当作一个单独的工作单元。这些动作要么全部完成，要么全部不起作用.
  本来数据库的连接和操作是Mybatis来管的,但是现在Mybatis和spring整合了,那么任务的最高权限就交给spring了,虽然与数据库的相关操作都还是
  Mybatis来执行,但是什么时候执行,什么时候结束,遇到错误该咋办...这些Mybatis你就不用操心了,由我spring来处理,这就是事务管理.相当于就是
- 个责任委托. spring有很多用于实物管理的类,现在我们只整合了Mybatis所以只需要配置管理数据库的事物,加入你要跟hibernate整合那你就再配置
- 用于管理hibernate的事务就行了.需要让啥被spring管理就配啥.-->
- <bean id="transactionManager"
+ 个责任委托. spring有很多用于实物管理的类,现在我们只整合了Mybatis所以只需要配置管理数据库的事务,加入你要跟hibernate整合那你就再配置
+ 用于管理hibernate的事务就行了.需要让啥被spring管理就配啥. 在事务管理中有个事务回滚的概念,当一个有关联的连续事务操作发生了异常,那么
+ 会进行事务回滚,一次返回到执行事务最开始的状态.-->
+ <bean id="transactionManager"   // 这里配置了一个事务管理器,用来管理对于数据库的操作.
   class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-  <property name="dataSource" ref="dataSource" />
+  <property name="dataSource" ref="dataSource" />  //事务管理器的属性是数据库,你要管理别的事务你的属性肯定就是别的.
  </bean>
  
- <!-- 通知  通知中transaction-manager会跟某个上面配的事务进行关联,用以完成一些操作,具体咋用的暂时不太清楚后续看看,目前可以理解的是
- 这是一个和上面的数据库事务管理配置相关的一个通知,因为transaction-manager指向了事务管理模块.-->
- <tx:advice id="txAdvice" transaction-manager="transactionManager">
+ // tx标签指定了一些具体的操作,这些操作和刚刚上面配置的那个事务管理器相关联.也就是说把下面的这些操作交给上面那个事务管理器去管理
+ <tx:advice id="txAdvice" transaction-manager="transactionManager"> //这里配置了一个具体的行为,它和你刚配置的那个事务是关联的
   <tx:attributes>
    <!-- 传播行为 -->
-   <tx:method name="save*" propagation="REQUIRED" />
-   <tx:method name="insert*" propagation="REQUIRED" />
-   <tx:method name="add*" propagation="REQUIRED" />
-   <tx:method name="create*" propagation="REQUIRED" />
-   <tx:method name="delete*" propagation="REQUIRED" />
-   <tx:method name="update*" propagation="REQUIRED" />
-   <tx:method name="find*" propagation="SUPPORTS" read-only="true" />
-   <tx:method name="select*" propagation="SUPPORTS" read-only="true" />
+   <tx:method name="save*" propagation="REQUIRED" />    //在这个具体的行为中我们看到了对于数据库的增删改查等操作
+   <tx:method name="insert*" propagation="REQUIRED" />  // 看到下面update的操作那一条中的 rollback-for="Exception"那个配置了吗
+   <tx:method name="add*" propagation="REQUIRED" />    // 这就是给update这个操作设置了事务回滚.回滚的条件是当update的方法发生了
+   <tx:method name="create*" propagation="REQUIRED" />   //指定的异常,那么就会进行回滚. 你可以像这个配置这样吧需要回滚的方法配置
+   <tx:method name="delete*" propagation="REQUIRED" />  //在配置文件中,也可以直接在类上或者类里面的那个指定的方法上用@Transactional注解
+   <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>  //注意这一条的配置,添加了回滚条件
+   <tx:method name="find*" propagation="SUPPORTS" read-only="true" />   
+   <tx:method name="select*" propagation="SUPPORTS" read-only="true" />  
    <tx:method name="get*" propagation="SUPPORTS" read-only="true" />
   </tx:attributes>
  </tx:advice>
- 
- <!-- AOP 切面  切面也算是一种事务,所以被配置到事务中,具体使用和原理后续再继续深究-->
- <aop:config>
-  <aop:advisor advice-ref="txAdvice"
-   pointcut="execution(* cn.itcast.core.service.*.*(..))" />
- </aop:config> 
+回滚机制 : 
+1.Spring事务管理是根据异常来进行回滚操作；
+2.Spring与Mybatis整合时，虽然在Service方法中并没有check异常，但是如果数据库有异常发生，默认也会进行事务回滚;
+3.Spring 如果不添加rollbackFor等属性,碰到Unchecked Exceptions,RuntimeException,Error都会回滚,如果添加了那么就按你添加的异常进行回滚.
+4.如果在需要被管理的方法中(比如刚的那个update方法)捕获了异常并进行了处理，一定要继续抛出异常,这样你在配置文件中的rollback才能识别到异常并进行
+回滚,否则捕获了不处理也不抛出是不会回滚的.因为要回滚肯定是遇到了异常,尼玛你把异常都在代码里捕捉了spring自然就没法得知这个异常自然无法回滚.所以
+你要么就啥也不干不try-catch,要么就捕获并重新抛出.很多时候我们在代码中的service中调用了dao层,但是我们并没有在调用的时候把那句话用try-catch包起来
+就是这个道理.因为你查一次库就相当于一次事务操作,spring用了默认的方式来管理你的这次操作,如果你的这个更新操作发生了异常,比如你往数据库更新数据刚
+更新了一半断电了,那么你的这次事务就被取消了,恢复到一个都没更新的状态.
+
+还有一种被我们忽略的事务回滚,其实就是在代码里直接写,比如你写了几行代码,然后对这几行代码的执行结果进行了判断,如果满足条件就继续执行后续的代码,否则
+则不执行,事务管理表现在代码上实际上就是一个条件判断,成立则继续,不成立则执行别的,但是这种方式要写很多重复代码而且你得把所有相关的东西都得写全才行,
+所以实际中这种情况比较少见.
+
+ <aop:config> //这个就是切点的配置
+  <aop:advisor advice-ref="txAdvice"  //上面那一堆操作就是一个切面,这个切面被在这里引用
+   pointcut="execution(* cn.itcast.core.service.*.*(..))" />  //而pointcut属性就是切点,也就是你的那个service类,这里配置了
+ </aop:config>                                // *.* 所以就是service中的所有方法都是这个事务中被管理的对象
 </beans>
 ```
 
