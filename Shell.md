@@ -7,7 +7,7 @@
 * Shell语言定义变量时,变量名前不加美元符号$,但是在php语言中需要. your_name="runoob.com" ,注意**shell中的变量和等号之间不能有空格**.可以在代码中使用命令语句for file in ``` `ls /etc` ```(注意这个不是单引号,是反引号,反引号中的内容是一个命令,比如你在反引号中写了data,那么输出的就是当前时间而不是data这个字符串) 或者for file in $(ls /etc) 该语句可以将/etc下目录的目录名称列出来
 * 使用一个定义过的变量，只要在变量名前面加美元符号即可，如：your_name="qinjx" , echo $your_name 或者echo ${your_name}. 推荐在使用的时候给所有变量加上花括号，这是个好的编程习惯.
 * readonly xxx 将xxx这个变量设置成只读变量  unset xxx 删除xxx变量,但不能删除只读变量,变量被删除后不能再次使用. 
-* shell中的字符串可以使用单双引号,但稍有区别. 单引号中不能使用转义,哪怕使用了反斜杠也不行,也不会输出变量,反正就是啥都不能用,只会原样输出其中的内容.而双引号内有这个限制  string="abchhjkhjd",echo ${#string},加了#相当于是求字符串长度. echo ${string:1:4},从第二个字符开始截取四个字符
+* shell中的字符串可以使用单双引号,但稍有区别. 单引号中不能使用转义,哪怕使用了反斜杠也不行,也不会输出变量,反正就是啥都不能用,只会原样输出其中的内容.而双引号没有这个限制  string="abchhjkhjd",echo ${#string},加了#相当于是求字符串长度. echo ${string:1:4},从第二个字符开始截取四个字符
 * Shell 中，用括号来表示数组，数组元素用"空格"符号分割开. array_name=(value0 value1 value2 value3).  也可以用下标来定义 array_name[0]=value0 .......array_name[n]=value0 可以不使用连续的下标，而且下标的范围没有限制.获取数组值的一般格式是使用下标 valuen=${array_name[下标]}, 使用 @ 符号可以获取数组中的所有元素 echo ${array_name[@]}, 取得数组元素的个数 length=${#array_name[@]}或者length=${#array_name[`*`]}
 * shell中没有多行注释,只有单行注释 ,使用#号 . 
 * echo "It is a test" > myfile 将结果输出到myfile文件  echo后加-e参数说明之后的东西将开始转义, \c的意思是不换行.  read -p "请输入一段文字:" -n 6 -t 5 -s password, echo -e "\npassword is $password" ,把这两条命令写入一个shell脚本中,然后执行该脚本,会输出如下东西: 请输入一段文字: 下一行:password is asdfgh .由此可以看出read的用法: -p参数是显示提示字符串, -n是限制输入文本的长度, -t是限制时间5分钟 ,-s是输入隐藏内容. 另外,read 命令一个一个词组地接收输入的参数，每个词组需要使用空格进行分隔；如果输入的词组个数大于需要的参数个数，则多出的词组将被作为整体为最后一个参数接收。
