@@ -36,5 +36,6 @@ cat hello.java  //查看hello.java文件
 git rm hello.java  //从Git上删除hello.java文件
 
 git clone 仓库地址  //把仓库上的工程克隆到本地,地址不带引号
+git pull   //从git上更新最新的代码到本地,类似于svn update
 git push //网Git上合并你的本地仓库,有可能会出现权限问题,是因为没有设置用户名和密码,需要手动修改 .git/config 文件添加用户名和密码
 ```
