@@ -81,7 +81,7 @@ echo "输入的两个数字之和为 $? !"        #  函数返回值在调用该
 * 重定向
 ```
 command > file 将输出重定向到 file。  # file内的已经存在的内容将被新内容替代。如果要将新内容添加在文件末尾，请使用>>操作符
-command < file将输入重定向到 file。
+command < file将输入重定向到 file。也就是从file中读入东西当做命令的参数.
 command >> file将输出以追加的方式重定向到 file。
 n > file将文件描述符为 n 的文件重定向到 file。      # 文件描述符 0 通常是标准输入（STDIN），1 是标准输出（STDOUT），2 是标准错误输出（STDERR）
 n >> file将文件描述符为 n 的文件以追加的方式重定向到 file。
