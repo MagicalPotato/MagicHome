@@ -27,8 +27,8 @@ less – View file contents  //浏览文件内容
 ```
 ```
 cp – Copy files and directories  
-    cp file1 file2  复制文件file1内容到文件file2中。若file2已经存在,file2所有内容会被file1的内容重写。若file2不存在,则创建file2。
-    cp item... directory  //copy一个或多个文件到某个目录下面, -a参数复制父文件的所有,包括属性等等, -r递归 , -i 提示是否覆盖已存在,否则默认覆盖  
+    cp file1 file2  复制文件1内容到文件2中。若2已经存在,则2所有内容会被1的内容重写。若2不存在,则创建2。
+    cp item... directory  //copy一个或多个文件到某个目录下, -a 复制父文件的所有,包括属性等, -r递归 , -i 提示是否覆盖,默认覆盖  
     可以使用通配符来匹配文件,当然在地址路径中也可以使用通配符, /home/*soft
     * 匹配任意多个字符（包括零个或一个）
     ? 匹配任意一个字符（不包括零个）
