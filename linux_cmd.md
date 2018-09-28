@@ -303,4 +303,21 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
     [root@linuxbox ~]# cd /mnt/cdrom; ls  //此时便可cd到该目录下查看该光盘中的东西了.注意:在该光盘目录下是无法卸载该光盘设备的,你进了该目录说明
     该光盘设备正在被使用,也就是被占用,所以卸载不了,除非你cd到别的目录下去卸载. 一般的系统无论是windows还是linux,外部设备比如打印机,U盘,光盘等,其
     处理速度都是远远低于计算机的处理速度,所以操作系统在操作这些外部设备都是使用缓存,假如你不删除设备直接拔了的话有时候很可能造成数据损坏.
+    [me@linuxbox ~]$ sudo tail -f /var/log/messages  //得知设备的挂载名通常不太容易,可以实时查看这个文件,当有新设备(比如一个U盘)被加进来之后,
+    这个文件最下面会显示新信息,像这样:Jul 23 10:07:59 linuxbox kernel: sdb: sdb1, 可以发现U盘名称就是sdb,其分区就是sdb1,那么/dev/sdb就指整个
+    设备,/dev/sdb1就指这个设备的第一分区. 注意查看完之后ctrl+c退出查看然后回到命令提示状态.此时刚刚的设备信息还是显示在屏幕上.
+    [me@linuxbox ~]$ sudo mount /dev/sdb1 /mnt/flash  //得知连接到系统上的设备的名称后就可以进行挂载了.只要设备不卸载或计算机不重启名称就不变.
+    [me@linuxbox ~]$ df  //df命令也可以查看文件系统顺便也能看到挂载信息:
+    Filesystem      1K-blocks   Used        Available   Use%    Mounted on
+    /dev/sdb1       15560       0           15560       0%      /mnt/flash
+
+用Linux本地文件系统来重新格式化一个闪存驱动器,在格式化的时候一定要确定你指定了正确的系统设备名称,否则可能导致错误的设备被格式化.
+    [me@linuxbox ~]$ sudo umount /dev/sdb  //首先卸载刚刚挂上的那个闪存,卸载闪存用的是设备名称
+    [me@linuxbox ~]$ sudo fdisk /dev/sdb1   //然后用fdisk软件来查看这个设备的某个分区,当前设备就sdb1一个分区
+    Command (m for help): p   //回车后命令行会变成这样,输入p再次回车就可以查看该设备的分区信息了:
+    Device Boot     Start        End     Blocks   Id        System  //该分区占了可用1008个柱面中的1006个,并被标识为Windows95 FAT32分区。
+    /dev/sdb1           2       1008      15608+   b       w95 FAT32  //而Id号码b就是这个分区在整个linux系统中的分区id
+
+
+
 ```
