@@ -281,3 +281,26 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
     apt-get update; apt-get install emacs /apt-get update; apt-get upgrade/  apt-get remove emacs  //上层工具从资源库安装,更新,卸载emacs
     rpm -i emacs-22.1-7.fc7-i386.rpm / rpm -U emacs-22.1-7.fc7-i386.rpm  // 用底层工具来安装,更新你已经获得的emaces.rpm包 (上层工具更方便)
 ```
+```
+/etc/fstab 文件可以列出系统启动时要挂载的设备(比如硬盘分区,第一个),其中有很多是虚拟的(第二个),我们挑几个实际的物理设备来看一下:
+    LABEL=/home(设备名称)    /home(挂载点)   ext3 (文件系统类型)      defaults(挂载选项)      1(频率)  2(次序)
+    tmpfs                   /dev/shm        tmpfs                   defaults               0        0
+    大多Linux本地文件系统是 ext3,但是也支持很多其它的，比方说 FAT16 (msdos), FAT32 (vfat)，NTFS (ntfs)，CD-ROM (iso9660)等.
+    挂载选项:挂载只读的文件系统,或者挂载阻止执行任何程序的文件系统,(一个有用的安全特性，避免删除媒介)等.
+    频率和次序都是一位数字,频率表示是否和在什么时间用dump命令来备份一个文件系统,次序 指定fsck命令按照什么次序来检查文件系统。
+    
+无参的mount命令用来查看当前挂载的文件系统,带参的用来挂载一个文件系统,看一下[me@linuxbox ~]$ mount  的一个例子,命令的输出是给人看的所以并不是fstab
+中的那种展示方式,on和type并没有特殊含义,只是为了让你理解这句话:什么挂在什么上,类型是啥.
+    /dev/sda2 on / type ext3 (rw)  // 意思是/dev/sda2挂载在根文件系统,文件系统类型是ext3,并且可读可写。
+    /dev/sdd1 on /media/disk type vfat (rw,nosuid,nodev,noatime,uhelper=hal,uid=500,utf8,shortname=lower) // 一个SD卡挂载到/media/disk
+    twin4:/musicbox on /misc/musicbox type nfs4 (rw,addr=192.168.1.4) // 一个网络设备,挂载到/misc/musicbox 上。
+    /dev/hdc on /media/live-1.0.10-8 type iso9660 (ro,noexec,nosuid,nodev,uid=500) // 一个光盘挂载在/media/live-1.0.10-8上
+    
+    [me@linuxbox ~]$ su -   //启动超级用户权限,接着会让你输入密码,完了之后你的提示符$会变成#
+    [root@linuxbox ~]# umount /dev/hdc  //此时我们来卸载刚刚挂载的那个光盘
+    [root@linuxbox ~]# mkdir /mnt/cdrom  //新建一个空文件夹来重新挂载该光盘(若把设备挂到一个非空目录,你将看不到目录中原来内容直到你卸载该设备)
+    [root@linuxbox ~]# mount -t iso9660 /dev/hdc /mnt/cdrom  //把光盘重新挂到新文件夹上去  -t用来指定文件系统类型
+    [root@linuxbox ~]# cd /mnt/cdrom; ls  //此时便可cd到该目录下查看该光盘中的东西了.注意:在该光盘目录下是无法卸载该光盘设备的,你进了该目录说明
+    该光盘设备正在被使用,也就是被占用,所以卸载不了,除非你cd到别的目录下去卸载. 一般的系统无论是windows还是linux,外部设备比如打印机,U盘,光盘等,其
+    处理速度都是远远低于计算机的处理速度,所以操作系统在操作这些外部设备都是使用缓存,假如你不删除设备直接拔了的话有时候很可能造成数据损坏.
+```
