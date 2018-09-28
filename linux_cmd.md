@@ -271,3 +271,13 @@ n跳过该次,a对当前及以后执行替换,q or esc退出替换操作,l(last)
 一个跨文件复制粘贴的例子,先打开多个文件,然后输入 :buffer 1,此时会显示文件1的内容,且是命令模式,通过yG等命令复制你想要的数据,然后输入:buffer 2,回车
 切到文件2,此时展示文件2的内容且是命令模式,然后你可以通过p命令来粘贴.
 ```
+```
+Linux要安装软件,要么使用源码自己编译.要么就是直接使用已经编译好的包文件(软件所有文件的压缩集).Linux也有资源库,类似于Maven的仓库,可以从中下载一些
+包文件来安装. Linux软件包管理系统通常由两种工具类型组成：底层工具用来处理诸如安装和删除软件包文件等操作(你的软件包不是从资源库来的,你从别处获得,那
+就只能用底层的工具来装,底层工具没有依赖解析的过程,如果安装过程中发现少了依赖,会报错并退出), 上层工具完成元数据搜索和依赖解析(你的包直接是用该工具
+从资源库下的,那么上层工具能自动去给你解析和安装你这个包依赖的一些第三方和软件). Linux的包管理主要有两大技术阵营,
+    Debian (.deb)            : Debian, Ubuntu, Xandros      底层工具:dpkg  上层工具:apt-get, aptitude
+    LinspireRed Hat (.rpm)   : Fedora, CentOS, Red Hat Enterprise Linux, OpenSUSE, Mandriva, PCLinuxOS  底层:rpm  上层:yum
+    apt-get update; apt-get install emacs /apt-get update; apt-get upgrade/  apt-get remove emacs  //上层工具从资源库安装,更新,卸载emacs
+    rpm -i emacs-22.1-7.fc7-i386.rpm / rpm -U emacs-22.1-7.fc7-i386.rpm  // 用底层工具来安装,更新你已经获得的emaces.rpm包 (上层工具更方便)
+```
