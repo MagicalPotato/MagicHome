@@ -224,6 +224,7 @@ less来看.  别名无法通过 set 或 printenv 查看。几个常用的shell�
     
 登录Shell后,该shell会按序读一或多个启动文件, /etc/profile(所有用户,全局); ~/.bash_profile(个人,可覆盖全局); ~/.bash_login(若个人没找到找这个);
 ~/.profile(若上面那个还没找到就找这个,一般这个比.bash_profile更常见).  若是非登录的Shell则去读这个 /etc/bash.bashrc(全局), ~/.bashrc(个人).
+在.bashrc这个隐藏PS1的环境变量,通过修改这个变量可以定制你的Shell提示符.
 
 看一个典型的登录Shell的个人文件 .bash_profile ,已去除注释：
     if [ -f ~/.bashrc ]; then   // if条件句的意思是: If the file ~/.bashrc exists, then read ~/.bashrc
