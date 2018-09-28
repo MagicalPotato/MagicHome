@@ -282,7 +282,8 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
     rpm -i emacs-22.1-7.fc7-i386.rpm / rpm -U emacs-22.1-7.fc7-i386.rpm  // 用底层工具来安装,更新你已经获得的emaces.rpm包 (上层工具更方便)
 ```
 ```
-/etc/fstab 文件可以列出系统启动时要挂载的设备(比如硬盘分区,第一个),其中有很多是虚拟的(第二个),我们挑几个实际的物理设备来看一下:
+/etc/fstab 文件中存着系统启动时要挂载的设备信息(比如硬盘分区,第一个),其中有很多是虚拟的(第二个).每次系统启动,在挂载文件系统之前,都会检查文件系统的
+完整性。这个任务由fsck程序(file system check)完成。每个fstab项中的最后一个数字指定了设备的检查顺序。一般/root的次序数字就是1,最先检查,0不检查.
     LABEL=/home(设备名称)    /home(挂载点)   ext3 (文件系统类型)      defaults(挂载选项)      1(频率)  2(次序)
     tmpfs                   /dev/shm        tmpfs                   defaults               0        0
     大多Linux本地文件系统是 ext3,但是也支持很多其它的，比方说 FAT16 (msdos), FAT32 (vfat)，NTFS (ntfs)，CD-ROM (iso9660)等.
@@ -313,11 +314,26 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
 
 用Linux本地文件系统来重新格式化一个闪存驱动器,在格式化的时候一定要确定你指定了正确的系统设备名称,否则可能导致错误的设备被格式化.
     [me@linuxbox ~]$ sudo umount /dev/sdb  //首先卸载刚刚挂上的那个闪存,卸载闪存用的是设备名称
-    [me@linuxbox ~]$ sudo fdisk /dev/sdb1   //然后用fdisk软件来查看这个设备的某个分区,当前设备就sdb1一个分区
-    Command (m for help): p   //回车后命令行会变成这样,输入p再次回车就可以查看该设备的分区信息了:
-    Device Boot     Start        End     Blocks   Id        System  //该分区占了可用1008个柱面中的1006个,并被标识为Windows95 FAT32分区。
-    /dev/sdb1           2       1008      15608+   b       w95 FAT32  //而Id号码b就是这个分区在整个linux系统中的分区id
-
-
-
+    [me@linuxbox ~]$ sudo fdisk /dev/sdb1   //fdisk软件用来查看设备分区,并对该分区进行操作.当前设备就sdb1一个分区.以下是更改分区id的一个例子:
+      Command (m for help): p   //回车后命令行会变成这样,输入p再次回车就可以查看该设备的分区信息了:
+      Device Boot     Start        End     Blocks   Id        System  //该分区占了可用1008个柱面中的1006个,并被标识为Windows95 FAT32分区。
+      /dev/sdb1           2       1008      15608+   b       w95 FAT32  //而Id号码b就是这个设备在fdisk这个软件为其分配的一个id
+      Command (m for help): l   //在这个cmd下输入小写l回车,就可以看到这个设备b在linux系统分区中对应的分区id
+      Command (m for help): t   //还是这个cmd下输入t,回车后输入你刚看到的linux文件系统为该设备分配的分区号码,回车后所有操作就被保存在内存了
+      Command (m for help): w  //输入w回车后对该设备分区的修改就会被写入该设备同时fdisk软件退出,回到shell的命令行.如果输入的是q则不修改直接退出.
+    [me@linuxbox ~]$ sudo mkfs -t ext3 /dev/sdb1  //这句话就是对/dev/sdb1这个分区进行格式化,而且文件系统类型被格成了linux的类型ext3,若你想保
+    持原有类型不变则用-t vfat . 以上 fdisk和mkfs(make file system)结合起来就是常用的分区和格式化的操作. 
+    
+文件系统损坏情况相当罕见,除非硬件存在问题,如磁盘驱动器故障。在大多数系统中,系统启动阶段若探测到文件系统已经损坏了,则会导致系统停止运行,在系统继续
+执行剩余操作之前，会指导你运行fsck程序来检查受损文件系统。(文件系统出故障导致系统启不起来真是操蛋,fuck,用fsck来检查下吧,这就是命名的由来!!!)
+    [me@linuxbox ~]$ sudo fsck /dev/sdb1  //fsck除了检查文件系统完整性,还能修复受损文件系统,这个命令用来检查我们的闪存设备(需先卸载)
+    dd if=/dev/sdb of=/dev/sdc   //一种常用的复制文件语法. 假设系统插了两个U盘,我们把/dev/sdb中的东西全部复制到/dev/sdc中就可以这样
+    dd if=/dev/sdb of=flash_drive.img  //或我们只把/dev/sdb的东西复制到系统的一个文件中去以供后续使用
+    警告:这个dd非常强大。虽然名字来自“数据定义”,但经常被戏称为'清除磁盘',因为用户经常会误输入if或of的规范。这通常会造成不可逆的严重后果.
+    dd if=/dev/cdrom of=ubuntu.iso  //用dd来复制你插入的光盘数据并制作一个镜像(其实就是个复制品)
+    genisoimage -o cd-rom.iso -R -J ~/cd-rom-files //  把~/cd-rom-files这个目录下的所有东西制作成一个cd-rom.iso镜像,-R意思是允许使用长
+    文件名和POSIX风格的文件权限,-J选项使-R生效,这样Windows中就支持长文件名了。
+    mount -t iso9660 -o loop image.iso /mnt/iso_image  //把刚做的镜像挂载到一个新建的文件夹,便可把该镜像当做一个设备来使用了(用完记得卸载)
+    wodim dev=/dev/cdrw blank=fast / wodim dev=/dev/cdrw image.iso   //用这种方式来清除一张可重写的CD-ROM并写入刚刚的镜像文件
+    md5sum image.iso  // 34e354760f9bb7fbf85c96f6a3f94ece image.iso 下载一个镜像文件后,执行md5sum命令,并与发行商提供的md5sum值比较来验证文件
 ```
