@@ -363,4 +363,22 @@ SSH 由两部分组成。SSH服务端运行在远端主机上,一般在端口22�
     [me@remote-sys ~]$  //成功连接后我们会收到远端系统的提示符.远端提示符会在输入exit命令后关闭.本地shell提示符才能重新恢复工作.
     [me@linuxbox ~]$ scp remote-sys:a.txt .  //OpenSSH软件包中还有另外两个借助ssh来进行安全传输的程序:scp(安全复制)ftp(安全传输);scp的文件
     源路径名要以远端主机的名字跟一个冒号开头; 而sftp不需要远端系统中运行FTP服务端,只要有SSH服务端就能工作.
+    
+locate执行一次快速的路径名搜索,输出每个包含给定字符串的路径名.总之它就是个查找命令.随着历史发展演化出了slocate和mlocate,locate逐渐成了它们的软链
+接.由于locate的搜索数据库由一个叫updatedb的程序来更新,默认是一天更新一次,所以它查不到最新的文件信息.可以用管理员权限来手动执行updatedb.
+    [me@linuxbox ~]$ locate bin/zip  //输出任一个包含字符串bin/zip的路径名比如: /usr/bin/zipcloak , /usr/bin/zipgrep
+    [me@linuxbox ~]$ locate zip | grep bin  //和grep结合使用: /bin/bunzip2 , /bin/bzip2 , /bin/bzip2recover
+    
+find可以通过一种更复杂的方式来查找文件,比如用文件的属性来查找等.但是掌握起来也很费时间.
+    [me@linuxbox ~]$ find ~ | wc -l  //统计家目录下的目录列表.  最好别直接输出,有好几万呢,计个数就行了
+    [me@linuxbox ~]$ find ~ -type d | wc -l   //-type d 限定只搜索目录, -type f 普通文件, l软连接, b块设备 ,c字符特殊设备
+    [me@linuxbox ~]$ find ~ -type f -name "*.JPG" -size +1M | wc -l  //指定一些别的属性, +1M就是大于1M, -是小于,如果没有就是精确匹配. 如果
+    没有单位,则默认是1b,也就是512个字节块. k(千字节) M(兆字节) G(千兆字节). 
+    [me@linuxbox ~]$ find ~ \( -type f -not -perm 0600 \) -or \( -type d -not -perm 0700 \)  //添加更复杂的筛选条件,由于圆括号在shell中有
+    特殊的含义,所以所以需要转义告诉shell把它当成括号而不是你的特殊命令, -and简写-a (可省,默认就是and) ,-or简写-o ,-not简写! ;诸如perm这种选项在
+    find中用到的有太多太多,find能完成的筛选条件也极其多,后续再看吧.掌握简单的操作就行了.
+    find ~ -type f -name '*.BAK' -delete  // find默认使用的匹配项是-print,就是把内容显示在屏幕上,这个是删除匹配项目(所有删除操作都应该谨慎)
+    find ~ -print -and -type f -and -name '*.BAK'  //顺序写错,结果不对. 当然print一般都是默认省略且在最后,没人会这样写,别的选项就要注意
+    [me@linuxbox ~]$ touch dir/a.txt  //touch通常用来更新文件的一些信息比如修改时间,如果文件不存在则会默认创建.
+    [me@linuxbox ~]$ stat dir/a.txt   //stat命令用来展示一个文件的所有信息  // dir前没有路径限定,所以指的就是你的~(家目录)下的dir目录   
 ```
