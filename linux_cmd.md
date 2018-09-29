@@ -334,7 +334,19 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
     genisoimage -o cd-rom.iso -R -J ~/cd-rom-files //  把~/cd-rom-files这个目录下的所有东西制作成一个cd-rom.iso镜像,-R意思是允许使用长
     文件名和POSIX风格的文件权限,-J选项使-R生效,这样Windows中就支持长文件名了。
     mount -t iso9660 -o loop image.iso /mnt/iso_image  //把刚做的镜像挂载到一个新建的文件夹,便可把该镜像当做一个设备来使用了,-o loop的意思是
-    这个这个镜像本来不是个设备,但是我们假装它是个设备并挂载它,然后把它当做一个设备来使用(用完记得卸载)
+    这个镜像本来不是个设备,但是我们假装它是个设备并挂载它,然后把它当做一个设备来使用,注意一定要指定文件系统-t ,用完记得卸载.
     wodim dev=/dev/cdrw blank=fast / wodim dev=/dev/cdrw image.iso   //用这种方式来清除一张可重写的CD-ROM并写入刚刚的镜像文件
     md5sum image.iso  // 34e354760f9bb7fbf85c96f6a3f94ece image.iso 下载一个镜像文件后,执行md5sum命令,并与发行商提供的md5sum值比较来验证文件
+```
+```
+ping命令会发送一个叫做ICMP ECHO_REQUEST的特殊网络数据包到一台指定的主机。大多数接收这个包的网络设备(包括Linux主机)会回复它,来允许网络连接验证。当
+然,出于安全考虑,也可以对网络设备进行设置来忽略这些数据包.
+    [me@linuxbox ~]$ ping linuxcommand.org //Ctrl-c中断,之后会打印运行统计信息。若网络网卡,电缆,路由,网关都正常则报告零数据包丢失.
+    [me@linuxbox ~]$ traceroute slashdot.org //显示本机到指定主机的所有路由.对于有标识信息的路由器,可看到主机名,IP地址,性能数据.否则显示星号.
+    [me@linuxbox ~]$ netstat -ie //查看系统中的网络接口 , -r选项显示内核的网络路由表
+    
+FTP被广泛地用来从因特网上下载文件。大多数网络浏览器都支持FTP,它们的URI以协议ftp://开头。在出现浏览器之前,ftp 程序已经存在了。ftp程序可用来与FTP
+服务器进行通信.FTP服务器就是存储文件的计算机,这些文件能够通过网络下载和上传。FTP（它的原始形式）并不是安全的,因为它会明文发送帐号的姓名和密码。由于
+此种原因,几乎因特网中所有FTP服务器都是匿名的,允许任何人使用注册名anonymous和无意义的密码登录系统。
+    [me@linuxbox ~]$ ftp fileserver  //尝试登陆一个ftp服务器 ,会让你输入用户名anonymous和密码.密码可为空或者一个邮箱或试试user@example.com。 
 ```
