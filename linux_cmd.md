@@ -275,7 +275,7 @@ n跳过该次,a对当前及以后执行替换,q or esc退出替换操作,l(last)
 Linux要安装软件,要么使用源码自己编译.要么就是直接使用已经编译好的包文件(软件所有文件的压缩集).Linux也有资源库,类似于Maven的仓库,可以从中下载一些
 包文件来安装. Linux软件包管理系统通常由两种工具类型组成：底层工具用来处理诸如安装和删除软件包文件等操作(你的软件包不是从资源库来的,你从别处获得,那
 就只能用底层的工具来装,底层工具没有依赖解析的过程,如果安装过程中发现少了依赖,会报错并退出), 上层工具完成元数据搜索和依赖解析(你的包直接是用该工具
-从资源库下的,那么上层工具能自动去给你解析和安装你这个包依赖的一些第三方和软件). Linux的包管理主要有两大技术阵营,
+从资源库下的,那么上层工具能自动去给你解析和安装你这个包依赖的一些第三方软件). Linux的包管理主要有两大技术阵营,
     Debian (.deb)            : Debian, Ubuntu, Xandros      底层工具:dpkg  上层工具:apt-get, aptitude
     LinspireRed Hat (.rpm)   : Fedora, CentOS, Red Hat Enterprise Linux, OpenSUSE, Mandriva, PCLinuxOS  底层:rpm  上层:yum
     apt-get update; apt-get install emacs /apt-get update; apt-get upgrade/  apt-get remove emacs  //上层工具从资源库安装,更新,卸载emacs
@@ -287,15 +287,15 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
     LABEL=/home(设备名称)    /home(挂载点)   ext3 (文件系统类型)      defaults(挂载选项)      1(频率)  2(次序)
     tmpfs                   /dev/shm        tmpfs                   defaults               0        0
     大多Linux本地文件系统是 ext3,但是也支持很多其它的，比方说 FAT16 (msdos), FAT32 (vfat)，NTFS (ntfs)，CD-ROM (iso9660)等.
-    挂载选项:挂载只读的文件系统,或者挂载阻止执行任何程序的文件系统,(一个有用的安全特性，避免删除媒介)等.
+    挂载选项:挂载只读的文件系统,或者挂载禁止任何程序执行的文件系统(一个有用的安全特性，避免删除媒介)等.
     频率和次序都是一位数字,频率表示是否和在什么时间用dump命令来备份一个文件系统,次序 指定fsck命令按照什么次序来检查文件系统。
     
-无参的mount命令用来查看当前挂载的文件系统,带参的用来挂载一个文件系统,看一下[me@linuxbox ~]$ mount  的一个例子,命令的输出是给人看的所以并不是fstab
+无参的mount命令用来查看当前挂载的文件系统,带参的用来挂载一个文件系统,看一下[me@linuxbox ~]$ mount  的例子,命令的输出是给人看的所以并不是fstab
 中的那种展示方式,on和type并没有特殊含义,只是为了让你理解这句话:什么挂在什么上,类型是啥.
     /dev/sda2 on / type ext3 (rw)  // 意思是/dev/sda2挂载在根文件系统,文件系统类型是ext3,并且可读可写。
     /dev/sdd1 on /media/disk type vfat (rw,nosuid,nodev,noatime,uhelper=hal,uid=500,utf8,shortname=lower) // 一个SD卡挂载到/media/disk
     twin4:/musicbox on /misc/musicbox type nfs4 (rw,addr=192.168.1.4) // 一个网络设备,挂载到/misc/musicbox 上。
-    /dev/hdc on /media/live-1.0.10-8 type iso9660 (ro,noexec,nosuid,nodev,uid=500) // 一个光盘挂载在/media/live-1.0.10-8上
+    /dev/hdc on /media/live-1.0.10-8 type iso9660 (ro,noexec,nosuid,nodev,uid=500) // 把一个光盘挂载在/media/live-1.0.10-8上
     
     [me@linuxbox ~]$ su -   //启动超级用户权限,接着会让你输入密码,完了之后你的提示符$会变成#
     [root@linuxbox ~]# umount /dev/hdc  //此时我们来卸载刚刚挂载的那个光盘
@@ -303,37 +303,38 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
     [root@linuxbox ~]# mount -t iso9660 /dev/hdc /mnt/cdrom  //把光盘重新挂到新文件夹上去  -t用来指定文件系统类型
     [root@linuxbox ~]# cd /mnt/cdrom; ls  //此时便可cd到该目录下查看该光盘中的东西了.注意:在该光盘目录下是无法卸载该光盘设备的,你进了该目录说明
     该光盘设备正在被使用,也就是被占用,所以卸载不了,除非你cd到别的目录下去卸载. 一般的系统无论是windows还是linux,外部设备比如打印机,U盘,光盘等,其
-    处理速度都是远远低于计算机的处理速度,所以操作系统在操作这些外部设备都是使用缓存,假如你不删除设备直接拔了的话有时候很可能造成数据损坏.
+    处理速度都是远远低于计算机的处理速度,所以操作系统在操作这些外部设备都是使用缓存,所以热插拔会造成数据损坏就是因为缓存还没写入设备.
     [me@linuxbox ~]$ sudo tail -f /var/log/messages  //得知设备的挂载名通常不太容易,可以实时查看这个文件,当有新设备(比如一个U盘)被加进来之后,
     这个文件最下面会显示新信息,像这样:Jul 23 10:07:59 linuxbox kernel: sdb: sdb1, 可以发现U盘名称就是sdb,其分区就是sdb1,那么/dev/sdb就指整个
     设备,/dev/sdb1就指这个设备的第一分区. 注意查看完之后ctrl+c退出查看然后回到命令提示状态.此时刚刚的设备信息还是显示在屏幕上.
     [me@linuxbox ~]$ sudo mount /dev/sdb1 /mnt/flash  //得知连接到系统上的设备的名称后就可以进行挂载了.只要设备不卸载或计算机不重启名称就不变.
-    [me@linuxbox ~]$ df  //df命令也可以查看文件系统顺便也能看到挂载信息:
+    [me@linuxbox ~]$ df  //df命令可以查看文件系统,顺便也能看到挂载信息:
     Filesystem      1K-blocks   Used        Available   Use%    Mounted on
     /dev/sdb1       15560       0           15560       0%      /mnt/flash
 
 用Linux本地文件系统来重新格式化一个闪存驱动器,在格式化的时候一定要确定你指定了正确的系统设备名称,否则可能导致错误的设备被格式化.
     [me@linuxbox ~]$ sudo umount /dev/sdb  //首先卸载刚刚挂上的那个闪存,卸载闪存用的是设备名称
-    [me@linuxbox ~]$ sudo fdisk /dev/sdb1   //fdisk软件用来查看设备分区,并对该分区进行操作.当前设备就sdb1一个分区.以下是更改分区id的一个例子:
+    [me@linuxbox ~]$ sudo fdisk /dev/sdb1   //fdisk软件能和磁盘设备进行交互,可以在设备上编辑,创建,删除分区.当前设备就sdb1一个分区.
       Command (m for help): p   //回车后命令行会变成这样,输入p再次回车就可以查看该设备的分区信息了:
       Device Boot     Start        End     Blocks   Id        System  //该分区占了可用1008个柱面中的1006个,并被标识为Windows95 FAT32分区。
       /dev/sdb1           2       1008      15608+   b       w95 FAT32  //而Id号码b就是这个设备在fdisk这个软件为其分配的一个id
-      Command (m for help): l   //在这个cmd下输入小写l回车,就可以看到这个设备b在linux系统分区中对应的分区id
-      Command (m for help): t   //还是这个cmd下输入t,回车后输入你刚看到的linux文件系统为该设备分配的分区号码,回车后所有操作就被保存在内存了
-      Command (m for help): w  //输入w回车后对该设备分区的修改就会被写入该设备同时fdisk软件退出,回到shell的命令行.如果输入的是q则不修改直接退出.
-    [me@linuxbox ~]$ sudo mkfs -t ext3 /dev/sdb1  //这句话就是对/dev/sdb1这个分区进行格式化,而且文件系统类型被格成了linux的类型ext3,若你想保
-    持原有类型不变则用-t vfat . 以上 fdisk和mkfs(make file system)结合起来就是常用的分区和格式化的操作. 
+      Command (m for help): l   //在这个cmd下输入小写l回车,就可以看到这个设备在FAT32文件类型中的分区id是b,且其在linux文件系统中对应id比如是55
+      Command (m for help): t   //还是这个cmd下输入t,回车后会输入找到的55,再次回车后所有操作就被保存在内存了
+      Command (m for help): w  //输入w回车后对该设备分区的修改就会被写入该设备同时fdisk退出,回到shell的命令行.如果输入的是q则不修改直接退出.
+    [me@linuxbox ~]$ sudo mkfs -t ext3 /dev/sdb1  //对/dev/sdb1这个分区进行格式化,文件系统类型被格成了linux的类型ext3,若你想保持原有类型不变
+    则用-t vfat . 以上 fdisk和mkfs(make file system)结合起来就是常用的分区和格式化的操作.(fdisk用来操作分区,mkfs用来对分区进行操作) 
     
 文件系统损坏情况相当罕见,除非硬件存在问题,如磁盘驱动器故障。在大多数系统中,系统启动阶段若探测到文件系统已经损坏了,则会导致系统停止运行,在系统继续
 执行剩余操作之前，会指导你运行fsck程序来检查受损文件系统。(文件系统出故障导致系统启不起来真是操蛋,fuck,用fsck来检查下吧,这就是命名的由来!!!)
     [me@linuxbox ~]$ sudo fsck /dev/sdb1  //fsck除了检查文件系统完整性,还能修复受损文件系统,这个命令用来检查我们的闪存设备(需先卸载)
     dd if=/dev/sdb of=/dev/sdc   //一种常用的复制文件语法. 假设系统插了两个U盘,我们把/dev/sdb中的东西全部复制到/dev/sdc中就可以这样
     dd if=/dev/sdb of=flash_drive.img  //或我们只把/dev/sdb的东西复制到系统的一个文件中去以供后续使用
-    警告:这个dd非常强大。虽然名字来自“数据定义”,但经常被戏称为'清除磁盘',因为用户经常会误输入if或of的规范。这通常会造成不可逆的严重后果.
+    警告:这个dd非常强大。虽然名字来自'数据定义',但经常被戏称为'清除磁盘',因为用户经常会误输入if或of的规范。这通常会造成不可逆的严重后果.
     dd if=/dev/cdrom of=ubuntu.iso  //用dd来复制你插入的光盘数据并制作一个镜像(其实就是个复制品)
     genisoimage -o cd-rom.iso -R -J ~/cd-rom-files //  把~/cd-rom-files这个目录下的所有东西制作成一个cd-rom.iso镜像,-R意思是允许使用长
     文件名和POSIX风格的文件权限,-J选项使-R生效,这样Windows中就支持长文件名了。
-    mount -t iso9660 -o loop image.iso /mnt/iso_image  //把刚做的镜像挂载到一个新建的文件夹,便可把该镜像当做一个设备来使用了(用完记得卸载)
+    mount -t iso9660 -o loop image.iso /mnt/iso_image  //把刚做的镜像挂载到一个新建的文件夹,便可把该镜像当做一个设备来使用了,-o loop的意思是
+    这个这个镜像本来不是个设备,但是我们假装它是个设备并挂载它,然后把它当做一个设备来使用(用完记得卸载)
     wodim dev=/dev/cdrw blank=fast / wodim dev=/dev/cdrw image.iso   //用这种方式来清除一张可重写的CD-ROM并写入刚刚的镜像文件
     md5sum image.iso  // 34e354760f9bb7fbf85c96f6a3f94ece image.iso 下载一个镜像文件后,执行md5sum命令,并与发行商提供的md5sum值比较来验证文件
 ```
