@@ -346,7 +346,21 @@ ping命令会发送一个叫做ICMP ECHO_REQUEST的特殊网络数据包到一�
     [me@linuxbox ~]$ netstat -ie //查看系统中的网络接口 , -r选项显示内核的网络路由表
     
 FTP被广泛地用来从因特网上下载文件。大多数网络浏览器都支持FTP,它们的URI以协议ftp://开头。在出现浏览器之前,ftp 程序已经存在了。ftp程序可用来与FTP
-服务器进行通信.FTP服务器就是存储文件的计算机,这些文件能够通过网络下载和上传。FTP（它的原始形式）并不是安全的,因为它会明文发送帐号的姓名和密码。由于
-此种原因,几乎因特网中所有FTP服务器都是匿名的,允许任何人使用注册名anonymous和无意义的密码登录系统。
+服务器进行通信.FTP服务器就是存储文件的计算机,这些文件能够通过网络下载和上传。FTP最致命的问题是它用明文发送帐号的姓名和密码。由于此种原因,几乎因特网
+中所有FTP服务器都是匿名的,允许任何人使用注册名anonymous和无意义的密码登录系统。
     [me@linuxbox ~]$ ftp fileserver  //尝试登陆一个ftp服务器 ,会让你输入用户名anonymous和密码.密码可为空或者一个邮箱或试试user@example.com。 
+    ftp> cd pub/cd\_images/Ubuntu-8.04  //等上服务器后cd到你想要下载数据的目录下,一般ftp公共资源都在pub目录下
+    ftp> lcd Desktop  //让ftp程序把目录切到本地的~/Desktop目录下。原本ftp程序在工作目录~下被唤醒,你可以随时lcd到~下的任何一个目录.
+    ftp> get ubuntu-8.04-desktop-i386.iso //把ftp服务器上的这个文件get下来,因为ftp此时已经把目录切到你本地了,所以就相当于下载该文件到你本地
+    ftp> bye  //下载完成后退出ftp工具,回到shell命令行. 也可以使用quit 和 exit.
+    ftp> help 会显示ftp所支持命令的列表.  lftp是新的工具,用法和ftp差不多,但功能比ftp更强大,持的协议也更多
+    [me@linuxbox ~]$ wget http://linuxcommand.org/index.php  //wget也是一个比较吊的命令行下载软件.能下网页,可支持多文件下载,断点下载等.
+
+为了解决FTP明文传输不安全的问题,SSH(Secure Shell)出现了.首先它要认证远端主机是否为它所知道的那台主机,其次它加密了本地与远程主机之间所有的通讯信息.
+SSH 由两部分组成。SSH服务端运行在远端主机上,一般在端口22上监听收到的外部连接, SSH客户端用在本地系统,用来和远端服务器通信。有的linux发行版会默认包含
+服务端和客户端,但有的只有客户端,要想远程你必须安装OpenSSH-server软件包,配置并运行它.
+    [me@linuxbox ~]$ ssh remote-sys  //接到名叫 remote-sys 的远端主机,需要输入密码.首次连接还会提示一些别的信息.若验证失败会提示一大串告警信息.
+    [me@remote-sys ~]$  //成功连接后我们会收到远端系统的提示符.远端提示符会在输入exit命令后关闭.本地shell提示符才能重新恢复工作.
+    [me@linuxbox ~]$ scp remote-sys:a.txt .  //OpenSSH软件包中还有另外两个借助ssh来进行安全传输的程序:scp(安全复制)ftp(安全传输);scp的文件
+    源路径名要以远端主机的名字跟一个冒号开头; 而sftp不需要远端系统中运行FTP服务端,只要有SSH服务端就能工作.
 ```
