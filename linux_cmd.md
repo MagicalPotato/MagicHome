@@ -383,8 +383,8 @@ find可以通过一种更复杂的方式来查找文件,比如用文件的属性
     [me@linuxbox ~]$ stat dir/a.txt   //stat命令用来展示一个文件的所有信息  // dir指的是当前路径下的dir路径,因为./通常会省略,  ./dir/a.txt   
 ```
 ```
-gzip,gunzip程序用来压缩和解压文件。执行压缩和解压时,压缩和解压文件都会替换原始文件。注意:无论什么压缩程序,如果你再次压缩已经压缩过的文件,实际上
-你会得到一个更大的文件。这是因为所有的压缩技术都会涉及一些开销,文件中会被添加描述压缩过程的信息,多次压缩毫无意义.
+gzip/gunzip, bzip2/bunzip2程序用来压缩和解压文件。执行压缩和解压时都会替换原始文件。注意:无论什么压缩程序,如果你再次压缩已经压缩过的文件,你会得到
+一个更大的文件。这是因为所有的压缩技术都会涉及一些开销,文件中会被添加描述压缩过程的信息,多次压缩毫无意义.zip在linux中几乎不用,不作讨论.
     [me@linuxbox ~]$ gzip foo.txt  //执行完压缩后原始文件foo.txt会被foo.txt.gz文件替换,压缩文件和原始文件有相同的权限和时间戳
     [me@linuxbox ~]$ gunzip foo.txt.gz   //执行完解压后foo.txt.gz会被替换成foo.txt,权限也是一样
     [me@linuxbox ~]$ ls -l /etc | gzip -r > foo.txt.gz  // -r是递归压缩,所有文件夹下的东西都会压缩  
@@ -410,4 +410,15 @@ tar程序用来归档文件,是tape archive的简称,意思是制作磁带备份
     [me@linuxbox ~]$ find playground -name 'file-A' | tar czf playground.tgz -T -   //由于现在的系统已经把gzip和bzip2当做tar的选项整合到
     一起了,所以我们可以使用z选项来指定是gzip.  --files-from= 这个选项也由-T来代替,所以最终命令就简化成了这样. 而j选项用来代表bzip2, play.tbz
     [me@linuxbox remote-stuff]$ ssh a 'tar cf - Doc' | tar xf -  //ssh登远端a系统,把其Doc目录tar到标准输出,然后在本地从-中把Doc tar到本地
+
+rsync程序能通过rsync远端更新协议同步本地与远端的目录,rsync能快速地检测两个目录的差异,执行最小量的复制来达到目录间的同步。该命令非常快速且高效,但是
+不支持远端到远端的同步,必须有一端是本地. 远端文件或目录格式 [user@]host:path ,  有服务器的格式 sysname://[user@]host[:port]/path
+    [me@linuxbox ~]$ sudo rsync -av --delete /etc /home /usr/local /media/BigDisk/backup  // 把/etc,/home,/usr/local目录从我们的系统中
+    复制到外部存储设备。–delete 删除在外部设备中存在但在本地系统不存在的文件.  -a(递归和保护文件属性) -v (冗余输出)
+    alias backup='sudo rsync -av --delete /etc /home /usr/local /media/BigDisk/backup' //制作成别名,再次注意引号,引号的作用就是限制参数展开,
+    引号里是啥,最终传递给shell执行的时候就是啥.
+    [me@linuxbox ~]$ sudo rsync -av --delete --rsh=ssh /etc /home /usr/local sysname:/backup  //把本地的数据备份到远端服务器上. --rsh=ssh
+    意思是使用ssh程序作为远端服务器的远程shell。这样就可以用ssh加密通道把数据安全地传送到远程主机中。 sysname是远程主机名.
+    [me@linuxbox ~]$ rsync -av -delete rsync://rsync.gtlib.gatech.edu/fedora-linux-core/development/i386/os fedora-devel  //在这个例子
+    里,我们使用远端 rsync 服务器的URI,其由协议（rsync://）,远端主机名 （rsync.gtlib.gatech.edu），和软件仓库的路径名组成。
 ```
