@@ -360,20 +360,20 @@ FTP被广泛地用来从因特网上下载文件。大多数网络浏览器都�
 SSH 由两部分组成。SSH服务端运行在远端主机上,一般在端口22上监听收到的外部连接, SSH客户端用在本地系统,用来和远端服务器通信。有的linux发行版会默认包含
 服务端和客户端,但有的只有客户端,要想远程你必须安装OpenSSH-server软件包,配置并运行它.
     [me@linuxbox ~]$ ssh remote-sys  //接到名叫 remote-sys 的远端主机,需要输入密码.首次连接还会提示一些别的信息.若验证失败会提示一大串告警信息.
-    [me@remote-sys ~]$  //成功连接后我们会收到远端系统的提示符.远端提示符会在输入exit命令后关闭.本地shell提示符才能重新恢复工作.
-    [me@linuxbox ~]$ scp remote-sys:a.txt .  //OpenSSH软件包中还有另外两个借助ssh来进行安全传输的程序:scp(安全复制)ftp(安全传输);scp的文件
-    源路径名要以远端主机的名字跟一个冒号开头; 而sftp不需要远端系统中运行FTP服务端,只要有SSH服务端就能工作.
+    [me@remote-sys ~]$  //成功连接后会收到远端系统提示符.输入exit命令,远端提示符关闭,本地shell提示符重新上线干活.
+    [me@linuxbox ~]$ scp remote-sys:a.txt .  //OpenSSH软件包中还有另外两个借助ssh来进行安全传输的程序:scp(安全复制)sftp(安全传输);scp的文件
+    源路径名要以远端主机的名字后跟着一个冒号开头; 而sftp不需要远端系统中运行FTP服务端,只要有SSH服务端就能工作.
     
 locate执行一次快速的路径名搜索,输出每个包含给定字符串的路径名.总之它就是个查找命令.随着历史发展演化出了slocate和mlocate,locate逐渐成了它们的软链
 接.由于locate的搜索数据库由一个叫updatedb的程序来更新,默认是一天更新一次,所以它查不到最新的文件信息.可以用管理员权限来手动执行updatedb.
     [me@linuxbox ~]$ locate bin/zip  //输出任一个包含字符串bin/zip的路径名比如: /usr/bin/zipcloak , /usr/bin/zipgrep
-    [me@linuxbox ~]$ locate zip | grep bin  //和grep结合使用: /bin/bunzip2 , /bin/bzip2 , /bin/bzip2recover
+    [me@linuxbox ~]$ locate zip | grep bin  //和grep结合使用,包含zip且包含bin的路径: /bin/bunzip2 , /bin/bzip2 , /bin/bzip2recover
     
 find可以通过一种更复杂的方式来查找文件,比如用文件的属性来查找等.但是掌握起来也很费时间.
-    [me@linuxbox ~]$ find ~ | wc -l  //统计家目录下的目录列表.  最好别直接输出,有好几万呢,计个数就行了
+    [me@linuxbox ~]$ find ~ | wc -l  //统计家目录下的所有目录和文件.  最好别直接输出,有好几万呢,计个数就行了
     [me@linuxbox ~]$ find ~ -type d | wc -l   //-type d 限定只搜索目录, -type f 普通文件, l软连接, b块设备 ,c字符特殊设备
-    [me@linuxbox ~]$ find ~ -type f -name "*.JPG" -size +1M | wc -l  //指定一些别的属性, +1M就是大于1M, -是小于,如果没有就是精确匹配. 如果
-    没有单位,则默认是1b,也就是512个字节块. k(千字节) M(兆字节) G(千兆字节). 
+    [me@linuxbox ~]$ find ~ -type f -name "*.JPG" -size +1M | wc -l  //指定一些别的属性, +1M就是大于1M, -是小于,没有+或-就是精确匹配. 如果
+    没加单位,则默认是1b,也就是512个字节块. k(千字节) M(兆字节) G(千兆字节). 
     [me@linuxbox ~]$ find ~ \( -type f -not -perm 0600 \) -or \( -type d -not -perm 0700 \)  //添加更复杂的筛选条件,由于圆括号在shell中有
     特殊的含义,所以所以需要转义告诉shell把它当成括号而不是你的特殊命令, -and简写-a (可省,默认就是and) ,-or简写-o ,-not简写! ;诸如perm这种选项在
     find中用到的有太多太多,find能完成的筛选条件也极其多,后续再看吧.掌握简单的操作就行了.
@@ -381,4 +381,15 @@ find可以通过一种更复杂的方式来查找文件,比如用文件的属性
     find ~ -print -and -type f -and -name '*.BAK'  //顺序写错,结果不对. 当然print一般都是默认省略且在最后,没人会这样写,别的选项就要注意
     [me@linuxbox ~]$ touch dir/a.txt  //touch通常用来更新文件的一些信息比如修改时间,如果文件不存在则会默认创建.
     [me@linuxbox ~]$ stat dir/a.txt   //stat命令用来展示一个文件的所有信息  // dir前没有路径限定,所以指的就是你的~(家目录)下的dir目录   
+```
+```
+gzip,gunzip程序用来压缩和解压文件。执行压缩和解压时,压缩和解压文件都会替换原始文件。注意:无论什么压缩程序,如果你再次压缩已经压缩过的文件,实际上
+你会得到一个更大的文件。这是因为所有的压缩技术都会涉及一些开销,文件中会被添加描述压缩过程的信息,多次压缩毫无意义.
+    [me@linuxbox ~]$ gzip foo.txt  //执行完压缩后原始文件foo.txt会被foo.txt.gz文件替换,压缩文件和原始文件有相同的权限和时间戳
+    [me@linuxbox ~]$ gunzip foo.txt.gz   //执行完解压后foo.txt.gz会被替换成foo.txt,权限也是一样
+    [me@linuxbox ~]$ ls -l /etc | gzip -r > foo.txt.gz  // -r是递归压缩,所有文件夹下的东西都会压缩  
+    [me@linuxbox ~]$ gunzip -c foo.txt.gz(等于zcat foo.txt.gz) | less  //浏览压缩文件的内容. -c 把输出写到标准输出且保留原始文件。gunzip可以
+    不用指定后缀,它默认foo.txt就是.gz结尾.   用gzip -d 同样能完成解压,但为了表意清晰还是最好解压就用解压,压缩就用压缩.
+    [me@linuxbox ~]$ bzip2 foo.txt   //bzip2与gzip相似,但使用了不同算法,舍弃了压缩速度,实现了更高的压缩级别。大多情况下它的工作模式等于gzip。
+    [me@linuxbox ~]$ bunzip2 foo.txt.bz2  // 除了-r选项,其他参数和gzip的都一样,同样bunzip2等于bzcat
 ```
