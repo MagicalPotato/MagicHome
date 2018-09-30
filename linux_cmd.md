@@ -380,7 +380,7 @@ find可以通过一种更复杂的方式来查找文件,比如用文件的属性
     find ~ -type f -name '*.BAK' -delete  // find默认使用的匹配项是-print,就是把内容显示在屏幕上,这个是删除匹配项目(所有删除操作都应该谨慎)
     find ~ -print -and -type f -and -name '*.BAK'  //顺序写错,结果不对. 当然print一般都是默认省略且在最后,没人会这样写,别的选项就要注意
     [me@linuxbox ~]$ touch dir/a.txt  //touch通常用来更新文件的一些信息比如修改时间,如果文件不存在则会默认创建.
-    [me@linuxbox ~]$ stat dir/a.txt   //stat命令用来展示一个文件的所有信息  // dir前没有路径限定,所以指的就是你的~(家目录)下的dir目录   
+    [me@linuxbox ~]$ stat dir/a.txt   //stat命令用来展示一个文件的所有信息  // dir指的是当前路径下的dir路径,因为./通常会省略,  ./dir/a.txt   
 ```
 ```
 gzip,gunzip程序用来压缩和解压文件。执行压缩和解压时,压缩和解压文件都会替换原始文件。注意:无论什么压缩程序,如果你再次压缩已经压缩过的文件,实际上
@@ -392,4 +392,22 @@ gzip,gunzip程序用来压缩和解压文件。执行压缩和解压时,压缩�
     不用指定后缀,它默认foo.txt就是.gz结尾.   用gzip -d 同样能完成解压,但为了表意清晰还是最好解压就用解压,压缩就用压缩.
     [me@linuxbox ~]$ bzip2 foo.txt   //bzip2与gzip相似,但使用了不同算法,舍弃了压缩速度,实现了更高的压缩级别。大多情况下它的工作模式等于gzip。
     [me@linuxbox ~]$ bunzip2 foo.txt.bz2  // 除了-r选项,其他参数和gzip的都一样,同样bunzip2等于bzcat
+    
+tar程序用来归档文件,是tape archive的简称,意思是制作磁带备份。而它仍然被用来完成传统文件归类任务,它也同样适用于其它的存储设备.
+    [me@linuxbox ~]$ tar cf play.tar ./play  //为play文件夹下所有东西创建一个tar包. c是模式(创建归档文件),x(抽取归档文件),r(追加具体的路径到
+    归档文件的末尾),t(列出归档文件的内容) 后面的f是选项,表示文件名,无论什么选项必须是跟在模式后面,先模式后选项. 中横线-可以省略.
+    [me@linuxbox ~]$ tar tvf play.tar  //列出归档文件的详细内容, 去掉v表示列出简单内容. vf都是选项,t是模式
+    [me@linuxbox ~]$ tar xf ../play.tar  // 抽取上个目录下tar包中的文件到你当前目录,相当于创建了一个原始文件的副本.注意:除非你是超级用户，
+    否则抽取出来的副本文件的所有权限由执行此抽取操作的用户所拥有,而不属于原始所有者。
+    [me@linuxbox ~]$ tar cf play2.tar ~/play  // 注意这个例子,tar默认使用的是相对路径来处理任务,而且处理相对路径时是直接把路径前的./给去掉,
+    就像第一个例子,把当前目录下的./play目录打成一个play.tar包,这时候你的当前目录下就会有一个play.tar包,如果你抽取这个tar包,那么还是抽取到当前
+    目录下. 但是假如你是用这个例子中的绝对路径, ~/play,在打tar包的时候,绝对路径会先展开成/home/me/play,也就相当于你把/home/me/play整个东西打了
+    一个tar包.当你把这个tar包抽取到任何目录(比如A目录)下的时候,会完整的抽取成 A/home/me/play
+    
+    [me@linuxbox ~]$ find play -name 'file-A' | tar cf - --files-from=- | gzip > playground.tgz //看这个例子,我们使用find产生了一个输出,
+    然后管道到tar命令中,然后把标准输出文件打了一个tar包就叫-,(中划线-通常被用来表示标准输入/输出),最后这个由tar命令产生的归档文件被管道到
+    gzip命令中,创建了压缩归档文件play.tgz。有时候也会使用 .tar.gz这个扩展名。 
+    [me@linuxbox ~]$ find playground -name 'file-A' | tar czf playground.tgz -T -   //由于现在的系统已经把gzip和bzip2当做tar的选项整合到
+    一起了,所以我们可以使用z选项来指定是gzip.  --files-from= 这个选项也由-T来代替,所以最终命令就简化成了这样. 而j选项用来代表bzip2, play.tbz
+    [me@linuxbox remote-stuff]$ ssh a 'tar cf - Doc' | tar xf -  //ssh登远端a系统,把其Doc目录tar到标准输出,然后在本地从-中把Doc tar到本地
 ```
