@@ -422,3 +422,16 @@ rsync程序能通过rsync远端更新协议同步本地与远端的目录,rsync�
     [me@linuxbox ~]$ rsync -av -delete rsync://rsync.gtlib.gatech.edu/fedora-linux-core/development/i386/os fedora-devel  //在这个例子
     里,我们使用远端 rsync 服务器的URI,其由协议（rsync://）,远端主机名 （rsync.gtlib.gatech.edu），和软件仓库的路径名组成。
 ```
+```
+正则表达式包含两种字符: 原意字符(只匹配它们自己本身)和元字符(用来指定更复杂的匹配项),元字符包括这些 ^ $ . [ ] { } - ? * + ( ) | \  ;  正如我们
+所见,许多正则元字符在shell中有特殊含义,所以当我们在命令行中传递包含元字符的正则表达式时,把元字符用引号引起来至关重要,这样可以阻止shell展开它们。
+    grep--global regular expression print  //参数-i(忽略大小写),-v(打印不匹配的项), -c(或者-vc,对匹配或者不匹配的条目计数), -l(打印只包含匹配
+    项的文件列表), -L(打印不包含匹配项的文件列表) ,-n(打印匹配条目在匹配文件中的行数) ,-h(搜索多个文件但是并不列出文件只列出条目)
+    [me@linuxbox ~]$ grep haha dirlist*.txt  //从文件列表中找到所有包含haha的条目,这时候被查到的文件和匹配的条目都会显示:
+      dirlist-bin.txt:bzip2  ,    dirlist-bin.txt:bzip2recover
+    [me@linuxbox ~]$ grep -l bzip dirlist*.txt  //如果加了-l,则只会显示文件,不显示条目:  dirlist-bin.txt
+    [me@linuxbox ~]$ grep -h '.zip' dirlist*.txt  //正则被引号引起来防止shell展开它
+    
+    在正则中,插入符(^)和美元符($)被看作是锚点。这意味着正则表达式只有在文本行(必须是单独的一行)的开头或末尾被找到时才算发生一次匹配,所以'^$'会匹配空行. 中括号[]用来作为一个筛选列表,即便是元字符放到里面也会失去其元字符的意义而变成一个待匹配的字符,但是要注意,^和-有些特殊,如果^被放在最开头[^45],则
+表示否定,想要匹配的话要放在除开头以外的位置[8^k56]; 而-如果出现在字符中间则会被当成是范围,如果你想匹配一个-,则需要将其放在最开始[-A58]
+```
