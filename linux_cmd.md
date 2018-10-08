@@ -280,6 +280,30 @@ Linux要安装软件,要么使用源码自己编译.要么就是直接使用已�
     LinspireRed Hat (.rpm)   : Fedora, CentOS, Red Hat Enterprise Linux, OpenSUSE, Mandriva, PCLinuxOS  底层:rpm  上层:yum
     apt-get update; apt-get install emacs /apt-get update; apt-get upgrade/  apt-get remove emacs  //上层工具从资源库安装,更新,卸载emacs
     rpm -i emacs-22.1-7.fc7-i386.rpm / rpm -U emacs-22.1-7.fc7-i386.rpm  // 用底层工具来安装,更新你已经获得的emaces.rpm包 (上层工具更方便)
+    
+yum 的配置文件分为两部分：main(全局配置,只有一个,位于/etc/yum.conf) 和repository(仓库配置,位于/etc/yum.repo.d/ 目录下,可能有一到多个配置文件),
+使用 # cat /etc/yum.conf 来查看一下yum的主配置,其中一些条目如下:
+    cachedir=/var/cache/yum  　　//yum缓存目录,存储下载的rpm包和数据库，默认为/var/cache/yum
+    keepcache=0             //安装完成后是否保留软件包，0为不保留（默认为0），1为保留
+    debuglevel=2           //Debug 信息输出等级，范围为0-10，缺省为2
+    logfile=/var/log/yum.log   //yum日志文件。里面记录了过去所做的更新。
+    pkgpolicy=newest      //包策略.若配了多个仓库,而同一软件在不同仓库都有,newest会装最新版本;last将服务器id以字母排序,装最后服务器上那个
+    exactarch=1    //默认为1,意思是yum只会安装和系统架构匹配的软件包,比如yum不会将i686的软件包安装在i386的系统中。
+    retries=6     //网络连接发生错误后的重试次数，如果设为0，则会无限重试。默认值为6.
+    plugins=1    //是否启用插件，默认1为允许，0表示不允许。一般会用到yum-fastestmirror这个插件。
+
+在仓库配置路径下一般会有多个.repo文件,其中CentOS-Base.repo 是yum 网络源的配置文件,可以在这里修改你的网络仓库地址. 仓库地址修改必须遵循以下模板:
+    [c5-media]                         #serverid 是用于区别各个不同的repository，必须有一个独一无二的名称；
+    name=CentOS-$releasever - Media    #name 是对repository 的描述，支持像$releasever $basearch这样的变量；
+    baseurl=file:///media/CentOS/      # url支持的协议有 http://, ftp://, file://三种
+            file:///mnt/cdrom/         # 可以像这样有多个仓库地址,但是baseurl这个key只能有一个,你不能每一行都写个baseurl=xxxxx
+            
+看一下使用yum(Yellow dog Updater, Modified )来安装,升级和卸载一个软件的例子:
+    yum install vim  //使用yum来安装vim这个软件,yum的默认资源库是centOS官网,如果官网没有我们要装的软件则会提示安装失败,比如mysql就没有.
+    yum erase vim  //卸载该软件
+    yum update  //更新 ,在centos系统中,yum是上层工具,我们可以直接用它来完成从仓库的依赖解析安装,很方便, rpm是底层工具,只能是你手动去安装已有的包.
+    rpm -q vim  //确定系统中是否安装了该软件
+    rpm -qf /usr/bin/vim  //查找那个软件安装了这个文件
 ```
 ```
 /etc/fstab 文件中存着系统启动时要挂载的设备信息(比如硬盘分区,第一个),其中有很多是虚拟的(第二个).每次系统启动,在挂载文件系统之前,都会检查文件系统的
