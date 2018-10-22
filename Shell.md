@@ -104,11 +104,23 @@ $ command > /dev/null  # 如果希望执行某个命令，但又不希望在屏�
 
 
 
+##### shell脚本重新学习
 
+* 在linux下运行一个脚本要具备三点: 1编写脚本 2给脚本可执行权限 3把脚本放到shell能找到的地方.
+```
+[me@linuxbox ~]$ ls -l hello.sh
+-rw-r--r-- 1  me    me      63  2009-03-07 10:10 hello.sh
+[me@linuxbox ~]$ chmod 755 hello.sh    # 755的脚本每个人都能执行,700的脚本只有文件所有者能够执行。
+[me@linuxbox ~]$ ls -l hello.sh        # 还有一点要注意:为了能够执行脚本，脚本必须是可读的。
+-rwxr-xr-x 1  me    me      63  2009-03-07 10:10 hello.sh
 
+[me@linuxbox ~]$ ./hello.sh   #执行脚本必须要明确指定路径,否则shell会去这几个路径下找,找不到就会报错.
+[me@linuxbox ~]$ echo $PATH   # /home/me/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export PATH=~/bin:"$PATH"  # 大多linux会将/home/me/bin配到PATH中,你在可以在自己的家目录下建一个bin目录然后把脚本放进去就行.如果没配可这样配.
+[me@linuxbox ~]$ . .bashrc # 修改之后让shell重新读取这个 .bashrc文件以应用修改。 整个命令相当于source .bashrc
 
-
-
-
-
-
+/home/用户名/bin(~/bin)   # 用户家目录通常用来存放用户个人所用脚本。
+/usr/local/bin           #如果想让系统中的每个用户都可以使用该脚本,则应将其放在这个路径下。
+/usr/local/sbin          # 管理员的脚本经常放在这个目录
+/usr/local              # 本地支持的软件,不管是脚本还是编译过的程序,都应该放到这个目录下
+```
