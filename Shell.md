@@ -124,3 +124,27 @@ export PATH=~/bin:"$PATH"  # 大多linux会将/home/me/bin配到PATH中,你在�
 /usr/local/sbin          # 管理员的脚本经常放在这个目录
 /usr/local              # 本地支持的软件,不管是脚本还是编译过的程序,都应该放到这个目录下
 ```
+
+* 养成良好的编程习惯,无论在编写脚本还是写代码中,用大写来表示常亮,而用小写来表示变量.
+
+```
+[me@linuxbox ~]$ a="thismytestfile"  #定义一个变量并赋值成 thismytestfile
+[me@linuxbox ~]$ touch $a   #以a这个变量的值来创建一个文件
+[me@linuxbox ~]$ mv $a $a1  #本意是想给刚创建的这个文件重命名,直接写文件名肯定繁琐,所以想用$a后面直接接1的这中形式,但是这样是无法把$a的值和1拼起来
+的,shell会把$a1解释成一个新的变量,新的变量没定义就是空,那么就会报错. 想要拼接的话应该这样${a}1,这样shell就只会将{}中的a解释成变量而1不会.
+
+来看一个脚本实例:
+#!/bin/bash
+# Script to retrieve a file via FTP
+FTP_SERVER=ftp.nl.debian.org
+FTP_PATH=/debian/dists/lenny/main/installer-i386/current/images/cdrom
+REMOTE_FILE=debian-cd_info.tar.gz
+ftp -n <<- _EOF_          #脚本中可以用 commond << 标记符 的模式来屏蔽shell中一些单双引号的作用,正常情况下引号中表示一个字符串,但是在这中模式中
+    open $FTP_SERVER      #引号会被原样输出,这个特性在一些场景中很有用. 注意commond << 标记符 必须在同一行且, <<-表示忽略后续行开头的tab,这样
+    user anonymous me@linuxbox   #可以提高可读性.
+    cd $FTP_PATH
+    hash
+    get $REMOTE_FILE
+    bye
+_EOF_           #遇到了_EOF_表示这个命令结束了. 标记符可以是任意定义的符号.
+```
