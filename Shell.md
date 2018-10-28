@@ -165,3 +165,15 @@ local foo  # 在函数中使用local关键字来定义一个局部变量,局部�
 foo=2
 }
 ```
+* If 语句真正做的事情是计算命令执行成功或失败,而非判断条件是否成立,判断条件是否成立的是test.所以if常常和test一起使用.中括号是test的另一种写法. 
+```
+[me@linuxbox ~]$ ls -d /usr/bin
+/usr/bin
+[me@linuxbox ~]$ echo $?   # $?是一个特殊的符号,这个符号会返回一个状态码用来检查上一个命令是否执行成功.0成功,其他都是失败.
+0
+
+[me@linuxbox ~]$ if false; true; then echo "It's true."; fi
+It's true.  # if语句如果有多个条件只会执行最后一个.
+
+test expression 等价于 [ expression ],其执行结果是 true或false。结果真时test命令返回一个零退出状态,假时退出状态为1。
+```
