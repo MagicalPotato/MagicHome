@@ -175,5 +175,13 @@ foo=2
 [me@linuxbox ~]$ if false; true; then echo "It's true."; fi
 It's true.  # if语句如果有多个条件只会执行最后一个.
 
-test expression 等价于 [ expression ],其执行结果是 true或false。结果真时test命令返回一个零退出状态,假时退出状态为1。
+test expression 等价于 [ expression ],其执行结果是 true或false。结果真时test命令返回一个零退出状态,假时退出状态为1。一下是一些文件测试表达式:
+file1 -ef file2	 #file1 和 file2 拥有相同的索引号（通过硬链接两个文件名指向相同的文件）。
+file1 -nt file2	 #file1比file2新。  file1 -ot file2	 #file1比file2旧。
+-b file  # file存在且是个块（设备）文件; -c file # 存且是字符（设备）文件; -d file #存且是目录; -e file #存; -f file # 存且是普通文件。
+-L file  # 存且是符号链接; -s file #存且长度大于零; -w file #存且可写;  -x file #存且可执行. -r 存且可读.
+
+if [ -e "$FILE" ]; then    # 在这里$FILE这个变量的引号并不是必须,加引号只是为了防止变量的值是空值,空值会导致错误.
+     echo "$FILE is a regular file."
+fi
 ```
