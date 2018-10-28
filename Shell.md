@@ -168,20 +168,37 @@ foo=2
 * If 语句真正做的事情是计算命令执行成功或失败,而非判断条件是否成立,判断条件是否成立的是test.所以if常常和test一起使用.中括号是test的另一种写法. 
 ```
 [me@linuxbox ~]$ ls -d /usr/bin
-/usr/bin
-[me@linuxbox ~]$ echo $?   # $?是一个特殊的符号,这个符号会返回一个状态码用来检查上一个命令是否执行成功.0成功,其他都是失败.
-0
+[me@linuxbox ~]$ echo $?   # 结果是0, $?是一个特殊的符号,这个符号会返回一个状态码用来检查上一个命令是否执行成功.0成功,其他都是失败.
 
 [me@linuxbox ~]$ if false; true; then echo "It's true."; fi
 It's true.  # if语句如果有多个条件只会执行最后一个.
 
-test expression 等价于 [ expression ],其执行结果是 true或false。结果真时test命令返回一个零退出状态,假时退出状态为1。一下是一些文件测试表达式:
+test expression 等价于 [ expression ],其执行结果是 true或false。结果真时test命令返回一个零退出状态,假时退出状态为1。
+以下是文件测试表达式:
 file1 -ef file2	 #file1 和 file2 拥有相同的索引号（通过硬链接两个文件名指向相同的文件）。
 file1 -nt file2	 #file1比file2新。  file1 -ot file2	 #file1比file2旧。
 -b file  # file存在且是个块（设备）文件; -c file # 存且是字符（设备）文件; -d file #存且是目录; -e file #存; -f file # 存且是普通文件。
 -L file  # 存且是符号链接; -s file #存且长度大于零; -w file #存且可写;  -x file #存且可执行. -r 存且可读.
+字符串则是表达式:
+str # str不为null; -n str # str长度大于零(不为空)。-z str #为空。 =或== 相等; != 不相等; str1>str2 #1排在2之前, < 是之后; 注意:与test一块
+使用的时候,>和<必须用引号引起来(或者是用反斜杠转义)否则它们会被解释为重定向操作符造成潜在的破坏结果。
+整型表达式:
+integer1 -eq integer2 #等于; -ne 不等于; -le 小于或等于(less or equel); -lt 小于(less than); -ge 大于或等于; -gt 大于(greater than)
 
-if [ -e "$FILE" ]; then    # 在这里$FILE这个变量的引号并不是必须,加引号只是为了防止变量的值是空值,空值会导致错误.
-     echo "$FILE is a regular file."
+#!/bin/bash
+INT=-5
+if [[ "$INT" =~ ^-?[0-9]+$ ]]; then   # 在这里$FILE这个变量的引号并不是必须,加引号只是为了防止变量的值是空值,空值会导致错误.
+    if [ $INT -eq 0 ]; then          #[[ xxx ]],这是加强版的test,可以通过使用 =~ 来匹配正则,和 == 来匹配类型,比如 foo.txt == foo.*
+        echo "INT is zero."
+    else
+        if [ $INT -lt 0 ]; then echo "INT is negative." else echo "INT is positive." fi  #negative复数,positive正数
+        if [ $((INT % 2)) -eq 0 ]; then echo "INT is even." else echo "INT is odd." fi    # even奇数,odd偶数
+    fi
+else echo "INT is not an integer." >&2
+    exit 1
 fi
+
+if [ $((INT % 2)) -eq 0 ] 等价于 if (( ((INT % 2)) == 0))  # (( ))也是一种特殊的写法,用来执行算术真测试。若算术结果是非零值，则其值为真。在这个
+例子中 ((INT % 2))首先计算出一个结果,是非0值,结果成立,然后这个非0值又和0比较,那么肯定不成立,不成立那么执行结果就是非0,那么肯定就不会进if条件,一定
+注意if只是判断执行结果是不是0或者其他值,if并不判断条件是否成立. 在(( ))中我们可以直接使用<和>,以及==,而且可以够通过名字识别变量
 ```
