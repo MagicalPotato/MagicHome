@@ -269,3 +269,35 @@ else
     exit 1
 fi
 ```
+```
+#!/bin/bash
+read -p "enter word > "
+case $REPLY in   # case的in不是在里面的意思,而是将要匹配某个模式的意思,右括号是结束标志
+    a)             echo "匹配字符a" ;;
+    [[:alpha:]])   echo "匹配一个字母" ;;
+    [ABC][0-9])    echo "xxx" ;;
+    ???)           echo "xxx" ;;
+    *.txt)         echo "xxx" ;;
+    *)             echo "xxx" ;;
+esac
+
+case $REPLY in  #可以使用|来表示选择,这通常在用字母作选择且不分大小写时很有用.
+q|Q) echo "Program terminated."  #只要匹配并且进入了分支,那么分支里面可以继续写if,while或者更多的命令等
+     exit ;;
+a|A) echo "Hostname: $HOSTNAME"
+     uptime ;;
+esac
+
+#!/bin/bash
+read -n 1 -p "Type a character > "
+case $REPLY in  
+    [[:upper:]])    echo "'$REPLY' is upper case." ;;&    # 传统的 ;;结尾的脚本要求你的输入只能匹配一个分支,且执行完该分支就会退出.否则会报错.
+    [[:lower:]])    echo "'$REPLY' is lower case." ;;&    # 若用 ;;& 来结束脚本那么只要满足条件的分支都会进,且不会报错.
+    [[:alpha:]])    echo "'$REPLY' is alphabetic." ;;&    # 左边那些待匹配模式叫POSIX字符集(正则字符集)   alphabetic 字母字符
+    [[:digit:]])    echo "'$REPLY' is a digit." ;;&       # 数字
+    [[:graph:]])    echo "'$REPLY' is a visible character." ;;&     # visible character 可见字符,也就是非空格
+    [[:punct:]])    echo "'$REPLY' is a punctuation symbol." ;;&    # punctuation symbol 标点符号
+    [[:space:]])    echo "'$REPLY' is a whitespace character." ;;& 
+    [[:xdigit:]])   echo "'$REPLY' is a hexadecimal digit." ;;&     #十六进制数字
+esac
+```
