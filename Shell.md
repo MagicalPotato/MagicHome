@@ -165,48 +165,71 @@ local foo  # 在函数中使用local关键字来定义一个局部变量,局部�
 foo=2
 }
 ```
-* If 语句真正做的事情是计算命令执行成功或失败,而非判断条件是否成立,判断条件是否成立的是test.所以if常常和test一起使用.中括号是test的另一种写法. 
+* If 语句真正做的事情是检验命令执行成功或失败,而非判断条件是否成立,判断条件是否成立的是test.所以if常常和test一起使用.中括号是test的另一种写法. 
 ```
 [me@linuxbox ~]$ ls -d /usr/bin
 [me@linuxbox ~]$ echo $?   # 结果是0, $?是一个特殊的符号,这个符号会返回一个状态码用来检查上一个命令是否执行成功.0成功,其他都是失败.
+[me@linuxbox ~]$ if false; true; then echo "It's true."; fi  # It's true.   if语句如果有多个条件只会执行最后一个.
 
-[me@linuxbox ~]$ if false; true; then echo "It's true."; fi
-It's true.  # if语句如果有多个条件只会执行最后一个.
-
-test expression 等价于 [ expression ],其执行结果是 true或false。结果真时test命令返回一个零退出状态,假时退出状态为1。
-以下是文件测试表达式:
-file1 -ef file2	 #file1 和 file2 拥有相同的索引号（通过硬链接两个文件名指向相同的文件）。
-file1 -nt file2	 #file1比file2新。  file1 -ot file2	 #file1比file2旧。
+test expression 等价于 [ expression ],其执行结果是 true或false。结果真时test命令返回一个零退出状态,假时退出状态为1。一下分别是文件测试条件,
+字符串测试条件和整型测试条件:
+file1 -ef file2	 #1和2拥有相同的索引号（通过硬链接两个文件名指向相同的文件）。file1 -nt file2	 #1比2新。  file1 -ot file #1比2旧。
 -b file  # file存在且是个块（设备）文件; -c file # 存且是字符（设备）文件; -d file #存且是目录; -e file #存; -f file # 存且是普通文件。
--L file  # 存且是符号链接; -s file #存且长度大于零; -w file #存且可写;  -x file #存且可执行. -r 存且可读.
-字符串则是表达式:
-str # str不为null; -n str # str长度大于零(不为空)。-z str #为空。 =或== 相等; != 不相等; str1>str2 #1排在2之前, < 是之后; 注意:与test一块
-使用的时候,>和<必须用引号引起来(或者是用反斜杠转义)否则它们会被解释为重定向操作符造成潜在的破坏结果。
-整型表达式:
+-L file  # 存且是符号链接; -s file #存且长度大于零; -w file #存且可写;-x file #存且可执行. -r 存且可读.
+str # str不为null; -n str # str长度大于零(不为空)。-z str #为空。 =或== 相等; != 不相等; str1>str2 #1排在2之前, < 是之后; 注意:与单方括号[]
+连用候,>和<必须用引号引起来(或者是用反斜杠转义)否则它们会被解释为重定向操作符造成潜在的破坏结果,而双[[]]则不需要.
 integer1 -eq integer2 #等于; -ne 不等于; -le 小于或等于(less or equel); -lt 小于(less than); -ge 大于或等于; -gt 大于(greater than)
 
 #!/bin/bash
 INT=-5
-if [[ "$INT" =~ ^-?[0-9]+$ ]]; then   # 在这里$FILE这个变量的引号并不是必须,加引号只是为了防止变量的值是空值,空值会导致错误.
-    if [ $INT -eq 0 ]; then          #[[ xxx ]],这是加强版的test,可以通过使用 =~ 来匹配正则,和 == 来匹配类型,比如 foo.txt == foo.*
-        echo "INT is zero."
+if [[ "$INT" =~ ^-?[0-9]+$ ]]; then   # 在[[ ]]中$本来可以省略,可以直接使用变量,但是一旦字符串变量是空值则会导致错误,所以给变量加了引号,引号是
+    if [ $INT -eq 0 ]; then     #为了防止空值,若变量空了,引号里就是空串,至少程序不会挂. 但是加了引号之后$符号就不能省略了,不然会把变量当成字符串.
+        echo "INT is zero."   # [[]]中可以通过使用 =~ 来匹配正则; == 来匹配类型,比如 foo.txt == foo.*
     else
-        if [ $INT -lt 0 ]; then echo "INT is negative." else echo "INT is positive." fi  #negative复数,positive正数
+        if [ $INT -lt 0 ]; then echo "INT is negative." else echo "INT is positive." fi  #negative负数,positive正数
         if [ $((INT % 2)) -eq 0 ]; then echo "INT is even." else echo "INT is odd." fi    # even奇数,odd偶数
     fi
 else echo "INT is not an integer." >&2
     exit 1
 fi
 
-if [ $((INT % 2)) -eq 0 ] 等价于 if (( ((INT % 2)) == 0))  # (( ))也是一种特殊的写法,用来执行算术真测试。若算术结果是非零值，则其值为真。在这个
-例子中 ((INT % 2))首先计算出一个结果,是非0值,结果成立,然后这个非0值又和0比较,那么肯定不成立,不成立那么执行结果就是非0,那么肯定就不会进if条件,一定
-注意if只是判断执行结果是不是0或者其他值,if并不判断条件是否成立. 在(( ))中我们可以直接使用<和>,以及==,而且可以够通过名字识别变量
-
-if [[ "$INT" =~ ^-?[0-9]+$ ]]   #这个里面加引号是为了防止空串,而加了引号之后肯定不能直接写INT来引用值了否则INT自身就被当成了字符串,得用$符
+if [ $((INT % 2)) -eq 0 ] 等价于 if (( ((INT % 2)) == 0))  # (( ))也是一种特殊的写法,用来执行算术运算。注意if只是判断执行结果是不是0或者
+其他值,if并不判断条件是否成立. 在(( ))中我们也可以直接使用<和>,以及==,而且可以够直接通过变量名称识别变量而不需要加$
 if [[ INT -ge MIN_VAL && INT -le MAX_VAL ]]  #如果只是当成数字使用,那么就没有加引号的必要,而且[[ ]]中也可以不用$就能直接用变量
 if [ ! \( $INT -ge $MIN_VAL -a $INT -le $MAX_VAL \) ] #单()用来分组 ,对于单的()或者[],在其中使用括号,>,<,==都需要转义,所以在单[]中都是用替代
 符号, -a等价于且&& , -o等价于或||, !就是非.且单[]中是需啊$的,只有双[]才没有这些限制. 实际中[[ ]]更常用且更易于编码
-if [[ $(id -u) -eq 0 ]]  # 直接用$()用于计算结果,就相当于是在bash输入命令一样,为了不混淆,所以就加了个括号
-
+if [[ $(id -u) -eq 0 ]]  # 直接用$()用于获取一个命令的执行结果,就相当于是在bash输入命令一样,为了不混淆,所以就加了个括号
+h
 cmd1 && cmd2 和 cmd1 || cmd2  # &&操作符先执行cmd1, 1执行成功后才执行2。对于||,先执行1,且只有1失败后,才执行2。
+```
+
+* __评估__
+```
+#!/bin/bash
+FILE=/etc/passwd
+read -p "Enter a user name > " user_name  #read命令用来从键盘获取输入,-p指定提示信息,提示你输入一个用户名,你的输入会赋值给user_name这个变量
+file_info=$(grep "^$user_name:" $FILE)  #这一行用正则来匹配文件中的一行
+if [ -n "$file_info" ]; then   # 如果匹配到的这一行不为空,-n表示长度大于0
+IFS=":" read user pw uid gid name home shell <<< "$file_info"   #这是一种特殊的用法:Shell 允许在一个命令之前给一个或多个变量赋值。这些赋值会
+    echo "User = '$user'"   #暂时改变之后的命令的环境变量。什么意思呢:原本read读取输入的时候是按照一个空格或一个tab或一个换行来分割输入的文本串,
+    echo "UID = '$uid'"   #但是你可以通过IFS这种方式将分割符改成别的,比如这个例子就是把分隔符改成了冒号":",最后从file文件中读取了文本,重定向的时候
+    echo "GID = '$gid'"  #用了三个<<<,而不写成 echo "$file_info" | IFS=":" read user pw uid gid name home shell,是因为管道符实际上是重新开了
+    echo "Full Name = '$name'"   #一个子shell,管道符后面的内容都会到子shell中去执行,但是子shell执行完后所有东西都会销毁,所以根本得不到结果.
+    echo "Home Dir. = '$home'"
+    echo "Shell = '$shell'"
+else
+    echo "No such user '$user_name'" >&2
+    exit 1
+fi
+这个赋值方式要额外说一下,刚这一行等价于下面这几行:在这种场景中改变环境变量只是暂时的,也就是说原本环境变量中分隔符就是空格tab换行,我暂时为此次的read
+命令改成冒号":",但是这个read命令完了之后我依然将其赋回原样了. 
+OLD_IFS="$IFS"
+IFS=":"
+read user pw uid gid name home shell <<< "$file_info"
+IFS="$OLD_IFS"
+
+invalid_input () { echo "Invalid input '$REPLY'" >&2 exit 1 } #错误校验方法
+read -p "Enter a single item > "  
+[[ -z $REPLY ]] && invalid_input  # 控制操作符&&在这里不要理解成并且的意思,而是上一个命令执行成功则这个就会执行,在这里这是一种校验措施
+(( $(echo $REPLY | wc -w) > 1 )) && invalid_input  # 双括号(( ))是用来评估结果是0还是非0,0是成功,非0是失败.可以说它是一个简版的if.
 ```
