@@ -233,3 +233,20 @@ read -p "Enter a single item > "
 [[ -z $REPLY ]] && invalid_input  # 控制操作符&&在这里不要理解成并且的意思,而是上一个命令执行成功则这个就会执行,在这里这是一种校验措施
 (( $(echo $REPLY | wc -w) > 1 )) && invalid_input  # 双括号(( ))是用来评估结果是0还是非0,0是成功,非0是失败.可以说它是一个简版的if.
 ```
+```
+#!/bin/bash
+while read distro version release; do       # while cmd;do cmd; done   可以用until来代替while,两种方式都可以
+    printf "Distro: %s\tVersion: %s\tReleased: %s\n" \
+        $distro \
+        $version \
+        $release
+done < distros.txt    #while是可以接受标准输入的
+
+#!/bin/bash   #当然也能接受标准输入,但是由于管道是单独打开一个子shell,所以循环和读取都是在子shell中运行,子shell运行完之后会销毁所有东西,所以在
+sort -k 1,1 -k 2n distros.txt | while read distro version release; do     #当前shell中我们是看不到任何输出的
+    printf "Distro: %s\tVersion: %s\tReleased: %s\n" \
+        $distro \
+        $version \
+        $release
+done
+```
