@@ -301,3 +301,35 @@ case $REPLY in
     [[:xdigit:]])   echo "'$REPLY' is a hexadecimal digit." ;;&     #十六进制数字
 esac
 ```
+```
+[me@linuxbox ~]$ for i in A B C D; do echo $i; done
+[me@linuxbox ~]$ for i in {A..D}; do echo $i; done   #花括号展开
+[me@linuxbox ~]$ for i in distros*.txt; do echo $i; done  #路径名展开
+
+#!/bin/bash
+# longest-word : find longest string in a file
+while [[ -n $1 ]]; do   # $1-$10通常用来表示一个命令的参数,以空格分割. $#通常用来表示命令的所有参数数量
+    if [[ -r $1 ]]; then  # -r表示该文件是否可读
+        max_word=       # 在这里像正常编程语言那里定义最长单词和单词数量
+        max_len=0
+        for i in $(strings $1); do   #strings命令将第一个文件中的所有单词组装成一个可迭代的列表之类的东西以供循环
+            len=$(echo $i | wc -c)  #打印第一个文件中的所有单词,并对每一个单词进行计数并赋值给len
+            if (( len > max_len )); then  #对len进行算数比较
+                max_len=$len   #赋值操作,注意不能像别的语言那样直接写变量名称,要用$来引用变量
+                max_word=$i   #注意是把$i赋值,不是$1
+            fi
+        done
+        echo "$1: '$max_word' ($max_len characters)"
+    fi
+    shift   # shift命令用来提升参数位置,假如$1并不是一个可读文件,那么所有参数都会往前移动一位,$2的参数移到$1,$3到$2,以此类推...
+done
+
+for i; do   #这是另一种写法,在这个写法中省略了while和其判断条件,直接用for循环,用i来代替位置参数进行操作
+    ......
+    ......  #如果直接用for进行位置参数的循环,那么shift命令也就不需要了
+done
+
+for (( i=0; i<5; i=i+1 )); do   #for循环的另外一种写法,直接用双括号
+    echo $i
+done
+```
