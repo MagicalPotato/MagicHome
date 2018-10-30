@@ -351,4 +351,50 @@ ${param//pattern/str} #替换所有的
 ${param/#pattern/str} #替换所有且要求匹配项要出现在字符串的开头
 ${param/%pattern/str} # 替换所有要求匹配项出现在结尾
 
+#!/bin/bash
+declare -u A   # 使用declare来声明变量, -u(upper)和-l(lower)分别声明纯大写或纯小写变量,也就是赋值给变量的东西都会被转换成响应的格式
+declare -l B
+if [[ $1 ]]; then
+    A="$1"
+    B="$1"
+    echo $A $B    
+fi        #下面是使用参数展开的方式来对字符进行统一处理,${}本来就是规范的参数引用方式,所以${1,,}这种写法没啥值得疑惑的,就是把第一个参数展开成小写
+${parameter,,}	把 parameter 的值全部展开成小写字母。
+${parameter,}	仅仅把 parameter 的第一个字符展开成小写字母。
+${parameter^^}	把 parameter 的值全部转换成大写字母。
+${parameter^}	仅仅把 parameter 的第一个字符转换成大写字母（首字母大写）。
+
+$((expression)) #现在可以不需要在疑惑了,$加上双括号就是算数展开的固定写法,在if,while,for等结构中双括号前的$是不需要的,但是在赋值操作或者一些echo
+等单元操作中这就是固定的写法,当然双括号里面的数字如果没有特殊表明那么就会被当成是十进制,如果你要用其他进制那么可以在数字前加上识别符号,比如,0aaa表示
+八进制数字,0xaaa表示十六进制; 当然也可以自定义比如: 2#aaa二进制,3#aaa三进制,5#aaa五进制
+[me@linuxbox ~]$ echo $(( 5 / 2 ))  #有一点要注意就是shell的运算仅且只能操作整数,所以结果自然也都是整数.如果是浮点之类的需要用别的程序,典型的是bc
+[me@linuxbox ~]$ bc <<< "2+3.3"  #可以直接这样来进行计算. 注意这种三连<<<的用法,它相当于是简短的可以直接输入的文本的重定向.
+[me@linuxbox ~]$ echo $((foo++))  #假设变量foo=1,那么这种方式是先打印foo的值,然后给foo增1,再次echo的时候foo才是2
+[me@linuxbox ~]$ echo $((++foo))  #而这种方式是先给foo增1,使得foo变成了2,然后将foo打印出来,也就是第一次打印的时候就是2,大多时候前缀运算符最有用.
+[me@linuxbox~]$ ((a<1?++a:--a)) #注意这个三元运算符,如果写成((a<1?a+=1:a-=1))会报错,但是如果把赋值运算括起来((a<1?(a+=1):(a-=1)))就可以执行
+```
+```
+[me@linuxbox ~]$ declare -a array  #定义一个空数组array
+[me@linuxbox ~]$ a[1]=foo  #定义数组a并赋值
+[me@linuxbox ~]$ days=(Sun Mon Tue Wed Thu Fri Sat)   # 当然,${#days[@]}依然用来确定数组元素个数
+[me@linuxbox ~]$ days=([0]=Sun [1]=Mon [2]=Tue [3]=Wed [4]=Thu [5]=Fri [6]=Sat)
+[me@linuxbox ~]$ animals=("a dog" "a cat" "a fish")
+[me@linuxbox ~]$ for i in "${animals[*]}"; do echo $i; done  # 符号@和#依然用来代替数组中的变量
+a dog a cat a fish
+[me@linuxbox ~]$ for i in "${animals[@]}"; do echo $i; done  #这种输出最美观 ,若 ${animals[*]},${animals[@]}没有被引号引起来,则输出不美观
+a dog
+a cat
+a fish
+[me@linuxbox ~]$ for i in "${!animals[@]}"; do echo $i; done  #如果是给"${!animals[@]}"中加了叹号,则表示点元素下标而不是值
+1
+2
+3
+[me@linuxbox ~]$ animals+=("a chicken" "a sheep" "a horse")  #直接往数组后续追加元素用+=
+[me@linuxbox ~]$ unset animals  #使用unset来删除一个数组
+[me@linuxbox ~]$ unset 'animals[2]'  #删除其中的一个元素,注意要用引号来防止展开. 无论什么时候,只要是会有展开歧义的地方都要使用引号
+[me@linuxbox ~]$ animals=     #手动给数组赋值为空并不会清空数组,还是原样
+
+#!/bin/bash     #注意这个给数组排序的脚本,是把数组中的数据先全部打印了出来然后管道给了sort程序
+a=(f e d c b a)
+a_sorted=($(for i in "${a[@]}"; do echo $i; done | sort))
 ```
