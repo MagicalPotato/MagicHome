@@ -398,3 +398,19 @@ a fish
 a=(f e d c b a)
 a_sorted=($(for i in "${a[@]}"; do echo $i; done | sort))
 ```
+```
+ls -l > output.txt   #覆盖
+echo "Listing of foo.txt" >> output.txt  #追加
+cat foo.txt >> output.txt #追加
+{ ls -l; echo "Listing of foo.txt"; cat foo.txt; } > output.txt  #用组命令方式简化,{}和命令之间必须空格,且最后一个命令后加分号
+(ls -l; echo "Listing of foo.txt"; cat foo.txt) > output.txt #用子shell的方式简化
+{ ls -l; echo "Listing of foo.txt"; cat foo.txt; } | lpr  #组和子shell的这种方式想当于是把一大堆流组合到一起然后进行后续操作,但是子shell肯定
+不能用管道,原因还是子shell执行完之后就清除所有东西了,所以把东西定向到文件可以,但是如果直接让其来输送流肯定不行.相比起来组命令消耗小且更好用.
+echo "foo" | read  #由于read是在子shell中执行,所以当我们echo $REPLY的时候结果总是空,可以这样read < <(echo "foo"), <(命令列表)用于产生标准输出,
+echo产生输出不用管道而是用重定向符号传给read,这样就可以在当前shell中使用了,  >(命令列表) 用于接受标准输入
+
+ls test.sh >a.txt 2>&1 #将ls的结果冲定向到文件,实际上原始写法是 1>a.txt ,本来ls的结果是显示在标准输出的,现在把标准输出定向到文件,又因为1可以省略,
+所以1>a.txt就成了>a.txt, 2>表示2将要冲定向,但是其定向方式和1相同,&表示定向方式和谁相同,那么2自然也就定向到a.txt了,当然可以直接写成2>a.txt,都可以.
+
+$! 最后一个后台进程的pid号, $?上一个命令的执行状态, $#命令的参数个数, $@或$* 所有列表参数, $$是shell本身的pid, $0当前脚本的全路径名称
+```
