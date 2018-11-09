@@ -42,16 +42,16 @@ chown root:bin test  # 改属性   chmod是改权限
 chattr +a a.sh #lsattr a.sh  #chattr -a a.sh    # change attribute   #隐藏权限
 
 #一般权限、特殊权限、隐藏权限 这三种权限都是对于某一类用户或者用户组而言,而文件的访问控制列表（ACL）则是针对特定的用户或者用户组的一种权限控制
-ls -ld /root # dr-xrwx---. 14 root root 4096 May 4 2017 /root  #没加acl权限的时候,ls后看到权限列最后是一个点,加了acl权限可以看到最后那个点变
+ls -ld /root # dr-xrwx---. 14 root root 4096 May 4 2017 /root  #没加acl权限,ls后看到权限列最后是一个点,加了acl权限可以看到最后那个点变
 ls -ld /root # dr-xrwx---+ 14 root root 4096 May 4 2017 /root  #成了一个加号+,就说明这个目录或文件具有针对某个用户或者组特别设置的一些权限
 setfacl -Rm u:abc:rwx /root  #给abc用户赋予/root目录rwx权限(普通用户原本无法访问/root),R表示递归,m表示普通文件; u:用户:权限, g:组名:权限
 getfacl /root  # 当得知某个文件或文件夹有acl权限的时候就可以通过getfacl来查看其acl权限
 
-su - abc # 由于直接只用root用户有时候会造成一些麻烦,所以大多时候我们都是使用非root用户来操作linux系统.但是如果你有root用户的权限,那么你可以
-随时切换到root或者任何其他用户的账号. su就是在不退出的情况下切换到别的用户,在su和用户之间有个-,意思是连同环境变量也一并切成该用户的,相当于彻底切换,
-强烈建议切换操作都加中划线. 
-root ALL=(ALL) ALL # 尽管普通用户可以通过su切换到root,但是很有可能输入的密码泄露,所以有了sudo这个命令.用visudo命令编辑/etc/sudoers文件,仿照此行
+su - abc # 由于直接使用root用户有时候会造成一些麻烦,所以大多时候我们都是使用非root用户来操作linux系统.但是如果你有root用户的权限,那么你可以
+随时切换到root或者任何其他用户的账号. su命令可以在不退出当前shell的情况下切换到其他用户,在su和用户之间有个-,意思是连同环境变量也一并切成该用户的,
+相当于彻底切换,强烈建议切换操作都加中划线. 
+root ALL=(ALL) ALL # 尽管普通用户可以通过su切换到root,但很可能输密码时导致泄露,所以有了sudo这个命令.用visudo命令编辑/etc/sudoers文件,仿照此行
 abc ALL=(ALL) ALL  # 添加用户abc,这样abc就可以使用sudo来执行命令了. abc用sudo执行命令时要验证自己的密码而非root用户的密码.可以通过配置取消.注意,
-如果赋予了一个用户 ALL权限,那么他几乎相当于root用户了,这样依然不太好,所以在配置的时候可以用具体的命令的绝对路径来代替最后的那个ALL, 用whereis找到
+如果赋予了一个用户 ALL权限,那么他几乎相当于root用户了,这样依然不太好,所以在配置的时候可以用具体命令的绝对路径来代替最后的那个ALL, 用whereis找到
 命令的绝对路径然后配置就行 abc ALL=(ALL) a/b/c, d/e/f 不同命令逗号隔开;  谁可以使用 允许使用的主机=(以谁的身份) 可执行的命令; sudo -l   
 ```
