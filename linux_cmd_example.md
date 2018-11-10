@@ -65,3 +65,45 @@ sda4,意思就是说我把sda这个硬盘分成了四个区.一块硬盘最多�
 分区还是逻辑分区他们都是在同一块硬盘上,所以使用都没啥影响,只是理解上的差异. 分好区后要对该区进行格式化,格式化的目的是为了给你的这个区装一个文件系统
 模板,linux系统有特别多的文件系统,不同的文件系统对文件的管理方式肯定不一样,所以你需要将其格式化成你想要的文件系统. 格式化完成之后,最后就是挂载,把你分
 好的这个区挂到某个目录就可以正常使用了.
+
+* 硬盘插入linux机器之后,会自动对其进行识别,一般硬盘都是sda,adb这个顺序往下走,对应的硬盘文件都统一放在/dev下. 假设你刚新连了一块硬盘到机器上,机器把
+该硬盘抽象成了sdb文件,现在我们来对该硬盘进行分区.
+```
+fdisk /dev/sdb  #此时会出现一堆提示信息,不用管
+Command (m for help): p   #直接输入p来查看当前这个硬盘的信息
+   Device Boot Start End Blocks Id System   #这是信息的最后一行,它用来表示该硬盘的分区信息的信息头,如果有分区,就会显示分区信息.
+Command (m for help): n   #信息显示完你的光标还是在命令行,直接输入n来添加一个新分区.会出现如下信息:
+   p primary (0 primary, 0 extended, 4 free)  # 输入p创建一个主分区
+   e extended  #输入e创建一个逻辑分区
+Command (m for help): n  #直接输入p创建主分区
+Partition number (1-4, default 1): 1   #分区都是按照数字来排序的,我们要创建第一个主分区,那就直接输入1
+First sector (2048-41943039, default 2048):    #这里是指定分区的起始扇区,用默认就好,不需要输入任何东西,直接回车
+   Using default value 2048   #系统会自动计算出最靠前的空闲扇区的位置,这里就表示当前分区的默认起始位置
+Last sector, +sectors or +size{K,M,G} (2048-41943039, default 41943039): +2G   #这里是要指定扇区结束位置.也可直接指定大小,+500M,+2G等
+Command (m for help): p   # 设置完大小时候就又回到了命令行,我们输入p来查看一下现在的分区情况,最后两行就变成这样了:
+   Device Boot Start   End    Blocks   Id  System
+   /dev/sdb1   2048  4196351  2097152  83  Linux    #这就是你新加的分区,可能显示/dev/sdb 也可能直接显示sdb1,都一样
+Command (m for help): w   #这时候还没完,我们必须输入w然后回车,这些信息才真正生效,否则是没有的.
+
+[root@linuxprobe ]# file /dev/sdb1  #使用file命令来查看你刚分好的那个区的类型
+   /dev/sdb1: cannot open (No such file or directory)  #如果显示信息是这样,那说明显示信息还没有同步到内核
+[root@linuxprobe ]# partprobe   #那你就手动执行partprobe命令手动同步,一遍不行就两遍,两遍还不行就重启机器就好了.
+
+[root@linuxprobe ~]# mkfs  #分完区之后要对该分区进行格式化,输入mkfs命令之后敲两下tab键,会出现所有文件系统的格式化命令
+    mkfs   mkfs.cramfs   mkfs.ext3   mkfs.fat   mkfs.msdos   mkfs.xfs
+    mkfs.btrfs   mkfs.ext2   mkfs.ext4   mkfs.minix   mkfs.vfat
+[root@linuxprobe ~]# mkfs.xfs /dev/sdb1  #用xfs的文件系统来格式化刚刚的分区,格式化就这么简单,直接就完成了
+[root@linuxprobe ~]# mkdir /newFS  #创建一个挂载目录
+[root@linuxprobe ~]# mount /dev/sdb1 /newFS/   #然后将刚刚的分区挂载到文件夹上
+[root@linuxprobe ~]# df -h  #然后使用df命令来查看当前系统的所有挂载信息,有一大堆呢,截取最后两条
+    /dev/sda1 497M 119M 379M 24% /boot
+    /dev/sdb1 2.0G 33M 2.0G 2% /newFS   #这就是你刚挂的
+    
+如果是新的外部硬件挂到文件夹上,每次重新启动挂载都是会失效的,得重新挂载,为了让其开机自动挂或者插上自动挂,那么需要将挂载信息直接写入到/etc/fstab文件中,
+打开该文件会看到一堆已经存在的挂载信息,然后你按照格式把你新分的区挂上去就行了
+    /dev/mapper   /rhel-swap      swap swap      defaults   0  0
+    /dev/cdrom    /media/cdrom    iso9660        defaults   0  0
+    /dev/sdb1     /newFS           xfs          defaults    0(是否备份,0否1是)  0(是否进行磁盘检查,0否1是)
+    
+[root@linuxprobe ~]# umount /dev/sdb1   #解挂
+```
