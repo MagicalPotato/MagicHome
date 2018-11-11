@@ -66,24 +66,24 @@ sda4,意思就是说我把sda这个硬盘分成了四个区.一块硬盘最多�
 模板,linux系统有特别多的文件系统,不同的文件系统对文件的管理方式肯定不一样,所以你需要将其格式化成你想要的文件系统. 格式化完成之后,最后就是挂载,把你分
 好的这个区挂到某个目录就可以正常使用了.
 
-* 硬盘插入linux机器之后,会自动对其进行识别,一般硬盘都是sda,adb这个顺序往下走,对应的硬盘文件都统一放在/dev下. 假设你刚新连了一块硬盘到机器上,机器把
-该硬盘抽象成了sdb文件,现在我们来对该硬盘进行分区.
+* 硬盘插入linux机器之后,会自动对其进行识别,一般硬盘命名都是按照sda,adb这个顺序往下走,对应的硬盘文件都统一放在/dev下. 假设你刚新连了一块硬盘到机器上,
+机器把该硬盘抽象成了sdb文件,现在我们来对该硬盘进行分区.
 ```
 fdisk /dev/sdb  #此时会出现一堆提示信息,不用管
 Command (m for help): p   #直接输入p来查看当前这个硬盘的信息
-   Device Boot Start End Blocks Id System   #这是信息的最后一行,它用来表示该硬盘的分区信息的信息头,如果有分区,就会显示分区信息.
+   Device Boot Start End Blocks Id System   #在信息最下面可以看到分区信息头,如果已经有分区,会接着列出分区信息.
 Command (m for help): n   #信息显示完你的光标还是在命令行,直接输入n来添加一个新分区.会出现如下信息:
    p primary (0 primary, 0 extended, 4 free)  # 输入p创建一个主分区
    e extended  #输入e创建一个逻辑分区
 Command (m for help): n  #直接输入p创建主分区
 Partition number (1-4, default 1): 1   #分区都是按照数字来排序的,我们要创建第一个主分区,那就直接输入1
-First sector (2048-41943039, default 2048):    #这里是指定分区的起始扇区,用默认就好,不需要输入任何东西,直接回车
-   Using default value 2048   #系统会自动计算出最靠前的空闲扇区的位置,这里就表示当前分区的默认起始位置
-Last sector, +sectors or +size{K,M,G} (2048-41943039, default 41943039): +2G   #这里是要指定扇区结束位置.也可直接指定大小,+500M,+2G等
+First sector (2048-41943039, default 2048):    #这里是指定分区的扇区起始位置,用默认就好,不需要输入任何东西,直接回车
+   Using default value 2048   # 系统会自动计算出最靠前的空闲扇区的位置,这里就表示当前分区的默认起始位置
+Last sector, +sectors or +size{K,M,G} (2048-41943039, default 41943039): +2G   #这里是要指定扇区结束位置.我们直接指定大小,+500M,+2G等
 Command (m for help): p   # 设置完大小时候就又回到了命令行,我们输入p来查看一下现在的分区情况,最后两行就变成这样了:
-   Device Boot Start   End    Blocks   Id  System
-   /dev/sdb1   2048  4196351  2097152  83  Linux    #这就是你新加的分区,可能显示/dev/sdb 也可能直接显示sdb1,都一样
-Command (m for help): w   #这时候还没完,我们必须输入w然后回车,这些信息才真正生效,否则是没有的.
+   Device Boot   Start   End    Blocks   Id  System
+   /dev/sdb1     2048  4196351  2097152  83  Linux    #这就是你新加的分区,可能显示/dev/sdb 也可能直接显示sdb1,都一样
+Command (m for help): w   #这时候还没完,我们必须输入w然后回车,这些信息才真正写入保存,否则是没用的.
 
 [root@linuxprobe ]# file /dev/sdb1  #使用file命令来查看你刚分好的那个区的类型
    /dev/sdb1: cannot open (No such file or directory)  #如果显示信息是这样,那说明显示信息还没有同步到内核
