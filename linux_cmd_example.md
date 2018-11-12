@@ -107,3 +107,12 @@ Command (m for help): w   #这时候还没完,我们必须输入w然后回车,�
     
 [root@linuxprobe ~]# umount /dev/sdb1   #解挂
 ```
+
+```
+系统中有很多服务,根据linux系统中一切皆文件的宗旨,那些后台的服务也是文件,而修改服务状态就是修改该服务对应的配置文件的过程.修改完配置文件之后要重启该
+服务才能使得修改生效.
+nmtui #该命令用来配置网络参数,比如ip地址是自动获取还是手动配置等,它是一个有UI界面的命令
+systemctl restart network   #修改了网卡配置,那么就要重启网络服务  # systemctl是一种系统服务管理工具
+[root@linuxprobe ~]# systemctl restart sshd   # sshd是ssh的远程连接服务,一般红帽7系统都是默认开启,你如果修改了其配置那么也要重启该服务
+[root@linuxprobe ~]# systemctl enable sshd   # 这一项是修改sshd服务让其开机自动启动
+```
