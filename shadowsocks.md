@@ -12,13 +12,15 @@ chmod +x bbr.sh
 uname -r     #用来查看内核版本,如果是最新的就表示安装成功了,最新的大概都4.19
 
 
-安装shadowsocksR:
+安装shadowsocks-r,这个脚本是四合一脚本,所以是-all,但是安装完成之后环境上的程序是-r:
 wget --no-check-certificate -O shadowsocks-all.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-
 all.sh
 chmod +x shadowsocks-all.sh
 ./shadowsocks-all.sh 2>&1 | tee shadowsocks-all.log
 
 卸载:
+./shadowsocks-all.sh uninstall  #原本卸载命令是这个,但是没找到这个,只找到了-r.我怀疑是他把-all这个脚本添加到系统PATH中去了.后续看一下这个脚本到底
+写了什么东西,面前也暂时用不到卸载就先这样放着吧.
 ./shadowsocks-r.sh uninstall   #卸载的时候只能是在root的目录下卸载,因为卸载文件shadowsock-r.sh放在root用户目录下
 
 
