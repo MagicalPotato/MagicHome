@@ -1,10 +1,22 @@
 ```
 sudo -i
 
-安装:
-wget --no-check-certificate https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocksR.sh
-chmod +x shadowsocksR.sh
-./shadowsocksR.sh 2>&1 | tee shadowsocksR.log
+安装内核并开启加速:
+yum install -y wget
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && chmod +x bbr.sh && ./bbr.sh
+上面这条是合在一起的命令,下面是分开的,两种都可以.
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
+chmod +x bbr.sh
+./bbr.sh
+安装完成后，脚本会提示需要重启 VPS，输入 y 并回车后重启。然后验证内核是否成功安装:
+uname -r     #用来查看内核版本,如果是最新的就表示安装成功了,最新的大概都4.19
+
+
+安装shadowsocksR:
+wget --no-check-certificate -O shadowsocks-all.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-
+all.sh
+chmod +x shadowsocks-all.sh
+./shadowsocks-all.sh 2>&1 | tee shadowsocks-all.log
 
 卸载:
 ./shadowsocks-r.sh uninstall   #卸载的时候只能是在root的目录下卸载,因为卸载文件shadowsock-r.sh放在root用户目录下
