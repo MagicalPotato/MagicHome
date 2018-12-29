@@ -8,7 +8,7 @@
 2. 网页搜索策略(深度优先还是广度优先)
 3. 爬虫访问边界
 
-###### 安装scrapy框架之前要先安装这些库存
+###### 安装scrapy框架之前要先安装这些库
 - pip3 install lxml
 - pip3 install zope.interface
 - 到https://www.lfd.uci.edu/~gohlke/pythonlibs/ 下载与本地python环境和计算机系统相匹配的twisted库文件Twisted‑18.9.0‑cp37‑cp37m‑win_amd64.whl,
