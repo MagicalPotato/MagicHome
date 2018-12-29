@@ -38,11 +38,10 @@ beautifulsoup库能将requests获取到的网页解析成soup文档,更利于后
   
 ```
 import  requests
-
 headers  = {'User-Agent' .........................}
-res  = requests.get ('http://www.kugou.com' , headers=headers)
 -------------------------------------------------
 from  bs4  import  BeautifulSoup  #通过bs来处理网页信息
+res  = requests.get ('http://www.kugou.com' , headers=headers)
 soup=  BeautifulSoup(res.text , 'html.parser')
 find_all(tag ,  attibutes ,  recursive ,  text ,  limit ,  keywords ) #soup主要方法之一,查找全部满足条件的标签,返回值是一个集合
 find(tag ,  attibutes ,  recursive ,  text ,  keywords)  #查找单个标签,返回值就是一个标签
@@ -56,11 +55,15 @@ body > section > div > div:nth-child(9) > a > img  #单个
 body > section > div > div> a > img   #略作修改,通过循环再获取标签中的图片
 -----------------------------------------------------------------------
 import  re   # 通过正则表达式来爬取信息,有的网页标签结构基本相同只需替换标签中的一小部分信息,可以考虑使用正则来匹配
-prices = re.findall('这里面就是一个正则',res.text)
-for price in prices;
-    print(price)
+f = open('D:/book.txt' 'a+')  #以追加的方式打开一个文本放着,然后代码就循环爬取东西,爬出来了就写到文本里,循环结束后关闭f
+res  = requests.get ('http://www.kugou.com' , headers=headers)
+if res.status_code == 200 :   # res可以用来判断状态,获取成功了再爬
+    txtlist = re.findall  ('<p>(.*?)</p>', res.content.decode('utf-8'), re.S)  # 爬取文本小说 
+    for txt in txtlist:
+        f.write(txt + '\n')
 -------------------------------------------------------------------
 from lxml import etree   # 通过lxml库直接处理网页信息
+res  = requests.get ('http://www.kugou.com' , headers=headers)
 html=  etree.HTML(res.text)
 result = etree.tostring(html)
 -----------------------------------------------------------
