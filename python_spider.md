@@ -22,8 +22,9 @@ __pip install scrapy # 安装完上面这一大堆库之后scrapy才能正常安
 
 浏览器F12进入审查页面,选择Network选项,然后点击左侧的index.html,就能找到User-Agent和各种请求信息
 
-爬取过程中如果报错,重新改了之后会重新从头开始爬取,效率低下,这是代码要用try捕获异常的原因之一. requests库会报四个错,这些错都继承自
-requests.exceptions.RequestException:
+爬取过程中如果报错,重新改了之后会重新从头开始爬取,效率低下,这是代码要用try捕获异常的原因之一. 
+
+requests库主要用于下载网页,主要会报四个错,这些错都继承自requests.exceptions.RequestException:
   - Request抛出ConnetcionError  #通常是网络问题,如:DNS查询失败,服务器拒绝连接等
   - Request抛出Timeout  #请求超时
   - Request抛出TooManyRedirects # 请求超过设定的重定向次数
