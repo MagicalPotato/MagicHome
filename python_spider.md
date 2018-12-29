@@ -29,3 +29,32 @@ requests库主要用于下载网页,主要会报四个错,这些错都继承自r
   - Request抛出Timeout  #请求超时
   - Request抛出TooManyRedirects # 请求超过设定的重定向次数
   - Response.raise_for_stats()抛出HTTPError # 请求失败,这个就和状态码有关,比如404页面不存在
+
+beautifulsoup库能将requests获取到的网页解析成soup文档,更利于后续数据的提取和处理,支持四种解析器,官方推荐lxml解析器:
+  - BeautifulSoup(res.text , 'html.parser')  # python的官方解析器
+  - BeautifulSoup(res.text , 'lxml')         # 官方推荐,效率高, 需要C库
+  - BeautifulSoup(res.text , ['lxml, xml'])  # 唯一支持xml的解析器,但需要安装C语言库
+  - BeautifulSoup(res.text , 'html5lib')     # 容错性四个中最好,生成html格式的文档
+  
+```
+import  requests
+from  bs4  import  BeautifulSoup
+
+headers  = {'User-Agent' .........................}
+res  = requests.get (’ http://bj . xiaozhu . com /’ , headers=headers)
+soup=  BeautifulSoup(res.text , 'html.parser')
+
+
+find_all(tag ,  attibutes ,  recursive ,  text ,  limit ,  keywords ) #soup主要的方法之一,查找全部满足条件的标签,返回值是一个集合
+find(tag ,  attibutes ,  recursive ,  text ,  keywords)  #查找单个标签,返回值就是一个标签
+list = soup.find_all('div', 'item')  #查找div标签,属性class=item
+list = soup.find_all('div', class = 'item') #同上
+list = soup.find_all('div', attrs ={'class':'item'}) #查包含特殊属性的div标签,这个特殊属性就是class,其值是item
+
+imgTag = soup.selector('#default > div > div > div > div > section > div:nth-child(2) > ol > li:nth-child(1) > article > 
+div.image_container > a > img')  #从大到小提取信息,类似于中国>安徽省>合肥市.. 找到一个网页上需要提取的元素,右键检查,然后在右侧出现的高亮地方继续
+右键,这时候会出现一个copy选项,里面有个copy select,单击之后就能得到该元素的secletor. 但是注意这个方法得到的是一个标签列表,可以在循环中调用 
+imgTag.gettext()方法来获取内容. 如果我们将这个selector略作修改,就能得到所有的同类图片,而不是单个:
+#default > div > div > div > div > section > div:nth-child(2) > ol > li:nth-child(1) > article > div.image_container > a > img
+#default > div > div > div > div > section > div > ol > li > article > div.image_container > a > img
+```
