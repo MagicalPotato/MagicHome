@@ -8,7 +8,7 @@
 2. 网页搜索策略(深度优先还是广度优先)
 3. 爬虫访问边界
 
-###### 安装scrapy框架之前要先安装这些库
+###### 安装scrapy框架之前要先安装这些库(一般能用pip安装的就用pip安装,不能装的再用whl文件手动装)
 - pip3 install lxml
 - pip3 install zope.interface
 - 到https://www.lfd.uci.edu/~gohlke/pythonlibs/ 下载与本地python环境和计算机系统相匹配的twisted库文件Twisted‑18.9.0‑cp37‑cp37m‑win_amd64.whl,
@@ -20,3 +20,11 @@
 
 __pip install scrapy # 安装完上面这一大堆库之后scrapy才能正常安装.完成后在命令行输入命令 scrapy 测试是否安装成功__
 
+浏览器F12进入审查页面,选择Network选项,然后点击左侧的index.html,就能找到User-Agent和各种请求信息
+
+爬取过程中如果报错,重新改了之后会重新从头开始爬取,效率低下,这是代码要用try捕获异常的原因之一. requests库会报四个错,这些错都继承自
+requests.exceptions.RequestException:
+  - Request抛出ConnetcionError  #通常是网络问题,如:DNS查询失败,服务器拒绝连接等
+  - Request抛出Timeout  #请求超时
+  - Request抛出TooManyRedirects # 请求超过设定的重定向次数
+  - Response.raise_for_stats()抛出HTTPError # 请求失败,这个就和状态码有关,比如404页面不存在
