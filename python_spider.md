@@ -30,7 +30,7 @@ requests库主要用于下载网页,主要会报四个错,这些错都继承自r
   - Request抛出TooManyRedirects # 请求超过设定的重定向次数
   - Response.raise_for_stats()抛出HTTPError # 请求失败,这个就和状态码有关,比如404页面不存在
 
-beautifulsoup库能将requests获取到的网页解析成soup文档,更利于后续数据的提取和处理,支持四种解析器,官方推荐lxml解析器:
+beautifulsoup库能将requests获取到的网页解析成soup文档,更利于后续数据的提取和处理,支持四种解析器,一个python官方,三个第三方,bs官方推荐lxml解析器:
   - BeautifulSoup(res.text , 'html.parser')  # python的官方解析器
   - BeautifulSoup(res.text , 'lxml')         # 官方推荐,效率高, 需要C库
   - BeautifulSoup(res.text , ['lxml, xml'])  # 唯一支持xml的解析器,但需要安装C语言库
@@ -38,23 +38,36 @@ beautifulsoup库能将requests获取到的网页解析成soup文档,更利于后
   
 ```
 import  requests
-from  bs4  import  BeautifulSoup
 
 headers  = {'User-Agent' .........................}
-res  = requests.get (’ http://bj . xiaozhu . com /’ , headers=headers)
+res  = requests.get ('http://www.kugou.com' , headers=headers)
+-------------------------------------------------
+from  bs4  import  BeautifulSoup  #通过bs来处理网页信息
 soup=  BeautifulSoup(res.text , 'html.parser')
-
-
-find_all(tag ,  attibutes ,  recursive ,  text ,  limit ,  keywords ) #soup主要的方法之一,查找全部满足条件的标签,返回值是一个集合
+find_all(tag ,  attibutes ,  recursive ,  text ,  limit ,  keywords ) #soup主要方法之一,查找全部满足条件的标签,返回值是一个集合
 find(tag ,  attibutes ,  recursive ,  text ,  keywords)  #查找单个标签,返回值就是一个标签
 list = soup.find_all('div', 'item')  #查找div标签,属性class=item
 list = soup.find_all('div', class = 'item') #同上
 list = soup.find_all('div', attrs ={'class':'item'}) #查包含特殊属性的div标签,这个特殊属性就是class,其值是item
-
-imgTag = soup.selector('#default > div > div > div > div > section > div:nth-child(2) > ol > li:nth-child(1) > article > 
-div.image_container > a > img')  #从大到小提取信息,类似于中国>安徽省>合肥市.. 找到一个网页上需要提取的元素,右键检查,然后在右侧出现的高亮地方继续
-右键,这时候会出现一个copy选项,里面有个copy select,单击之后就能得到该元素的secletor. 但是注意这个方法得到的是一个标签列表,可以在循环中调用 
-imgTag.gettext()方法来获取内容. 如果我们将这个selector略作修改,就能得到所有的同类图片,而不是单个:
-#default > div > div > div > div > section > div:nth-child(2) > ol > li:nth-child(1) > article > div.image_container > a > img
-#default > div > div > div > div > section > div > ol > li > article > div.image_container > a > img
+imgTag = soup.selector('body > section > div > div:nth-child(9) > a > img')  #从大到小提取信息,类似于中国>安徽省>合肥市.. 在一个网页图片上
+右键检查,在右侧高亮地方继续右键,出现一个copy选项,里面有个copy select,单击之后就能得到该元素的secletor. 这个方法得到的是单个标签.需要继续调用别的
+方法来获取标签内容.比如Tag.get_text()获取文本,imgTag.get('src')获取图片. 如果我们将这个selector略作修改,就能得到所有的同类图片,返回值是标签列表:
+body > section > div > div:nth-child(9) > a > img  #单个
+body > section > div > div> a > img   #略作修改,通过循环再获取标签中的图片
+-----------------------------------------------------------------------
+import  re   # 通过正则表达式来爬取信息,有的网页标签结构基本相同只需替换标签中的一小部分信息,可以考虑使用正则来匹配
+prices = re.findall('这里面就是一个正则',res.text)
+for price in prices;
+    print(price)
+-------------------------------------------------------------------
+from lxml import etree   # 通过lxml库直接处理网页信息
+html=  etree.HTML(res.text)
+result = etree.tostring(html)
+-----------------------------------------------------------
+#以前一直不理解zip的作用,现在明白了,它可以将同类型有关系的东西放一起来迭代,比如这四个list将其数据放到一起整体展示才是一整条, 你如果分开循环,那就得四
+次循环,完了之后还得组合数据,那将会非常麻烦:
+for a, b, c, d in zip(alist,blist,clist,dlist):  
+    data = {'春天':a.xxx,'夏天':b.xxx,'秋天':b.xxx,'冬天':b.xxx}  
+    
+urls  =  ['http://www.kugou.com/yy/rank/home/{}-8888.html'.format(str(num)) for num in range(l , 14)] #结构固定的页面url可以这样构造
 ```
