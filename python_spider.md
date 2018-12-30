@@ -74,3 +74,20 @@ for a, b, c, d in zip(alist,blist,clist,dlist):
     
 urls  =  ['http://www.kugou.com/yy/rank/home/{}-8888.html'.format(str(num)) for num in range(l , 14)] #结构固定的页面url可以这样构造
 ```
+##### Xpath语法
+```
+<people>                    # people  选取people节点下所有的子节点
+  <user>                    # /people  选取根元素people,起于正斜杆的路径都表示绝对路径
+    <name>小明</name>     # people/user  选取people下的所有user节点
+    <sex>女</sex>         # //user   选取所有的user元素而不考虑其在文档中的位置
+    <id>34</id>           # people//user 选取people下的所有user而不考虑其位置
+    <goal>89</goal>      # //@abc 选取名为abc的所有属性
+  </user>                # /people/user[1]  以绝对路径,选根people下第一个user
+</people>               # //li[@abc]  选所有的li元素,且li元素要有abc属性,不管值是多少,属性名一定要叫abc
+                       # //li[@abc='kk']  选所有的li,且li元素要有abc属性,且属性值为kk
+                       
+xpath语法也可以从浏览器拷贝到,如同之前拷贝selector路径那样,copy里面同样有个copy xpath:
+res = requests.get(url,headers=headers)
+selector = etree.HTML (res.text)
+img = selector.xpath('/html/body/section/div/div[1]/a/img') #这就是之前那个图片的xpath
+```
