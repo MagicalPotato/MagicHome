@@ -14,9 +14,8 @@
 - 到https://www.lfd.uci.edu/~gohlke/pythonlibs/ 下载与本地python环境和计算机系统相匹配的twisted库文件Twisted‑18.9.0‑cp37‑cp37m‑win_amd64.whl,
 下载好之后放到本地某个文件夹,然后在命令行cd到该文件夹然后使用pip安装该库 pip3 install Twisted‑18.9.0‑cp37‑cp37m‑win_amd64.whl
 - pip3 install pyOpenSSL
-- 还是到上面地址搜索并下载pywin32的库然后用pip安装 pip install pywin32-224-cp37-cp37m-win_amd64.whl ,安装完之后要注意,这个库存还是导不进去,这时候
-到你本机这个目录 C:\Python37\Lib\site-packages\pywin32_system32,将该目录下的两个文件pythoncom37.dll和pywintypes37.dll拷贝到C:\Windows\System32
-目录下
+- 还是到上面地址搜索并下载pywin32的库然后用pip安装 pip install pywin32-224-cp37-cp37m-win_amd64.whl ,安装完之后要注意,这个库还是导不进去,这时
+到你本机 C:\Python37\Lib\site-packages\pywin32_system32,将该目录下的两个文件pythoncom37.dll和pywintypes37.dll拷贝到 C:\Windows\System32下
 
 __pip install scrapy # 安装完上面这一大堆库之后scrapy才能正常安装.完成后在命令行输入命令 scrapy 测试是否安装成功__
 
@@ -43,16 +42,16 @@ headers  = {'User-Agent' .........................}
 from  bs4  import  BeautifulSoup  #通过bs来处理网页信息
 res  = requests.get ('http://www.kugou.com' , headers=headers)
 soup=  BeautifulSoup(res.text , 'html.parser')
-find_all(tag ,  attibutes ,  recursive ,  text ,  limit ,  keywords ) #soup主要方法之一,查找全部满足条件的标签,返回值是一个集合
-find(tag ,  attibutes ,  recursive ,  text ,  keywords)  #查找单个标签,返回值就是一个标签
-list = soup.find_all('div', 'item')  #查找div标签,属性class=item
-list = soup.find_all('div', class = 'item') #同上
+list = soup.find_all('div', 'item') 或('div', class = 'item') #查找div标签,属性class=item
 list = soup.find_all('div', attrs ={'class':'item'}) #查包含特殊属性的div标签,这个特殊属性就是class,其值是item
 imgTag = soup.selector('body > section > div > div:nth-child(9) > a > img')  #从大到小提取信息,类似于中国>安徽省>合肥市.. 在一个网页图片上
 右键检查,在右侧高亮地方继续右键,出现一个copy选项,里面有个copy select,单击之后就能得到该元素的secletor. 这个方法得到的是单个标签.需要继续调用别的
 方法来获取标签内容.比如Tag.get_text()获取文本,imgTag.get('src')获取图片. 如果我们将这个selector略作修改,就能得到所有的同类图片,返回值是标签列表:
 body > section > div > div:nth-child(9) > a > img  #单个
 body > section > div > div> a > img   #略作修改,通过循环再获取标签中的图片
+
+find_all(tag ,  attibutes ,  recursive ,  text ,  limit ,  keywords ) #soup主要方法之一,查找所有满足条件的标签,返回值是一个集合
+find(tag ,  attibutes ,  recursive ,  text ,  keywords)  #查找单个标签,返回值就是一个标签
 -----------------------------------------------------------------------
 import  re   # 通过正则表达式来爬取信息,有的网页标签结构基本相同只需替换标签中的一小部分信息,可以考虑使用正则来匹配
 f = open('D:/book.txt' 'a+')  #以追加的方式打开一个文本放着,然后代码就循环爬取东西,爬出来了就写到文本里,循环结束后关闭f
@@ -73,6 +72,8 @@ for a, b, c, d in zip(alist,blist,clist,dlist):
     data = {'春天':a.xxx,'夏天':b.xxx,'秋天':b.xxx,'冬天':b.xxx}  
     
 urls  =  ['http://www.kugou.com/yy/rank/home/{}-8888.html'.format(str(num)) for num in range(l , 14)] #结构固定的页面url可以这样构造
+注意: format语法的{}是个占位符,写成{0:s}意思并不是直接把后面的数字给你format成一个字符串,而是表示第一个位置这里要放一个字符串,放进来
+之前就已经是个字符串了,直接放别的会报错.所以在后面的表达式中要先对数字进行转换,转成str之后才往里面放.
 ```
 ##### Xpath语法
 ```
