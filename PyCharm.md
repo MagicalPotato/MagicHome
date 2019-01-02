@@ -18,3 +18,33 @@
   * settings-editor-inspections 将所有PEP8的选项去除对勾(用于def函数的命名检查和导包时候的检查)
   * settings-editor-inspections 找到spelling选项,下面就一项typo,把typo的对勾去除(去除部分变量的命名)
   * settings-editor-color scheme-general-errors and warnings 把其中的weak warning选中,然后把右边的对勾去掉(还是消除变量命名的告警)
+
+
+```
+有时候安装的第三方库在本地命令行可以导入使用但是在pycharm中却导不进来,这样排查:
+import sys
+print(sys.path)   #导入sys库先打印当前环境的path看看当前的环境用的包都是从哪些路径下引的,一般结果如下:
+['F:\\workspace_pycharm\\PySpider\\spider','F:\\workspace_pycharm\\PySpider', 
+ F:\\workspace_pycharm\\PySpider\\venv\\Scripts\\python37.zip', 'F:\\workspace_pycharm\\PySpider\\venv',
+'F:\\workspace_pycharm\\PySpider\\venv\\lib\\site-packages', 
+'F:\\workspace_pycharm\\PySpider\\venv\\lib\\site-packages\\setuptools-39.1.0-py3.7.egg', 
+'F:\\workspace_pycharm\\PySpider\\venv\\lib\\site-packages\\pip-10.0.1-py3.7.egg',   #上面这部分都是pycharm中你当前工程的虚拟环境的
+'C:\\Program Files\\JetBrains\\PyCharm 2018.1.4\\helpers\\pycharm_matplotlib_backend',     #这是pycharm这个软件自己用的
+'C:\\Python37\\DLLs', 'C:\\Python37\\lib', 'C:\\Python37']  #这部分才是关键,可以发现Python37的lib目录实际上已经有了,那可以推测安装的第三方库
+应该没放在lib下,在doc窗口使用pip查看一个你已经安装的库看看其路径在哪:
+pip show lxml
+C:\Users\王泽>pip show lxml
+Name: lxml
+Version: 4.2.5
+Summary: Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API.
+Home-page: http://lxml.de/
+Author: lxml dev team
+Author-email: lxml-dev@lxml.de
+License: BSD
+Location: c:\python37\lib\site-packages     #注意这里,这才是这个库的真实安装路径
+Requires:
+Required-by: Scrapy, parsel
+
+现在就可以发现pycharm识别不了lib下的子目录,所以我们将这个目录手动添加到你当前工程引用的环境中去:File-Settings-Project:Python-project interpretate
+点击右边的设置按钮会出现一个show all,点击然后选中你当前工程用的那个环境,然后点击右侧最下面那个图标把路径添加上即可
+```
