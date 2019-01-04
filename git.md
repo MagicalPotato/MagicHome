@@ -39,3 +39,16 @@ git clone 仓库地址  //把仓库上的工程克隆到本地,地址不带引�
 git pull   //从git上更新最新的代码到本地,类似于svn update
 git push //网Git上合并你的本地仓库,有可能会出现权限问题,是因为没有设置用户名和密码,需要手动修改 .git/config 文件添加用户名和密码
 ```
+
+在本地新建文件夹并初始化成git仓库然后上传
+```
+mkdir abc
+cd adc
+git init
+touch readme.md
+git add readme.md
+git commit -m 'xxx'
+在网页GitHub上创建一个仓库并复制仓库的地址
+git remote add origin  https://github.com/MagicalPotato/Python_spider.git
+git push -u origin master
+```
