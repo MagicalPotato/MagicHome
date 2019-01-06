@@ -80,3 +80,25 @@ TCP 将在两个应用程序之间建立一个全双工 (full-duplex) 的通信�
 - TCP和IP在一起协同工作。TCP负责应用软件和网络软件之间的通信。IP负责计算机之间的通信。TCP负责将数据分割并装入IP包,然后在它们到达的时候重新组合它们。
 IP 负责将包发送至接受者。
 
+##### 三次握手--是指建立一个TCP连接时，需要客户端和服务端总共发送3个数据包以确认连接的建立。在socket编程中，这一过程由客户端执行connect来触发:
+- 第一次握手：Client设置包的标志位SYN=1，产生随机值seq=J，并将该包发给Server，Client进入SYN_SENT状态，等待Server确认。
+- 第二次握手：Server收到包后由标志位SYN=1知道Client请求建立连接，Server设置标志位SYN=1,ACK=1，ack=J+1，随机值seq=K，将该包发送给Client以确认
+连接请求，Server进入SYN_RCVD状态。
+- 第三次握手: Client收到确认后，检查ack是否为J+1，ACK是否为1，如果正确则将标志位ACK置为1，ack=K+1，并将该数据包发送给Server，Server检查ack是否为
+K+1，ACK是否为1，如果正确则连接建立成功，Client和Server进入ESTABLISHED状态，完成三次握手，随后Client与Server之间可以开始传输数据了。
+
+- 简单总结:客户端发一个SYN包,服务端收到并确认,然后把该SYN和自己的ACK发回给客户端,客户端收到后再发一个ACK包.
+
+- SYN攻击：在Server发送SYN-ACK之后，收到Client的ACK之前,这个状态的TCP连接称为半连接（half-open connect）,此时Server处于SYN_RCVD状态，当收
+到ACK后，Server转入ESTABLISHED状态。SYN攻击就是Client在短时间内伪造大量不存在的IP地址，并向Server不断地发送SYN包，Server回复确认包，并等待Client的
+确认，由于源地址是不存在的，所以根本就不会有回应,因此，Server需要不断重发直至超时，这些伪造的SYN包将产时间占用未连接队列，导致正常的SYN请求因为队列满
+而被丢弃，从而引起网络堵塞甚至系统瘫痪。SYN攻击时一种典型的DDOS攻击，检测SYN攻击的方式非常简单，即当Server上有大量半连接状态且源IP地址是随机的，则可
+以断定遭到SYN攻击了，使用如下命令可以让之现行： #netstat -nap | grep SYN_RECV
+##### 四次告别
+- 第一次挥手：Client发送一个FIN，主动关闭Client到Server的数据传送，Client进入FIN_WAIT_1状态。 (我要关闭了)
+- 第二次挥手：Server收到FIN后，发送一个ACK给Client，并进入CLOSE_WAIT状态。                   (好你就关! 此时客户端就关了)
+- 第三次挥手：Server再发一个FIN，主动关闭Server到Client的数据传送，Server进入LAST_ACK状态。   (那我也关了)
+- 第四次挥手：Client收到FIN后，Client进入TIME_WAIT状态，接着发送一个ACK给Server,Server进入CLOSED状态。(好!此时服务端关闭)
+
+- 为什么建立连接是三次握手，而关闭连接却是四次？这是因为关闭连接时，当收到对方的FIN报文时，仅仅表示对方不再发送数据了但是对方此时还能接收数据,己方
+现在可能还没有将全部数据都发给对方.此时己方需要先把剩下的数据都发完，然后再发FIN表示自己也要close. 因此己方ACK和FIN是分开发的。
