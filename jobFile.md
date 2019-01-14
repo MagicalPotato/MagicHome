@@ -24,8 +24,8 @@
 * 熟练使用java,python编程语言.
 * 熟练使用sql,postgreSQL数据库. 
 * 熟练使用 git,svn,maven,ant等版本和项目管理工具. 
-* 熟悉spring ,mybatis框架.
-* 熟练使用eclipse,pycharm集成开发环境.
+* 熟练使用spring ,mybatis框架.
+* 熟练使用eclipse,pycharm,idea集成开发环境.
 * 熟练使用linux操作系统
 
 * 熟悉nosql;会用hbase数据库,了解其原理.
