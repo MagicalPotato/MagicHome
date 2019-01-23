@@ -15,9 +15,13 @@
 
 
 #### Springboot的使用
-- 用@SpringBootApplication注解来把当前创建的类标注成一个springboot的主程序.这个程序就是启动整个工程的入口.
-- 在刚刚那个test包下新建controller.MyController类,就会自动创建test包下创建controller包并在controller包下创建MyController类.这时候的目录结构是:主
-程序MainApplication在test包下,而MyController类就在controller包下.
+- 用@SpringBootApplication注解来把当前创建的类标注成一个springboot的主程序.这个程序就是启动整个工程的入口. 后续springboot的自动扫描也是基于这个
+注解.被注解的这个类所在的包同路径和子路径下的所有组件都会被springboot扫描进去,然后再根据注解关系来寻找和使用不同的组件.
+- 在刚刚那个test包下新建controller.MyController类,就会自动创建test包下创建controller包并在controller包下创建MyController类.这时候的目录结构是:
+主程序MainApplication在test包下,而MyController类就在controller包下.
+- 编写好相关的类之后可以直接运行MainApplication类,整个项目就运行起来了. 然后将在idea右侧找到Maven Project选项,找到你的项目,选中LifeCycle-package
+然后点击三角图标将项目打成一个jar包.此时jar包是存放在你的项目target目录下.将该jar包拷贝到你环境的任意目录下,使用: java -jar xxxx.jar命令来运行你的
+这个包,这个包就被部署成了一个服务.
 
 
 
@@ -39,19 +43,19 @@
 
     // springboot的版本和依赖导入
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.19.RELEASE</version>
+        <groupId>org.springframework.boot</groupId>  //这个是springboot的一个父依赖,它管理了springboot几乎所有要用到的依赖的版本,比如我们
+        <artifactId>spring-boot-starter-parent</artifactId> //引入一个mysql依赖,但是不需要指定其版本,就是这个玩意帮我们自动适配的.
+        <version>1.5.19.RELEASE</version>   // 这个是个版本仲裁
     </parent>
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-    </dependencies>
-
-    // 将项目打成jar包的插件
+            <groupId>org.springframework.boot</groupId>  //spring-boot-starter这个玩意是springboot的一个启动器,它有很多的启动器,
+            <artifactId>spring-boot-starter-web</artifactId>  //你用那个功能我就给你提供哪个功能个的启动器.这个是web启动器,所有运行web项目
+        </dependency>  //的模块和依赖都由这个启动器给你配好了,你只要把这个启动器依赖在pom.xml中就行.版本还是由版本仲裁来自动适配的.
+    </dependencies>  //还有其他更多的启动器比在官方文档中都可以看到,用哪一个就引入哪个就行了.
+    
     <build>
+        // 将项目打成jar包的插件,一般这个插件在引入springboot的时候会推荐一并让你引入
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
