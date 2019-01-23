@@ -25,12 +25,43 @@ META-INF/spring.factories中enableAutoconfigure中指定的.我们在springboot�
 然后点击三角图标将项目打成一个jar包.此时jar包是存放在你的项目target目录下.将该jar包拷贝到你环境的任意目录下,使用: java -jar xxxx.jar命令来运行你的
 这个包,这个包就被部署成了一个服务.
 
+#### IDEA快速构建springboot应用
+- Create New Project--Springboot initializer--选择jdk,指定maven组id--选择模块--指定项目名称-OK
+- 快速构建会生成主程序,我们只需要关注业务逻辑即可.在指定maven组id和小组id那个页面最下面的 '组id+小组id'实际上就是你的当前项目的主包名称,而主包名称
+上面那个名称实际上最后会被用到主程序里,那个名称可以改不过最好跟小组id名称保持一致,因为最后主程序名称就会叫'小组ID+Application.java'
+- 默认还会生成一个resources文件夹里面有三个文件夹:
+  - static: 文件夹,放静态资源. 比如css,js,image等
+  - templates: 文件夹,放模板页面.springboot内嵌的tomcat不支持jsp,但是我们可以通过使用模板引擎来支持,比如freemarker, thymeleaf等
+  - application.propreties: 文件,springboot的默认配置文件.可直接用键值对的方式来改配置.比如server.port=8081就是改tomcat的端口
+  - application.yml(yaml): 另外一种配置文件(需要手动创建),也是springboot常用的全局配置文件,和上面那种写法不同. 在写yml配置文件的时候可能需要引入
+  一个yam配置自动提示的依赖,可以直接在pom.xml里配上,这样你在写配置的时候能动态提示你要写啥属性.
 
+```
+@component //这个注解的意思是把普通的pojo实体类实例化到容器当中.相当于是一个组件注解.@Controller,@service,@dao(Repository)这些都是组件注解,
+         // 由于某个组件没有更好的划分种类,所以就用这个注解来标注它们. 
+@ConfigurerationProperties(prefix="person") //用这两个注解就可以将配置应用到对应的类上,比如映射到Person类上
 
+// ymal文件中可配字符串,map,list,对象等数据结构,配置好之后可以通过注解来映射到对应的类上
+person:           属性和值之间必须要有一个空格. 字符串不需要用引号,如果非要用,那么双引号禁止转义,单引号可以转义
+    port: 9999    //层级关系比如server和port之间也有空格但是几个无所谓
+    path: xxxx    //同级关系要对齐.  属性大小写敏感. 对象和
+// 用properties配置文件也可以实现相同的功能,一般写成这种格式.这种配置方式有可能引起中文乱码,需要在settings中搜索file code选项进行更该编码
+  person.port=xxx
+  person.path=xxx
+```
 
-单体架构和微服务架构的区别: 单体架构所有的东西都是做在一个应用里面,最后打成war包,然后部署在环境的tomcat上,如果业务量大不够用了那就多放一些tomcat,每个
-里面都部署一份应用. 微服务呢是把一个整体的应用拆分成很多功能模块,同样也是往环境上的Tomcat里面去复制这些模块,一个tomcat部署一个模块,但是我只是复制需要
-用的模块,哪个模块用的多那我就在环境上多部署一些.所以就有很多dataImport,dataClean等,但是分析可能就那两三个.
+```
+@ResponseBody  //事实上我们可以把这个注解写在类上,表示该类所有的方法返回数据都直接写给浏览器
+@Controller
+@RestController   //我们也可以直接用这个注解来代替@ResponseBody和@Controller两个,因为点进@RestController可以发现其实它就是上面两个注解的合体
+public class MyController {
+    @ResponseBody   //这个注解的作用意思是:当前这个方法的返回数据直接写给浏览器,如果是对象则转成json格式
+    @RequestMapping("/hello")  //这个注解就是映射请求
+    public String SayHello(){
+        return "hello nimabi";
+    }
+}
+```
 
 #### 主要的配置
 ```
@@ -62,3 +93,7 @@ META-INF/spring.factories中enableAutoconfigure中指定的.我们在springboot�
         </plugins>
     </build>
 ```
+
+- 单体架构和微服务架构的区别: 单体架构所有的东西都是做在一个应用里面,最后打成war包,然后部署在环境的tomcat上,如果业务量大不够用了那就多放一些tomcat,
+每个里面都部署一份应用. 微服务呢是把一个整体的应用拆分成很多功能模块,同样也是往环境上的Tomcat里面去复制这些模块,一个tomcat部署一个模块,但是我只是复
+制需要用的模块,哪个模块用的多那我就在环境上多部署一些.所以就有很多dataImport,dataClean等,但是分析可能就那两三个.
