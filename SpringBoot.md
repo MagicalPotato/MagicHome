@@ -16,16 +16,14 @@
 
 #### Springboot的使用
 - 用@SpringBootApplication注解来把当前创建的类标注成一个springboot的主程序.这个程序就是启动整个工程的入口. 后续springboot的自动扫描也是基于这个
-注解.被注解的这个类所在的包同路径和子路径下的所有组件都会被springboot扫描进去,然后再根据注解关系来寻找和使用不同的组件.
+注解.被注解的这个类所在的包同路径和子路径下的所有组件都会被springboot扫描进去,以全路径的格式放到一个String数组里面返回,并被添加到框架的容器中,然后
+框架会根据注解去使用相应的组件. 实现这整个功能的是springboot的自动配置类,这些自动配置类是springboot在启动的时候从类路径下的
+META-INF/spring.factories中enableAutoconfigure中指定的.我们在springboot里面什么配置都没有做实际上是boot都已经帮我们全部配好了.
 - 在刚刚那个test包下新建controller.MyController类,就会自动创建test包下创建controller包并在controller包下创建MyController类.这时候的目录结构是:
 主程序MainApplication在test包下,而MyController类就在controller包下.
 - 编写好相关的类之后可以直接运行MainApplication类,整个项目就运行起来了. 然后将在idea右侧找到Maven Project选项,找到你的项目,选中LifeCycle-package
 然后点击三角图标将项目打成一个jar包.此时jar包是存放在你的项目target目录下.将该jar包拷贝到你环境的任意目录下,使用: java -jar xxxx.jar命令来运行你的
 这个包,这个包就被部署成了一个服务.
-
-
-
-
 
 
 
