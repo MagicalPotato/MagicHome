@@ -39,7 +39,10 @@ META-INF/spring.factories中enableAutoconfigure中指定的.我们在springboot�
 ```
 @component //这个注解的意思是把普通的pojo实体类实例化到容器当中.相当于是一个组件注解.@Controller,@service,@dao(Repository)这些都是组件注解,
          // 由于某个组件没有更好的划分种类,所以就用这个注解来标注它们. 
-@ConfigurerationProperties(prefix="person") //用这两个注解就可以将配置应用到对应的类上,比如映射到Person类上
+@ConfigurerationProperties(prefix="person") //用这两个注解就可以将配置应用到对应的类上,比如映射到Person类上.这个注解支持松散绑定,就是说你的变量
+用lastName或者last-name都行. 但是他不支持表达式,就是不能在配置中给变量赋值的时候用表达式计算出来的值. 而@value这个标签是可以的.还有个区别,那
+就是@从figureration...支持复杂类型注入,比如对象,list,map,但是@value不行,它只支持注入简单类型. 还有个注意点,@config....它只能加载全局配置,你要是想
+加载自己的配置需要用@propertiesSource这个注解,把你的配置放在全局配置同级,然后通过key-value来应用
 
 // ymal文件中可配字符串,map,list,对象等数据结构,配置好之后可以通过注解来映射到对应的类上
 person:           属性和值之间必须要有一个空格. 字符串不需要用引号,如果非要用,那么双引号禁止转义,单引号可以转义
@@ -97,3 +100,5 @@ public class MyController {
 - 单体架构和微服务架构的区别: 单体架构所有的东西都是做在一个应用里面,最后打成war包,然后部署在环境的tomcat上,如果业务量大不够用了那就多放一些tomcat,
 每个里面都部署一份应用. 微服务呢是把一个整体的应用拆分成很多功能模块,同样也是往环境上的Tomcat里面去复制这些模块,一个tomcat部署一个模块,但是我只是复
 制需要用的模块,哪个模块用的多那我就在环境上多部署一些.所以就有很多dataImport,dataClean等,但是分析可能就那两三个.
+
+- spring.propertie.active = 环境1(2,3,4,5) //用来激活使用哪个环境配置
