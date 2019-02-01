@@ -114,3 +114,5 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
 配置明确的映射关系时,想要访问某个静态资源默认就是去他们下的文件夹下去找的. 静态资源的默认路径可以通过配置文件来修改.
 - 如果修改了template下面的静态资源,重新刷新浏览器页面后没生效.可以先将模板引擎的缓存设置成false,spring.thymeleaf.chach=false,然后再按ctrl+f9重新
 编译修改过的文件.
+- springboot的内置servlet容器(也就是内置tomcat)是在springboot的ioc容器创建的创建的. 如果用的不是内置tomcat而是外部服务器,那么是先启动服务器
+然后才创建ioc容器.内置的通tomcat不支持jsp,外部的支持;
