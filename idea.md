@@ -22,3 +22,4 @@
 * 全局设置中的Build,Execution,Deployment中配置项目管理工具比如Maven.如果你配置好了Maven,那么create new project的时候就可以在左侧进行选择创建一个maven工程了.注意创建maven工程的时候要勾选create from archetype那个复选框.这个复选框的意思是maven给你给定了一些默认的工程骨架结构,你在创建响应的工程的时候需要选择对应的工程骨架.比如你要创建一个单纯的java ee的maven工程那么你就选择Java EE的骨架.而你要创建一个web且由maven管理的项目的时候你就要选择对应的webapp骨架.
 * 创建好的maven工程打开后工作台的右边有一个Maven Project侧边条,点开之后就是maven的一些常用命令和操作.包括应用新的修改,自定义操作命令,还有查看当前工程的依赖结构等.
 * 工作空间的VCS选项用来进行版本控制,可以选择配置SVN和Git来管理当前工程.
+* 在项目中的settings是对当前项目生效,如果要在当前项目内设置全局,则是other setting-default setting
