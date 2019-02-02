@@ -122,3 +122,21 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
 返回,并把那个属性对象用@bean注解添加到ioc容器中,springboot就会自动去适配你写的那个配置类.
 - 在容器创建好之后刷新容器的那一部会加载所有的组件,配置类信息,实例化一些类;反正那些乱七八糟的东西都是在刷新容器的时候弄好的.
 - @component是表示该类是要放在容器当中;@bean表示该东西是一个组件,这个组件会被放在容器当中
+
+* 用springboot整合mybatis创建一个使用Redis做缓存的增删改查工程
+```
+1. 创建一个springboot的工程,勾选web,mybatis,mysql,catch模块.(javaEE有catch标准,但是用起来很麻烦,所有后续有了redis这类缓存,springboot对java的
+缓存进行了进一步的抽象,所以有了springboot的catch模块)
+2. 创建数据库.可以直接执行建表语句建表;或者将建表文件放在某个文件夹下,在springboot启动的时候就会自动帮你建表,这快还有点不清楚,后续再重新看下
+3. 创建javabean对象类.也就是我们所说的那个实体对象类.这个类和具体的表关联.里面有私有属性,有参和无参构造器,还有getter和setter方法.
+4. 整个mybatis. 首先是配置数据源: 
+   spring.datasource.url=jdbc:mysql://localhost:3306/spring_catch  #最后这个spring_catch就是你创建的数据库名称
+   spring.datasource.username=admin
+   spring.datasource.password=123456
+   spring.datasource.driver-class=com.mysql.jdbc.Driver  #最后这个可以不用配,springboot会根据url自动适配
+5. 在主程序上用@MapperScan("com.mozun.catch.mapper")来标注springboot需要扫描哪个文件夹下的mapper类(mapper类就是dao层)
+   然后就在你创建的mapper文件夹下创建你的mapper类,该类要用@Mapper来标注是一个查询数据库的类.然后在类方法上直接用@select写sql
+6. 编写service类.使用@service来标注该类是一个service类.
+   然后直接用@Autowired来自动引入你写好的那个mapper对象,然后在service的方法中直接返回该mapper对象的查库方法就可以了
+7. 编写Controller类,用@Restcontrollor来标注该类返回值是json对象.然后在类中用@Autowired来自动依赖一个service,调用service的查询方法即可
+```
