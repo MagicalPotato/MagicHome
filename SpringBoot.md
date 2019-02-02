@@ -155,5 +155,7 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
 1. 首先在环境上安装Redis,装在docker或者真实环境上都可以.Redis也是类似于mysql的一个数据库服务,只不过它更多的用来做缓存中间件.也有客户端可以操作
 2. 然后从springboot的官方文档中找到并引入Redis的starter
 3. 在工程主配置文件中配置好Redis,就跟配置数据库类似,也是配置环境地址,名称啥的.
-4. 然后使用Redis提供的两个template(一个专门处理key-value都是string的,一个都是obj的)来调用对应方法进行数据的存取
+4. 然后使用Redis提供的两个template(一个专门处理key-value都是string的,一个都是obj的)来调用对应方法进行数据的存取.默认提供的对象template是使用
+   java的序列化机制来保存对象. 我们可以自己写一个template,然后传入一个处理json的东西,让这个template可以将对象用json的方式来存储,到时候我们就调用
+   我们自己写的这个template来存对象数据.
 ```
