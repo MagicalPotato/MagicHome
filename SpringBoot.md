@@ -125,7 +125,7 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
 
 * 用springboot整合mybatis创建一个使用Redis做缓存的增删改查工程
 ```
-1. 创建一个springboot的工程,勾选web,mybatis,mysql,catch模块.(javaEE有catch标准,但是用起来很麻烦,所有后续有了redis这类缓存,springboot对java的
+1. 创建一个springboot的工程,勾选web,mybatis,mysql,cache模块.(javaEE有cache标准,但是用起来很麻烦,所有后续有了redis这类缓存,springboot对java的
 缓存进行了进一步的抽象,所以有了springboot的catch模块)
 2. 创建数据库.可以直接执行建表语句建表;或者将建表文件放在某个文件夹下,在springboot启动的时候就会自动帮你建表,这快还有点不清楚,后续再重新看下
 3. 创建javabean对象类.也就是我们所说的那个实体对象类.这个类和具体的表关联.里面有私有属性,有参和无参构造器,还有getter和setter方法.
@@ -140,7 +140,9 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
    然后直接用@Autowired来自动引入你写好的那个mapper对象,然后在service的方法中直接返回该mapper对象的查库方法就可以了
 7. 编写Controller类,用@Restcontrollor来标注该类返回值是json对象.然后在类中用@Autowired来自动依赖一个service,调用service的查询方法即可
 8. 有时候可能需要在主配置中开启驼峰命名:  mybatis.configuration.map-underscore-to-camel-case=true
-9. 在主程序上使用@EnableautoCatch注解来使用缓存,然后在方法上使用@Catchable来让该方法的返回值进行缓存.缓存时会指定一个name,这个name相当于
-   一个缓存器的名称,每个方法都会对应一个名称,比如查员工的方法一个就是一个员工缓存器,老师的就叫老师缓存器,然后缓存器的名称会对应一个
-   currentHashmap,里面又是每一个员工或者老师的缓存信息.
+9. 在主程序上使用@EnableCaching注解来开启缓存,然后在方法上使用@Cacheable来让该方法的返回值进行缓存.缓存时会指定一个name,这个name相当于
+   一个缓存器的名称,每个方法都会对应一个缓存器,比如查员工的方法对应一个员工缓存器,老师的对应老师缓存器,缓存器的value是个concurrentHashmap,
+   里面又是每一个员工或者老师的缓存信息.每一位员工的key是根据你的传入参数来确定的,有一个参数就用一个,有多个就再处理一下结合起来当做key.
+   总结:@Cacheable的作用是方法执行之前先检查缓存,如果能从缓存中查到信息就直接用,如果查不到就用sql查并把结果进行缓存.
+        @CachePut的作用是先执行更新或者插入操作,然后将结果重新缓存,这样就保证缓存和更新的同步.
 ```
