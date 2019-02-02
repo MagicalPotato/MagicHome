@@ -139,4 +139,5 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
 6. 编写service类.使用@service来标注该类是一个service类.
    然后直接用@Autowired来自动引入你写好的那个mapper对象,然后在service的方法中直接返回该mapper对象的查库方法就可以了
 7. 编写Controller类,用@Restcontrollor来标注该类返回值是json对象.然后在类中用@Autowired来自动依赖一个service,调用service的查询方法即可
+8. 有时候可能需要在主配置中开启驼峰命名:  mybatis.configuration.map-underscore-to-camel-case=true
 ```
