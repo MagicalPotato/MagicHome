@@ -140,4 +140,7 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
    然后直接用@Autowired来自动引入你写好的那个mapper对象,然后在service的方法中直接返回该mapper对象的查库方法就可以了
 7. 编写Controller类,用@Restcontrollor来标注该类返回值是json对象.然后在类中用@Autowired来自动依赖一个service,调用service的查询方法即可
 8. 有时候可能需要在主配置中开启驼峰命名:  mybatis.configuration.map-underscore-to-camel-case=true
+9. 在主程序上使用@EnableautoCatch注解来使用缓存,然后在方法上使用@Catchable来让该方法的返回值进行缓存.缓存时会指定一个name,这个name相当于
+   一个缓存器的名称,每个方法都会对应一个名称,比如查员工的方法一个就是一个员工缓存器,老师的就叫老师缓存器,然后缓存器的名称会对应一个
+   currentHashmap,里面又是每一个员工或者老师的缓存信息.
 ```
