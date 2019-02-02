@@ -123,7 +123,7 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
 - 在容器创建好之后刷新容器的那一部会加载所有的组件,配置类信息,实例化一些类;反正那些乱七八糟的东西都是在刷新容器的时候弄好的.
 - @component是表示该类是要放在容器当中;@bean表示该东西是一个组件,这个组件会被放在容器当中
 
-* 用springboot整合mybatis创建一个使用Redis做缓存的增删改查工程
+* 用springboot整合mybatis创建一个使用springboot默认缓存的增删改查工程
 ```
 1. 创建一个springboot的工程,勾选web,mybatis,mysql,cache模块.(javaEE有cache标准,但是用起来很麻烦,所有后续有了redis这类缓存,springboot对java的
 缓存进行了进一步的抽象,所以有了springboot的catch模块)
@@ -149,4 +149,11 @@ logging.path=C:\\   #file是指定一个文件,而path只是指定路径,不带�
    来的参数作为key的,所以这两个缓存就被认为是不同的缓存.要解决这个问题,就要在更新数据的方法上的@CachePut标签里手动指定这个key="xxx.id"
         @CacheEvict 在删除数据的方法上清除缓存
         @Caching  可以定义多个缓存规则.比如在保存数据的时候同时将以id和name为key的该数据都缓存一份.这样一次保存就可以多次用不同条件从缓存查询.
+```
+* 创建一个使用springboot整合Redis作缓存的工程
+```
+1. 首先在环境上安装Redis,装在docker或者真实环境上都可以.Redis也是类似于mysql的一个数据库服务,只不过它更多的用来做缓存中间件.也有客户端可以操作
+2. 然后从springboot的官方文档中找到并引入Redis的starter
+3. 在工程主配置文件中配置好Redis,就跟配置数据库类似,也是配置环境地址,名称啥的.
+4. 然后使用Redis提供的两个template(一个专门处理key-value都是string的,一个都是obj的)来调用对应方法进行数据的存取
 ```
