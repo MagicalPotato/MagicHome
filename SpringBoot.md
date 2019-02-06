@@ -225,4 +225,5 @@ mineMessageHelper,然后把邮件对象传进去,之后再设置各种属性.
   不一样,访问完之后可以注销,登录之后记住我等等.
 
 ##### 分布式
-1. 微服务部署的多了会涉及到跨物理机或者跨虚拟机的调用,也就是RPC(远程调用)
+1. 微服务部署的多了会涉及到跨物理机或者跨虚拟机的调用,也就是RPC(远程调用).国内常用的分布式组合是zookeeper+dubbo,和springboot+springcloud,其中
+zookeeper和springboot是注册中心,dubbo和springcloud都是RPC框架,也就是分布式框架.
