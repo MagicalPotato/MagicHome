@@ -65,4 +65,10 @@ lambda表达式本质就是对函数式接口的实现,所以如果我直接用�
    其中filter,limit都是中间操作,而forEach是终止操作.在终止操作执行前,无论有多少中间操作都不会执行,当终止操作执行时,中间操作才一次性执行.
    除了forEach,还有如下终止操作:allMatch,anyMatch,noneMatch,findFirst,findAny,count,max,min,详情使用的时候再具体查看.
    Stream.generate((x) -> Math.random()).forEach(System.out::println)  //生成无限流的第二种方式. 这个方法生成无限随机数
+5. Optional<Double> op = carArray.stream().map(Car::getPrice).reduce(Double::sum)  //reduce相当于一种迭代累加.map中得到每一辆小车的价格,
+然后把第一辆和第二辆价格相加的到一个值,再用这个值和第三个相加,最终得到所有小车总价. 但是这里有个问题,因为我们没有在map中指定标志位,所以最后的结果
+并不一定就有值.可能会得到null.所以java提供了Optional来尽量避免null值.用Optional把结果再包装一次.最后用op.get()来取出值.
+   Optional<Integer> op = carArray.stream().map((x) -> 1).reduce(Integer::sum) //map中的表达式要应用到每一个元素上,我应用了,但是每次都直接
+   返回1,然后用reduce来对map产生的结果进行计数. reduce是归纳,就是连续加,那么最后就能得到Array里面元素的数量了.
+   
 ```
