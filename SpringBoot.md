@@ -219,7 +219,7 @@ mineMessageHelper,然后把邮件对象传进去,之后再设置各种属性.
 
 ##### 安全
 1. 在pom.xml中有一个parent标签,这个标签里放的是所有启动器的父依赖,点进去在<relativePath>标签中可以看到父依赖的dependencies,这个点进去还有一个
-  dependencies,点进去可以看到springboot所有依赖的本本信息.如果我们用的某个依赖的版本过低,我们可以直接到maven仓库去搜索这个依赖,找到之后看下最新
+  dependencies,点进去可以看到springboot所有依赖的版本信息.如果我们用的某个依赖的版本过低,我们可以直接到maven仓库去搜索这个依赖,找到之后看下最新
   的版本配置是咋样的,然后直接把配置拷贝过来配在pom.xml中该依赖的标签中.这样就能替换该依赖的版本了.
 2. 引入springboot的security模块.然后写一个自己的安全配置类.可以在该类中设置当前项目的安全机制.比如查看资源要先登录,登录之后不同的身份访问的资源
   不一样,访问完之后可以注销,登录之后记住我等等.
@@ -227,3 +227,5 @@ mineMessageHelper,然后把邮件对象传进去,之后再设置各种属性.
 ##### 分布式
 1. 微服务部署的多了会涉及到跨物理机或者跨虚拟机的调用,也就是RPC(远程调用).国内常用的分布式组合是zookeeper+dubbo,和springboot+springcloud,其中
 zookeeper和springboot是注册中心,dubbo和springcloud都是RPC框架,也就是分布式框架.
+2. 要安装某个镜像,去docker hub去搜索该镜像看好版本下载.下载的时候使用docker中国来加速. 在docker hub搜索到响应的镜像之后点击该镜像可以查看该镜像
+的官方安装方法.
