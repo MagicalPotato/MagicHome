@@ -50,14 +50,19 @@ lambda表达式本质就是对函数式接口的实现,所以如果我直接用�
  如果a.getName()方法的参数列表和返回值类型与函数式接口的方法列表和返回值类型相同,则可以换一种更简洁的写法:
  Supplier<String> sup2 = a::getName;  //就是这么简洁.但是记住使用条件.感觉种反而不容易理解了.有点简化过度.
  String str = sup2.get();    //这种简化成为方法引用
+ 
+如果lambda表达式有返回值,且有多条语句,无论前面的语句怎么执行,最终的执行结果都需要return.不同语句之间用分号隔开.
 ```
 * Stream是一个中间操作链,类似于linux的管道,从数据源获取数据放入流,然后对流中的数据进行一些操作,最后生成新流.
 ```
 1. Stream<String> stm = list.Stream();  //通过Collection系列集合(list,set,map)的Stream(串行流)或者parelleStream(并行流)生成流.
+   stm.map((x) -> x.toUpperCase()).forEach(System.out::println)  //中间操作map可以将lambda方法应用到list中每一个元素上
 2. Employee[] emps = new Employee[10];
    Stream<String> arr = Arrays.Stream(emps); //通过Arrays中的静态方法Stream()获取数组流.  注意流都是有泛型的
 3. Stream<String> ss = Stream.of("aaa","bbb","ccc") //使用Stream类中的静态方法of()来生成流,of方法中是可变参数,传入数组,list,map都行
 4. Stream<Integer> i = Stream.iterate(0, (x) -> x+2)  //第一个参数是标志位,第二个是lambda表达式.可以理解为这个里面包装着无限的偶数
-   i.limit(10).forEach(System.out::println)  //然后从流中取出包装的数据. 这是无限流的第一种创建方式. 会一直执行下去.limit是中间操作.
-   Stream.generate((x) -> Math.random()).forEach(System.out::println)  //无限流的第二种方式. 这个方法生成无限随机数
+   i.filter((x) -> x+2).limit(10).forEach(System.out::println)  //从流中取出包装的数据. 这是无限流的第一种创建方式. 无限流会一直执行下去.
+   其中filter,limit都是中间操作,而forEach是终止操作.在终止操作执行前,无论有多少中间操作都不会执行,当终止操作执行时,中间操作才一次性执行.
+   除了forEach,还有如下终止操作:allMatch,anyMatch,noneMatch,findFirst,findAny,count,max,min,详情使用的时候再具体查看.
+   Stream.generate((x) -> Math.random()).forEach(System.out::println)  //生成无限流的第二种方式. 这个方法生成无限随机数
 ```
