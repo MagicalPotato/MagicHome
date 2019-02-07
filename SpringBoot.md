@@ -229,3 +229,7 @@ mineMessageHelper,然后把邮件对象传进去,之后再设置各种属性.
 zookeeper和springboot是注册中心,dubbo和springcloud都是RPC框架,也就是分布式框架.
 2. 要安装某个镜像,去docker hub去搜索该镜像看好版本下载.下载的时候使用docker中国来加速. 在docker hub搜索到响应的镜像之后点击该镜像可以查看该镜像
 的官方安装方法.
+3. 在工程的文件夹上右键点击copy reference可以复制该文件夹的包名称.注意不是绝对路径,而是包名称.
+4. 安装zookeeper的镜像,在工程中引入zookeeper和dubbo,然后在配置文件中配置dubbo相关属性,包括你要注册到zookeeper的工程名称,你要注册的zookeeper
+的地址zookeeper://10.144.245.218:2181,还有你加了dubbo的@service注解的那个包路径.dubbo中也有@service注解,你的类上加了dubbo的@service注解
+那么springboot就能把这个类发布到zookeeper中去,同时也要使用@compotent将这个类加到springboot的容器中.
