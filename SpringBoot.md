@@ -230,6 +230,11 @@ zookeeper和springboot是注册中心,dubbo和springcloud都是RPC框架,也就�
 2. 要安装某个镜像,去docker hub去搜索该镜像看好版本下载.下载的时候使用docker中国来加速. 在docker hub搜索到响应的镜像之后点击该镜像可以查看该镜像
 的官方安装方法.
 3. 在工程的文件夹上右键点击copy reference可以复制该文件夹的包名称.注意不是绝对路径,而是包名称.
-4. 安装zookeeper的镜像,在工程中引入zookeeper和dubbo,然后在配置文件中配置dubbo相关属性,包括你要注册到zookeeper的工程名称,你要注册的zookeeper
-的地址zookeeper://10.144.245.218:2181,还有你加了dubbo的@service注解的那个包路径.dubbo中也有@service注解,你的类上加了dubbo的@service注解
-那么springboot就能把这个类发布到zookeeper中去,同时也要使用@compotent将这个类加到springboot的容器中.
+4. 安装zookeeper的镜像,在工程中引入zkclient(zookeeper的客户端依赖,可以直接在maven仓库中搜索zkclient,把示例配置拷贝过来就行)和dubbo(dubbo和
+springboot整合包的启动器),然后在配置文件中配置dubbo相关属性,包括你要注册到zookeeper的工程名称,你要注册的zookeeper的地址
+zookeeper://10.144.245.218:2181,还有你要让dubbo进行扫描的包.在扫描包中使用dubbo的@service注解来标注你的service类,那么springboot就能
+把这个类发布到zookeeper中去,同时也要使用@compotent将这个类加到springboot的容器中.
+5. 如果4的工程是一个生产者工程,那么现在我们就来搞一个消费者的工程.步骤还是和4一样,引入依赖,进行配置,然后在类上标示注解.只不过消费者类中的@service
+注解用的就是springboot的注解.然后我们可以在消费者类中使用@reference注解来远程引入生产者工程中的类,就是4中建的那个类.以前我们来自动依赖注入使用的
+都是同一个工程的东西,现在服务多了,我们要在一个服务中引入另一个服务的类,那就不能直接使用@autowired来依赖了.所以有了zookeeper的注册中心,所以有了
+dubbo这个分布式框架. 把所有的工程都注册到注册中心zookeeper,然后让框架来协调和调用这些类.
