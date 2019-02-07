@@ -238,3 +238,8 @@ zookeeper://10.144.245.218:2181,还有你要让dubbo进行扫描的包.在扫描
 注解用的就是springboot的注解.然后我们可以在消费者类中使用@reference注解来远程引入生产者工程中的类,就是4中建的那个类.以前我们来自动依赖注入使用的
 都是同一个工程的东西,现在服务多了,我们要在一个服务中引入另一个服务的类,那就不能直接使用@autowired来依赖了.所以有了zookeeper的注册中心,所以有了
 dubbo这个分布式框架. 把所有的工程都注册到注册中心zookeeper,然后让框架来协调和调用这些类.
+6. dubbo的专长是解决远程调用问题,而springcloud是一个分布式的整体解决方案,所有分布式中设计到的东西它都有处理办法.
+
+1. springcloud的使用和zookeeper+dubbo的方式差不多,springcloud中也有注册中心组件,也有类似于dubbo的远程调用组件,还有熔断器,配置等其他三个组件,
+使用springcloud的时候我们依然是引入注册中心组件和远程调用组件,然后配置该配的东西就行了. 
+2. 用idea创建一个空工程,在file-new-module-springboot initializer-cloud discovery中选择相应的注册中心组件和别的组件
