@@ -18,16 +18,26 @@ Metaspace(元空间).元空间直接用的是物理内存,你的物理内存有�
 用lambda表达式>>使用Stream Api
 * lambda表达式本质是对函数式(里面只有一个抽象方法)接口的扩展.所以使用lambda必须有函数式接口的支持,看如下例子:
 ```
-public interface myInter
+public interface myInter<T, R>  //指定泛型的好处就是你在使用这个接口的时候想传入什么类型的参数就传什么类型的参数
 {
-    public integer getValue(integer i);    //这个是函数式接口中的一个抽象方法 
-}
+    public R compare(T i,T i2);    //这个是函数式接口中的一个抽象方法.接口中的两个泛型一个是参数一个是返回值.同样
+}                                //类型的参数当然你可以指定多个.
 
 在另一个类里有个方法要进行大小比较用到了这个接中的getValue抽象方法
-public integer compare(integer i, myInter mi) 
-{                           //实际上这就是策略模式中的那种方式.直接用一个类来实现接口的抽象方法,然后在使用
-      return mi.getValue(i);  //的时候把已经实现的类对象传递进去,让实现类对象中的方法起作用.但是lambda的方式
-} //实际上是将这个实现留空了,真正的实现在具体应用的时候再指定,而非像实现类中那样直接实现方法.避免了多个实现类.而且想实现成什么样就实现成什么样 
+public integer getValue(integer i,integer k, myInter<integer,integer> mi)//第一个integer是参数,第二个是返回值.泛型参数指定一次就行, 
+{                           //但可以传入多个.mi是接口的实现.实际上这就是策略模式,直接用一个类来实现接口的抽象方法,然后在使用
+      return mi.compare(i,k);  //的时候把已经实现的类对象传递进去,让实现类对象中的方法起作用.lambda的方式
+} //是将这个实现留空了,真正的实现在具体使用时才指定,想实现成什么样就实现成什么样.这就就是方法可以当成参数传递的精髓.本质是接口和实现类
 
 integer a = compare(100, (x) -> x*x)  //然后在使用的时候就可以直接使用lambda来对该方法进行实现
+
+在实际的开发中我们并不需要自己先去写接口然后在在用lambda,java8已经内置了四大接口供我们使用:
+Consumer<T>    //消费型接口
+    void accept(T t)  //传进去一个T,啥也不返回
+Supplier<T>   //提供型接口
+     T get()     //啥也不传,返回一个T
+Function(T, R)   //函数式接口
+     R apply(T t)  //传进去一个T,返回一个R
+Predicate<T>   //断言型接口
+     boolean test(T t)  //传进去一个T,返回一个判断结果.
 ```
