@@ -224,7 +224,7 @@ mineMessageHelper,然后把邮件对象传进去,之后再设置各种属性.
 2. 引入springboot的security模块.然后写一个自己的安全配置类.可以在该类中设置当前项目的安全机制.比如查看资源要先登录,登录之后不同的身份访问的资源
   不一样,访问完之后可以注销,登录之后记住我等等.
 
-##### 分布式
+##### zookeeper+dubbo
 1. 微服务部署的多了会涉及到跨物理机或者跨虚拟机的调用,也就是RPC(远程调用).国内常用的分布式组合是zookeeper+dubbo,和springboot+springcloud,其中
 zookeeper和springboot是注册中心,dubbo和springcloud都是RPC框架,也就是分布式框架.
 2. 要安装某个镜像,去docker hub去搜索该镜像看好版本下载.下载的时候使用docker中国来加速. 在docker hub搜索到响应的镜像之后点击该镜像可以查看该镜像
@@ -240,9 +240,14 @@ zookeeper://10.144.245.218:2181,还有你要让dubbo进行扫描的包.在扫描
 dubbo这个分布式框架. 把所有的工程都注册到注册中心zookeeper,然后让框架来协调和调用这些类.
 6. dubbo的专长是解决远程调用问题,而springcloud是一个分布式的整体解决方案,所有分布式中设计到的东西它都有处理办法.
 
+##### springcloud
 1. springcloud的使用和zookeeper+dubbo的方式差不多,springcloud中也有注册中心组件,也有类似于dubbo的远程调用组件,还有熔断器,配置等其他三个组件,
 使用springcloud的时候我们依然是引入注册中心组件和远程调用组件,然后配置该配的东西就行了. 
 2. **用idea创建一个空工程,在file-new-module-springboot initializer-cloud discovery中选择相应的注册中心组件和别的组件.这里有个非常重要
 的点,在看zookeeper+dubbo那一节的时候以为生产者和消费者是两个不同的工程,现在发现并不是,而是同一个工程中的两个模块,就如同springcloud这个工程
 一样,我直接在一个工程中创建三个模块,相当于一个大工程下的三个小工程,然后在三个小工程中分别引入了springcloud的不同模块,一个引入注册中心,另外两个
-都引入了eureka discovery(相当于dubbo)**
+都引入了eureka discovery(相当于dubbo).不过之前那种单独的两个工程的理解也没有错,因为你的工程最终是要部署到不同的服务上去,不论是一个工程中建
+了三个子工程,还是三个单独的工程,最终都是为了部署分布的服务,只要目的能达到,至于过程怎么弄的也不必太在意,只是要记住这中new module的方式**
+3. 创建好三个模块之后,我们来配置注册中心eureka,主要是配置地址端口,还有配置eureka别把自己注册到注册中心了,因为eureka自己也是一个独立模块,但是
+我们不想让它把他自己也配置到自己这个注册中心中去所以要把该配置置成false. 还要在注册中心模块的主类上标注@EnableEurekaServer让中心起作用.之后就可以
+直接通过页面访问eureka,localhost:xxx,eureka是有界面的,可以在界面看到注册了哪些东西.
