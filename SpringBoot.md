@@ -242,4 +242,7 @@ dubbo这个分布式框架. 把所有的工程都注册到注册中心zookeeper,
 
 1. springcloud的使用和zookeeper+dubbo的方式差不多,springcloud中也有注册中心组件,也有类似于dubbo的远程调用组件,还有熔断器,配置等其他三个组件,
 使用springcloud的时候我们依然是引入注册中心组件和远程调用组件,然后配置该配的东西就行了. 
-2. 用idea创建一个空工程,在file-new-module-springboot initializer-cloud discovery中选择相应的注册中心组件和别的组件
+2. **用idea创建一个空工程,在file-new-module-springboot initializer-cloud discovery中选择相应的注册中心组件和别的组件.这里有个非常重要
+的点,在看zookeeper+dubbo那一节的时候以为生产者和消费者是两个不同的工程,现在发现并不是,而是同一个工程中的两个模块,就如同springcloud这个工程
+一样,我直接在一个工程中创建三个模块,相当于一个大工程下的三个小工程,然后在三个小工程中分别引入了springcloud的不同模块,一个引入注册中心,另外两个
+都引入了eureka discovery(相当于dubbo)**
