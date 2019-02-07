@@ -57,5 +57,7 @@ lambda表达式本质就是对函数式接口的实现,所以如果我直接用�
 2. Employee[] emps = new Employee[10];
    Stream<String> arr = Arrays.Stream(emps); //通过Arrays中的静态方法Stream()获取数组流.  注意流都是有泛型的
 3. Stream<String> ss = Stream.of("aaa","bbb","ccc") //使用Stream类中的静态方法of()来生成流,of方法中是可变参数,传入数组,list,map都行
-4. Stream<Integer> i = Stream.iterate(seed,lambda)  //seed是标志位,lambda就是一种计算方式.返回一个无限流
+4. Stream<Integer> i = Stream.iterate(0, (x) -> x+2)  //第一个参数是标志位,第二个是lambda表达式.可以理解为这个里面包装着无限的偶数
+   i.limit(10).forEach(System.out::println)  //然后从流中取出包装的数据. 这是无限流的第一种创建方式. 会一直执行下去.limit是中间操作.
+   Stream.generate((x) -> Math.random()).forEach(System.out::println)  //无限流的第二种方式. 这个方法生成无限随机数
 ```
