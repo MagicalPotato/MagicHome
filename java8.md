@@ -40,4 +40,15 @@ Function(T, R)   //函数式接口
      R apply(T t)  //传进去一个T,返回一个R
 Predicate<T>   //断言型接口
      boolean test(T t)  //传进去一个T,返回一个判断结果.
+ 
+lambda表达式本质就是对函数式接口的实现,所以如果我直接用赋值的方式来使用lambda也是可以的:
+ Supplier<String> str = ???  //提供者的接口特性是什么,没有参数,但是有返回值.那么我们就来写一个lambda,让它返回一些东西
+ A a = newA()  //创建一个A对象
+ Supplier<String> sup = () -> a.getName();  //等号右边是lambda对接口的实现,a.getName会生成一个str让接口来包装,sup是包装后的接口实体
+ String str = sup.get();   //实现接口的实体对象调用自己的get方法,返回自己内部包装了的值.
+ 
+ 如果a.getName()方法的参数列表和返回值类型与函数式接口的方法列表和返回值类型相同,则可以换一种更简洁的写法:
+ Supplier<String> sup2 = a::getName;  //就是这么简洁.但是记住使用条件.感觉种反而不容易理解了.有点简化过度.
+ String str = sup2.get();    //这种简化成为方法引用
+
 ```
