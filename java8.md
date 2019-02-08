@@ -57,7 +57,7 @@ lambda表达式本质就是对函数式接口的实现,所以如果我直接用�
 ```
 1. Stream<String> stm = list.Stream();  //通过Collection系列集合(list,set,map)的Stream(串行流)或者parelleStream(并行流)生成流.
    stm.map((x) -> x.toUpperCase()).forEach(System.out::println)  //中间操作map可以将lambda方法应用到list中每一个元素上
-2. Employee[] emps = new Employee[10];
+2. Employee[] emps = new Employee[10];   //map相当于未做任何操作的原始状态,比如filter是一个专业过滤,map就是没有施加任何干扰的原始状态
    Stream<String> arr = Arrays.Stream(emps); //通过Arrays中的静态方法Stream()获取数组流.  注意流都是有泛型的
 3. Stream<String> ss = Stream.of("aaa","bbb","ccc") //使用Stream类中的静态方法of()来生成流,of方法中是可变参数,传入数组,list,map都行
 4. Stream<Integer> i = Stream.iterate(0, (x) -> x+2)  //第一个参数是标志位,第二个是lambda表达式.可以理解为这个里面包装着无限的偶数
