@@ -70,8 +70,7 @@ lambda表达式本质就是对函数式接口的实现,所以如果我直接用�
 并不一定就有值.可能会得到null.所以java提供了Optional来尽量避免null值.用Optional把结果再包装一次.最后用op.get()来取出值.
    Optional<Integer> op = carArray.stream().map((x) -> 1).reduce(Integer::sum) //map中的表达式要应用到每一个元素上,我应用了,但是每次都直接
    返回1,然后用reduce来对map产生的结果进行计数. reduce是归纳,就是连续加,那么最后就能得到Array里面元素的数量了.
-   
-   把中间操作看成linux的管道操作,每流入一个管道就完成一件事情,linux的管道之间的命令有不同的写法,那么对应在java中也就有各种殊途同归的写法,无论怎么
-   写,最终只要能完成任务就行.
-   
+6. 把中间操作看成linux的管道操作,每流入一个管道就完成一件事情,linux的管道之间的命令有不同的写法,那么对应在java中也就有各种殊途同归的写法,无论怎么
+   写,最终只要能完成任务就行,比如:Car.stream().map((x) -> x.getPrice()).max(Integer::compare)拿到流之后我想对每个元素干点事,而map正好就是干这个
+   事的,所以用它. 然后又想从应用完规则之后的东西里挑出最大的那个,所以用了max这个大规则,这个大规则具体是怎么实现的呢?就是Integer里的compare.
 ```
