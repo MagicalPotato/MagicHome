@@ -106,3 +106,5 @@ Task task = new Task();  //创建线程对象task
 // executor.submit(futureTask);   //然后再把futuretask交给线程池
 executor.shutdown();  //执行完之后一定要关闭线程池,不然eclipse上就会发现结束按钮一直是红色,就是线程池没关.关了的话执行完按钮就灰了.
 ```
+* 旧的时间api是线程不安全的,1.8以后的是线程安全的.分别提供了日期,时间,日期时间,时区,格式化等api,他们的now()方法获取当前值,同时计算时间日期也有
+相应的加减方法,可以直接加减年月日时分秒. 也有专门用于计算机使用的instant毫秒api.
