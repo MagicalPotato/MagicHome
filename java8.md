@@ -81,4 +81,14 @@ Optional<Car> o = Optional.of(new Car) //返回值类型是有泛型的.  of()�
 Car car = o.get() //从o中拿到对象
 ```
 * jdk1.5以前创建线程都是继承Thread或者实现Runnable,都要重写run()方法,但是run方法的返回值值void,也就是获取不到线程的执行结果,从1.5以后新增了
-Future和Callable,使用他们来创建线程要重写call方法,call方法是有返回值的,这样就可以得到线程执行的结果.
+Callable接口,使用他来创建线程要重写call方法,call方法是有返回值的,这样就可以得到线程执行的结果.一般情况下它要配合ExecutorService使用.
+Future可以获取Runnable或者Callable任务的执行结果.该方法会阻塞直到任务返回结果。callable和future都在java.util.concurrent包下.
+```
+public interface Future<V> {
+    boolean cancel(boolean mayInterruptIfRunning);//用于取消任务.取消成功则返回true.参数表示是否允许取消正在执行却没有执行完毕的任务.
+    boolean isCancelled();  /如任务已经完成,则无论参数为true还是false都返回false.  isCancelled()用于检测是否取消成功
+    boolean isDone();  //检查是否执行成功
+    V get() throws InterruptedException, ExecutionException;  //用来获取执行结果，该方法会阻塞，一直等到任务执行完毕才返回；
+    V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;指定时间内未获取结果则直接返回null.
+}
+```
