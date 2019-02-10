@@ -80,3 +80,5 @@ lambda表达式本质就是对函数式接口的实现,所以如果我直接用�
 Optional<Car> o = Optional.of(new Car) //返回值类型是有泛型的.  of()方法用于得到一个封装对象.但是注意传入的参数不能显式为null
 Car car = o.get() //从o中拿到对象
 ```
+* jdk1.5以前创建线程都是继承Thread或者实现Runnable,都要重写run()方法,但是run方法的返回值值void,也就是获取不到线程的执行结果,从1.5以后新增了
+Future和Callable,使用他们来创建线程要重写call方法,call方法是有返回值的,这样就可以得到线程执行的结果.
