@@ -92,16 +92,17 @@ public interface Future<V> {
     V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;指定时间内未获取结果则直接返回null.
 }
 future接口有一个唯一实现类叫FutureTask,它实现了RunnableFuture接口,而RunnableFuture继承了Runnable接口和Future接口，所以它既可以作为Runnable
-被线程执行，又可以作为Future得到Callable的返回值。下面使用Callable+Future获取任务执行结果:
+被线程执行，又可以作为Future得到Callable的返回值。看一个例子:
 class Task implements Callable<Integer>{   //写一个Task类实现Callable接口
     @Override
     public Integer call() throws Exception {   //重写call方法
         //具体逻辑...............
         return sum;
-    }
-这样来调用:
+}
 ExecutorService executor = Executors.newCachedThreadPool();  //创建线程池,线程池可以指定数量
 Task task = new Task();  //创建线程对象task
-Future<Integer> result = executor.submit(task);   //把task交给线程池去执行并获取结果
+## Future<Integer> result = executor.submit(task);   //用Future获取结果:把task直接交给线程池去执行并获取结果
+// FutureTask<Integer> futureTask = new FutureTask<Integer>(task); //使用FutureTask获取结果:把task交给FutureTask,
+// executor.submit(futureTask);   //然后再把futuretask交给线程池
 executor.shutdown();  //执行完之后一定要关闭线程池,不然eclipse上就会发现结束按钮一直是红色,就是线程池没关.关了的话执行完按钮就灰了.
 ```
