@@ -53,8 +53,8 @@ mybatis:     //这快配置就是boot和mybatis的整合,把这些配上就行�
     
 spring:
    application:
-     name: microservicecloud-dept    //这个名称就会你这个微服务暴露给外界使用的名称
-   datasource:        //数据库相关的一大堆
+     name: microservicecloud-dept    //这个名称就是当你把这个微服务注册到Eureka中之后,在管理界面上显示的名字,也就是该服务暴露给外界的名字
+   datasource:        //数据库相关的一大堆                                             //Eureka会自动将其改成全大写.
      type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
      driver-class-name: org.gjt.mm.mysql.Driver              # mysql驱动包
      url: jdbc:mysql://localhost:3306/cloudDB01              # 数据库名称
