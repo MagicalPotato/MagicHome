@@ -45,7 +45,7 @@ sonProjext3  //新建好一个子工程之后,先配置pom,首先是引入父工
 server:
   port: 8001   //你这个服务暴露的端口
   
-mybatis:     //这快配置就是boot和mybatis的整合,把这些配上就行了
+mybatis:     //这快配置就是boot和mybatis的整合,把这些配上就行了.事实上当和boot整合之后mybatis自己就没有配置了,都在这个yml的配置中.有需要就建.
   config-location: classpath:mybatis/mybatis.cfg.xml        # mybatis配置所在路径,意思就是你要在你工程resources下创建对应的文件夹和文件
   type-aliases-package: com.atguigu.springcloud.entities    # 所有Entity别名类所在包,就是你那些实体类所在的包,到时候mybatis就会去扫该包
   mapper-locations:
