@@ -28,9 +28,9 @@ sonProject2   //子工程在父工程下有一个快捷方式,然后和父工程
     src/main/java
         各个要用的包  //lombok是一个可以通过注解来自动生成对象类的get,set,构造方法,toString,equals,hash等一堆方法的一个jar包,在子工程
             xxx.java   //引入之后创建实体类时引入直接用.这样避免了后续增删属性还要对应增删get,set等方法.当然如果需要特定构造方法可单独加.
-    src/main/recources  //resources下放一些配置,静态资源之类的文件. 注意一个开发技巧,实体类编写的时候最好实现序列化接口.
+    src/main/recources  //resources下放一些配置,静态资源之类的文件.  有时候在配置文件中写的classpath就是指这个文件夹下
     src/test/java
-    src/test/recources
+    src/test/recources   // 注意一个开发技巧,实体类编写的时候最好实现序列化接口.
     API Library
     src
     target
@@ -38,5 +38,47 @@ sonProject2   //子工程在父工程下有一个快捷方式,然后和父工程
     
 sonProjext3  //新建好一个子工程之后,先配置pom,首先是引入父工程,然后如果用到了模块2中那个实体类,这时候你就直接在依赖中把模块2引入,groupid是父id,
            // artifactid是子模块id,版本用表达式.这样当你将模块2 clean install之后,就可以在这个模块直接用其中的实体类,也不用管模块2的版本之类的
+           //配置好pom之后就是配置各个子模块各自的工程配置,也就是properties.yml,按照yml中的条目配好文件夹都建好配置文件也建好这个整合就完成了.
+```
+* 一个典型的工程yml配置:
+```
+server:
+  port: 8001   //你这个服务暴露的端口
+  
+mybatis:     //这快配置就是boot和mybatis的整合,把这些配上就行了
+  config-location: classpath:mybatis/mybatis.cfg.xml        # mybatis配置所在路径,意思就是你要在你工程resources下创建对应的文件夹和文件
+  type-aliases-package: com.atguigu.springcloud.entities    # 所有Entity别名类所在包,就是你那些实体类所在的包,到时候mybatis就会去扫该包
+  mapper-locations:
+  - classpath:mybatis/mapper/**/*.xml                       # mapper映射文件, 就是你的sql的xml放的目录
+    
+spring:
+   application:
+     name: microservicecloud-dept    //这个名称就会你这个微服务暴露给外界使用的名称
+   datasource:        //数据库相关的一大堆
+     type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
+     driver-class-name: org.gjt.mm.mysql.Driver              # mysql驱动包
+     url: jdbc:mysql://localhost:3306/cloudDB01              # 数据库名称
+     username: root
+     password: 123456
+     dbcp2:
+       min-idle: 5                                           # 数据库连接池的最小维持连接数
+       initial-size: 5                                       # 初始化连接数
+       max-total: 5                                          # 最大连接数
+       max-wait-millis: 200                                  # 等待连接获取的最大超时时间
+      
+eureka:
+  client: #客户端注册进eureka服务列表内
+    service-url: 
+      #defaultZone: http://localhost:7001/eureka
+       defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/      
+  instance:
+    instance-id: microservicecloud-dept8001
+    prefer-ip-address: true     #访问路径可以显示IP地址     
+ 
+info: 
+  app.name: atguigu-microservicecloud
+  company.name: www.atguigu.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
 ```
 
