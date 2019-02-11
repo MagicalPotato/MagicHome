@@ -100,4 +100,12 @@ public Car get(@PathVariable long id){        //但是呢实际上完成任务�
     return restTemplate.forObjext('http://localhost:8001'+'/car/get'+id,Car.class)
 }
 ```
+* Eureka server用于提供注册,Eureka client用于查看各个微服务的状况.在刚刚上面那个例子中我们可看到,消费者调用生产者是直接调用了生产者的接口,相当于
+是多了个中间调用过程,而有了Eureka之后我们就可将生产者注册到Eureka上,然后消费者从Eureka中来消费生产者.
+  - 像创建模块2那样新建一个Eureka的注册中心模块
+  - 接下来还是先搞依赖,在pom中引入注册中心相关依赖
+  - 然后写yml配置,端口(每个微服务都要配),注册中心实例名称,是否注册自己啊之类的当前工程会用到的配置
+  - 建主包,在主包下建主启动类,主启动类加@springbootApplication,注意此时你的这个服务是个Eureka server,也引入了相关依赖,自然你这个主启动类就要
+  开启相关的功能,所以还要加@EnableEurekaServer
+
 
