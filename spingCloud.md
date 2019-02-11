@@ -18,8 +18,20 @@
 * 分布式的正确打开方式是分包分部署.也就是你创建一个主工程之后把这个工程当成父工程,然后再在这个父工程下创建各个子模块. 创建maven父工程的时候打包
 方式packing选择pom,后续把各个子模块的公共jar包提出来放到pom中,这个工程就相当于一个抽象父父类.在它下面继续创建别的子工程.
 ```
-fatherProject   //这就是父工程,创建工程的时候我们就不是使用new maven project了,而是new-other-maven module了,然后一步步往下,
-    src        //packing也就不是pom了而是jar,因为后续的子模块都是要用来真正使用的,而父抽象工程实际上起到的是提出子模块公共内容的作者
-    pom.xml
+fatherProject    //这就是父工程,创建工程的时候我们就不是使用new maven project了,而是new-other-maven module了,然后一步步往下,
+    sonProject1  //packing也就不是pom了而是jar,因为后续的子模块都是要用来真正使用的,而父抽象工程实际上起到的是提出子模块公共内容的作者
+    sonProject2  //当子工程创建好之后就会在挂在父工程的目录下
+    src        
+    pom.xml   //父目录的pom文件中引入了所有子类都会用到的一些依赖和其版本.
+    
+sonProject2   //子工程在父工程下有一个快捷方式,然后和父工程平级则是自己的工程真正的目录,一个maven工程的经典目录结构
+    src/main/java
+    src/main/recources
+    src/test/java
+    src/test/recources
+    API Library
+    src
+    target
+    pom.xml  //子类的pom中用<parent>标签引入父pom的依赖,如果子类有单独需要的依赖再单独引入即可.
 ```
 
