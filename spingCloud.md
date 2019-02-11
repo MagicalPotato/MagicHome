@@ -87,9 +87,17 @@ dao层类上要加@Mapper,本来dao要有实现层,但是整合了mybatis之后�
 spring时代bean组件还是通过配置来指定的,到了boot时代,配置类代替了配置文件,只要在类上加了@configuration,那就说明这个类是个配置类.然后在配置类中
 再创建@bean注解的方法,在方法里直接返回组件对象,就是我们的bean实例.以往我们的一个工程都是Controller调service,service再调dao,现在还有中方式,我们
 在配置类中写个这样的方法:
-@bean
-public RestTemplate getRestTemplate(){
-    return new RestTemplate();   //注意这个东西就是学boot的时候遇见的那个模板接口,springboot提供了很多模板接口,rest模板接口主要是用来调
-}                                //rest方法的
+@bean                        
+public RestTemplate getRestTemplate(){  //注意这个东西就是学boot的时候遇见的那个模板接口,springboot提供了很多模板接口,rest模板接口主要是用来调
+    return new RestTemplate();   //rest方法的. 你直接在Controller中自动依赖这个模板类,然后用模板类的各个方法去调用生产者的方法查询东西.
+}            //为啥我不写service呢,是因为我这个模块是个消费者,消费者没有业务逻辑,所以不需要逻辑,要得到东西就用生产者现成的,所以模板实际上是把
+   //生产者的方法给调用了一遍, 避免了重复类和代码,你的消费者模块中就少写很多东西.
+
+@Autowired
+private RestTemplate restTemplate
+@RequestMapping(value='/consumer/car/get{id}')  //看到没,暴露给外面的调用url是加了consumer的
+public Car get(@PathVariable long id){        //但是呢实际上完成任务的url还是生产者模块中的,方法也调的是生产者中的方法.
+    return restTemplate.forObjext('http://localhost:8001'+'/car/get'+id,Car.class)
+}
 ```
 
