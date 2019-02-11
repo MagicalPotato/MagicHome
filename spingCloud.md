@@ -80,5 +80,16 @@ info:
   company.name: www.atguigu.com
   build.artifactId: $project.artifactId$
   build.version: $project.version$
+  
+一个工程的流程:maven的pom,工程的yml>创建数据库,建表>dao层和mapper.xml>service>Controller>boot主启动类.
+dao层类上要加@Mapper,本来dao要有实现层,但是整合了mybatis之后直接使用mapper.xml就行了,不用实现了;主启动类别忘了@springbootApplication
+
+spring时代bean组件还是通过配置来指定的,到了boot时代,配置类代替了配置文件,只要在类上加了@configuration,那就说明这个类是个配置类.然后在配置类中
+再创建@bean注解的方法,在方法里直接返回组件对象,就是我们的bean实例.以往我们的一个工程都是Controller调service,service再调dao,现在还有中方式,我们
+在配置类中写个这样的方法:
+@bean
+public RestTemplate getRestTemplate(){
+    return new RestTemplate();   //注意这个东西就是学boot的时候遇见的那个模板接口,springboot提供了很多模板接口,rest模板接口主要是用来调
+}                                //rest方法的
 ```
 
