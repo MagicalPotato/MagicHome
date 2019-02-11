@@ -22,16 +22,21 @@ fatherProject    //这就是父工程,创建工程的时候我们就不是使用
     sonProject1  //packing也就不是pom了而是jar,因为后续的子模块都是要用来真正使用的,而父抽象工程实际上起到的是提出子模块公共内容的作者
     sonProject2  //当子工程创建好之后就会在挂在父工程的目录下
     src        
-    pom.xml   //父目录的pom文件中引入了所有子类都会用到的一些依赖和其版本.
+    pom.xml   //父目录的pom文件中引入了所有子类都会用到的一些依赖和其版本.当子模块创建好之后,父pom中会有一个<module>标签,里面放的就是子类的名称
     
 sonProject2   //子工程在父工程下有一个快捷方式,然后和父工程平级则是自己的工程真正的目录,一个maven工程的经典目录结构
     src/main/java
-    src/main/recources
+        各个要用的包  //lombok是一个可以通过注解来自动生成对象类的get,set,构造方法,toString,equals,hash等一堆方法的一个jar包,在子工程
+            xxx.java   //引入之后创建实体类时引入直接用.这样避免了后续增删属性还要对应增删get,set等方法.当然如果需要特定构造方法可单独加.
+    src/main/recources  //resources下放一些配置,静态资源之类的文件. 注意一个开发技巧,实体类编写的时候最好实现序列化接口.
     src/test/java
     src/test/recources
     API Library
     src
     target
     pom.xml  //子类的pom中用<parent>标签引入父pom的依赖,如果子类有单独需要的依赖再单独引入即可.
+    
+sonProjext3  //新建好一个子工程之后,先配置pom,首先是引入父工程,然后如果用到了模块2中那个实体类,这时候你就直接在依赖中把模块2引入,groupid是父id,
+           // artifactid是子模块id,版本用表达式.这样当你将模块2 clean install之后,就可以在这个模块直接用其中的实体类,也不用管模块2的版本之类的
 ```
 
