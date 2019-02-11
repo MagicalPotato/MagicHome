@@ -67,7 +67,7 @@ spring:
        max-wait-millis: 200                                  # 等待连接获取的最大超时时间
       
 eureka:
-  client: #客户端注册进eureka服务列表内
+  client: #客户端注册进eureka服务列表内 //这快就是要把一个微服务注册到eureka的时候在自己工程的yml中增加的配置
     service-url: 
       #defaultZone: http://localhost:7001/eureka
        defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/      
@@ -103,9 +103,11 @@ public Car get(@PathVariable long id){        //但是呢实际上完成任务�
 * Eureka server用于提供注册,Eureka client用于查看各个微服务的状况.在刚刚上面那个例子中我们可看到,消费者调用生产者是直接调用了生产者的接口,相当于
 是多了个中间调用过程,而有了Eureka之后我们就可将生产者注册到Eureka上,然后消费者从Eureka中来消费生产者.
   - 像创建模块2那样新建一个Eureka的注册中心模块
-  - 接下来还是先搞依赖,在pom中引入注册中心相关依赖
+  - 接下来还是先搞依赖,在pom中引入Eureka server启动器
   - 然后写yml配置,端口(每个微服务都要配),注册中心实例名称,是否注册自己啊之类的当前工程会用到的配置
   - 建主包,在主包下建主启动类,主启动类加@springbootApplication,注意此时你的这个服务是个Eureka server,也引入了相关依赖,自然你这个主启动类就要
-  开启相关的功能,所以还要加@EnableEurekaServer
-
-
+  开启相关的功能,所以还要加@EnableEurekaServer,表示服务启动了注册中心,能接受别的微服务过来注册.
+* 要将一个微服务注册进eureka注册中心,需要如下几步
+  - 修改该微服务的pom,新增两个依赖,一个是eureka(带server的是服务端,不带的都是客户端,也就是都是可注册的服务)启动器,另一个是config启动器
+  - 改yml配置,将当前微服务注册到eureka,参考上面那个完整的yml配置
+  - 在当前微服务的主启动类上加上@EnableEurekaClient,表示这是一个Eureka的客户端,一个可被注册到服务端的微服务
