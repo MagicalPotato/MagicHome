@@ -138,9 +138,9 @@ public Object discovery(){
 server:    //这个是eureka注册中心模块的配置,三个模块当然得有三份配置,把一些小细节修改一下即可.还要注意,加了集群之后你的其他模块当然也要把集群
   port: 7001    //端口要改                //地址配上,看生产者中的那个配置.
 eureka: 
-  instance:   //为了让localhost能对应三个Eureka,需要修改host文件,让本地ip对应三个Eureka实例> 127.0.0.1 eureka7001(2)(3).com .....
-    hostname: eureka7001.com #eureka实例名称.如果不想和localhost对应,那就不管了,也不用改host了.推而广之,以后如果要让localhost可以对应多个
-  client:               //端口,那就在host中自己配置,这样就可以通过localhost来访问多个端口了.
+  instance:   //还有一个点很重要,加了集群之后要做端口映射,单机的时候127.0.0.1对应的是localhost,你直接用localhost:端口即可访问服务,但是有了
+    hostname: eureka7001.com #eureka实例名称.   //集群之后你用localhost就不行了,因为计算机不知道localhost到底要对应哪个,所以要改host文件
+  client:               //让127.0.0.1 分别对应三个注册中心地址eureka7001(2)(3).com ...,这样就可以用地址:端口来访问对应的服务了
     register-with-eureka: false     #false表示不向注册中心注册自己。
     fetch-registry: false     #false表示自己端就是注册中心，我的职责就是维护服务实例，并不需要去检索服务
     service-url: 
