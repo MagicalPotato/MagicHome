@@ -116,3 +116,14 @@ public Car get(@PathVariable long id){        //但是呢实际上完成任务�
   - 修改该微服务的pom,新增两个依赖,一个是eureka(带server的是服务端,不带的都是客户端,也就是都是可注册的服务)启动器,另一个是config启动器
   - 改yml配置,将当前微服务注册到eureka,参考上面那个完整的yml配置
   - 在当前微服务的主启动类上加上@EnableEurekaClient,表示这是一个Eureka的客户端,一个可被注册到服务端的微服务
+* 注册进Eureka的微服务可以添加发现功能.比如你当前这个生产者服务,你注册进了Eureka,然后你想知道Eureka中还有哪些服务,它们的信息是什么,这时候可以通过
+在当前这个服务的Controller中引入DiscoveryClient来实现,同时主启动类添加@EnableDiscoveryClient
+```
+@Autowired
+private DiscoveryClient client
+@RequestMapping(value='/Car/discovery/')
+public Object discovery(){
+    client.getxxx   //循环获取或者查找单个已经注册的client
+    //也就是你的这个生产者中自己提供了一个对外的接口,可以直接通过自身这个接口来查询注册中心有哪些服务
+}
+```
