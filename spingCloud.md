@@ -69,7 +69,7 @@ spring:
 eureka:
   client: #客户端注册进eureka服务列表内 //这快就是要把一个微服务注册到eureka的时候在自己工程的yml中增加的配置
     service-url: 
-      #defaultZone: http://localhost:7001/eureka
+      #defaultZone: http://localhost:7001/eureka  //注意这是单机时候的配置,下面是添加了集群时候的配置.也就是这个服务要同时注册到三个中心中
        defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/      
   instance:  //下面这个id是你给你这个微服务在Eureka中指定的名字,本来是自动分配,但是为了简单你可以自己指定,页面上这个名字是可以点进去的,若不处理,
     instance-id: microservicecloud-dept8001  //点进去是个error页面.在工程中引入boot的actuator启动器,然后在父pom中添加构建信息,最后在你当前 
@@ -135,15 +135,15 @@ public Object discovery(){
   - 改新Eureka模块的主启动类的类名,老的叫Eureka1,那拷过来得叫Eureka2
   - 改各个eureka的yml配置
 ```
-server:    //这个是eureka注册中心模块的配置,三个模块当然得有三份配置,把一些小细节修改一下即可
-  port: 7001    //端口要改
+server:    //这个是eureka注册中心模块的配置,三个模块当然得有三份配置,把一些小细节修改一下即可.还要注意,加了集群之后你的其他模块当然也要把集群
+  port: 7001    //端口要改                //地址配上,看生产者中的那个配置.
 eureka: 
   instance:   //为了让localhost能对应三个Eureka,需要修改host文件,让本地ip对应三个Eureka实例> 127.0.0.1 eureka7001(2)(3).com .....
-    hostname: eureka7001.com #eureka实例名称.如果不想和localhost对应,那就不管了,也不用改host了
-  client: 
+    hostname: eureka7001.com #eureka实例名称.如果不想和localhost对应,那就不管了,也不用改host了.推而广之,以后如果要让localhost可以对应多个
+  client:               //端口,那就在host中自己配置,这样就可以通过localhost来访问多个端口了.
     register-with-eureka: false     #false表示不向注册中心注册自己。
     fetch-registry: false     #false表示自己端就是注册中心，我的职责就是维护服务实例，并不需要去检索服务
     service-url: 
-      # defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/  # 单机配置,只有一个eureka时候用这个
+      # defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/  # 单机配置,只有一个eureka时候用这个,集群就不用了
       defaultZone: http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/   #这个是集群配置,每个中心要把另外两个配上
 ```
