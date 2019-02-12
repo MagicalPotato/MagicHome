@@ -188,6 +188,8 @@ Eureka来调用的生产者,也就是说当Eureka和ribbon整合之后消费者�
 * 在消费者主启动类上添加@RibbonClient(name='你要特殊定制的那个服务对外暴露的名称',configuration='myRule.class'),注意,你自己写的这个自定义类
 不能放在加了@ComponentScan注解所在的类所在的包或者子包下,而我们的主启动类@SpringbootApplication这个注解点进去之后就有@ComponentScan,所以说
 你自己写的这个自定义类是不能放在你的模块的主启动类那个包下的,你得重新建一个包.既然是配置类,那么类上就要加@Configuration,这个注解就是告诉boot,
-启动的时候要默认加载我的这个配置类,当然实现具体自定义算法的方法上自然也少不了@bean.
+启动的时候要默认加载我的这个配置类,当然返回实现对象的方法少不了@bean.
+* 在muRule.class同级创建你自己的算法类,继承AbstractLoadBalanceRule,然后把源码算法拷过来改巴该巴,在配置类的返回对象方法中直接返回你自己写的这个,
+新轮子,搞定.
 
 
