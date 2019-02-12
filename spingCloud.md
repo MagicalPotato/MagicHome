@@ -147,3 +147,11 @@ eureka:
       # defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/  # 单机配置,只有一个eureka时候用这个,集群就不用了
       defaultZone: http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/   #这个是集群配置,每个中心要把另外两个配上
 ```
+* ACID:原子性,一致性,独立性,持久性   CAP:强一致性,高可用性,分区容错性
+* 任何一个分布式系统不能同时满足CAP,传统的关系型数据库大多是CA,而新兴的nosql数据库大多是CP,要满足分布式,P分区容错性必须要保证,剩下就是在一致性
+和可用性中做选择,作为一个架构师,如果是对双十一,京东618这样的东西,那么并发量大保证可用才是关键,所以选AP,而对于数据量不打但是数据更重要的系统同步才更
+重要,所以选CP. zookeeper有个leader,当leader挂了会后会选举出一个新leader,但是选择通常会耗费30秒到2分钟,所以它不适合高可用,而只适合强一致.所以
+zookeeper是CP;Eureka的节点不分主次,当一个挂了其他照样可以服务,除非服务都死绝了,服务挂了之后数据同步不及时,拿到的数据不一定就是最新的,所以Eureka
+不保强一致性,而是在并发非常大的时候的首选.这是他们之间一个重要区别.Eureka也是借鉴了zookeeper的缺点所以选择了AP.
+
+
