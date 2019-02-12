@@ -159,5 +159,20 @@ zookeeper是CP;Eureka的节点不分主次,当一个挂了其他照样可以服�
 也差不了多少.  负载均衡(load balance),所以简称LB,常见的Nginx就是一个负载均衡服务器. 
   - 集中式: 直接在客户端和服务端之间加硬件设施,比如F5,请求来了看那个服务器轻松就发哪个,效果好,但是贵,小公司肯定用不起
   - 进程内: 偏软件,就是在消费者端实现均衡,比如排队,消费者查看一下注册中心看看哪个人少我就排哪个队,而不是在那里死等
+* 一定注意,ribbon是客户端的负载均衡,所以你要配置当然是在你的消费者模块中配置它,改消费者模块中的pom添加相关依赖,然后是yml:
+```
+server:       //这是消费者的yml配置
+  port: 80
+eureka:
+  client:
+    register-with-eureka: false   //不往注册中心注册自己
+    service-url: 
+      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/  
+之前我们在消费者的Controller中调用生产者的接口的时候是通过RestTemplate调用的,当时这个模板是从配置类中直接返回的,我们在放回这个模板对象
+的方法上加了@bean,现在我们要让客户端有负载均衡的能力,那还是在那个方法上加上@LoadBalance即可,当然不能忘主启动类@EnableEurekaClient.
+return restTemplate.forObjext('http://localhost:8001'+'/car/get'+id,Car.class)  //之前我们在消费者中是通过地址调生产者
+现在改成 return restTemplate.forObjext('http://直接用Eureka中注册的服务名称'+'/car/get'+id,Car.class),只有改了名称之后才是真正的通过
+Eureka来调用的生产者,不然你那个根本没有经过注册中心,就是个假的分布式.
+```
 
 
