@@ -53,7 +53,7 @@ mybatis:     //这快配置就是boot和mybatis的整合,把这些配上就行�
     
 spring:
    application:
-     name: microservicecloud-dept    //这个名称就是当你把这个微服务注册到Eureka中之后,在管理界面上显示的名字,也就是该服务暴露给外界的名字
+     name: microservicecloud-dept  //注册到Eureka之后,管理界面上Application一栏你的微服务显示的名字,也就是该服务暴露给外界的名字
    datasource:        //数据库相关的一大堆                                             //Eureka会自动将其改成全大写.
      type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
      driver-class-name: org.gjt.mm.mysql.Driver              # mysql驱动包
@@ -71,10 +71,10 @@ eureka:
     service-url: 
       #defaultZone: http://localhost:7001/eureka
        defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/      
-  instance:
-    instance-id: microservicecloud-dept8001
-    prefer-ip-address: true     #访问路径可以显示IP地址     
- 
+  instance:  //下面这个id是你给你这个微服务在Eureka中指定的名字,本来是自动分配,但是为了简单你可以自己指定,页面上这个名字是可以点进去的,若不处理,
+    instance-id: microservicecloud-dept8001  //点进去是个error页面.在工程中引入boot的actuator启动器,然后在父pom中添加构建信息,最后在你当前 
+    prefer-ip-address: true     #工程的pom中添加页面跳转的info信息即可.
+    //上面这个是你改了instance-id之后鼠标放上去浏览器左下角会显示当前微服务的ip和端口,false就不显示
 info: 
   app.name: atguigu-microservicecloud
   company.name: www.atguigu.com
