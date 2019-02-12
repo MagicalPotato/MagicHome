@@ -40,7 +40,7 @@ sonProjext3  //新建好一个子工程之后,先配置pom,首先是引入父工
            // artifactid是子模块id,版本用表达式.这样当你将模块2 clean install之后,就可以在这个模块直接用其中的实体类,也不用管模块2的版本之类的
            //配置好pom之后就是配置各个子模块各自的工程配置,也就是properties.yml,按照yml中的条目配好文件夹都建好配置文件也建好这个整合就完成了.
 ```
-* 一个典型的工程yml配置:
+* 这个是生产者的yml配置,生产者要完成各种功能,所以要整合数据库信息,boot信息,eureka客户端信息等:
 ```
 server:
   port: 8001   //你这个服务暴露的端口
@@ -131,6 +131,19 @@ public Object discovery(){
 * 高可用:那Eureka来说,你配一个注册中心当然没问题,但是假如有一天你的这个中心突然被闪电劈死了你的整个系统咋办?所以说就有了集群的概念,有了集群你的系统
 可用性当然就高了.当然,集群对机器是有要求的,因为你的一个模块启动通过任务管理器看到大概就要占用三四百兆的内存,一个集群少说也得配个三五个注册中心吧,所以
 要使用分布式大集群,你的物理设置不能太简陋啊.配置集群也是一样:
-  - 建新Eureka模块
-  - 把老的模块中的pom中的依赖拷过来
+  - 建新Eureka模块,把老的模块中的pom中的依赖拷过来
   - 改新Eureka模块的主启动类的类名,老的叫Eureka1,那拷过来得叫Eureka2
+  - 改各个eureka的yml配置
+```
+server:    //这个是eureka注册中心模块的配置,三个模块当然得有三份配置,把一些小细节修改一下即可
+  port: 7001    //端口要改
+eureka: 
+  instance:   //为了让localhost能对应三个Eureka,需要修改host文件,让本地ip对应三个Eureka实例> 127.0.0.1 eureka7001(2)(3).com .....
+    hostname: eureka7001.com #eureka实例名称.如果不想和localhost对应,那就不管了,也不用改host了
+  client: 
+    register-with-eureka: false     #false表示不向注册中心注册自己。
+    fetch-registry: false     #false表示自己端就是注册中心，我的职责就是维护服务实例，并不需要去检索服务
+    service-url: 
+      # defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/  # 单机配置,只有一个eureka时候用这个
+      defaultZone: http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/   #这个是集群配置,每个中心要把另外两个配上
+```
