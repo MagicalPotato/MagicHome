@@ -117,13 +117,20 @@ public Car get(@PathVariable long id){        //但是呢实际上完成任务�
   - 改yml配置,将当前微服务注册到eureka,参考上面那个完整的yml配置
   - 在当前微服务的主启动类上加上@EnableEurekaClient,表示这是一个Eureka的客户端,一个可被注册到服务端的微服务
 * 注册进Eureka的微服务可以添加发现功能.比如你当前这个生产者服务,你注册进了Eureka,然后你想知道Eureka中还有哪些服务,它们的信息是什么,这时候可以通过
-在当前这个服务的Controller中引入DiscoveryClient来实现,同时主启动类添加@EnableDiscoveryClient
+在当前这个服务的Controller中引入DiscoveryClient来实现,同时主启动类添加@EnableDiscoveryClient. 不过服务发现不是重点
 ```
 @Autowired
 private DiscoveryClient client
 @RequestMapping(value='/Car/discovery/')
 public Object discovery(){
     client.getxxx   //循环获取或者查找单个已经注册的client
-    //也就是你的这个生产者中自己提供了一个对外的接口,可以直接通过自身这个接口来查询注册中心有哪些服务
+    //也就是你的这个生产者中自己提供了一个对外的接口,可以直接通过自身这个接口来查询注册中心有哪些服务. 当然,在自身的服务中查这个没什么意义,你要让
+    //消费者能调用到你的生产者,获得信息,那即是一个道理,在消费者中新建方法,把生产者的这个方法调用一遍即可.
 }
 ```
+* 高可用:那Eureka来说,你配一个注册中心当然没问题,但是假如有一天你的这个中心突然被闪电劈死了你的整个系统咋办?所以说就有了集群的概念,有了集群你的系统
+可用性当然就高了.当然,集群对机器是有要求的,因为你的一个模块启动通过任务管理器看到大概就要占用三四百兆的内存,一个集群少说也得配个三五个注册中心吧,所以
+要使用分布式大集群,你的物理设置不能太简陋啊.配置集群也是一样:
+  - 建新Eureka模块
+  - 把老的模块中的pom中的依赖拷过来
+  - 改新Eureka模块的主启动类的类名,老的叫Eureka1,那拷过来得叫Eureka2
