@@ -216,3 +216,34 @@ get接口返回一个Car对象,而我的熔断xxx方法中也返回一个对象,
 xxx这个接口,然后在消费者类的yml中增加Feign:Hystrix:enable: true,maven clean install,搞定.实际上这个就是一个典型的面向切面思想,原本我们会给每个
 功能方法头上添加一个熔断注解,然后在同类中写这个熔断方法,那么每个方法头上这个熔断注解不就相当于一个切面.我把这一堆切面统一提出来,弄成一个大面整合到
 一起,在公共的接口中实现他们的真正逻辑,这就完成了切面编程.想必那些日志之类的东西也是这样实现的.
+* 创建监控dashboard微服务,pom引入启动器,yml配端口,工程主启动类上@EnableHystrixDashboard开启熔断监控的管理页面, 然后各个生产者的pom中添加
+spring-boot-starter-actuatur,这个之前加过了,确保都好着,然后启动该服务,访问响应的地址就可监控各个生产者的信息了.
+
+* zuul是gateway网关,注册进Eureka之后获取所有服务信息,之后所有请求由它统一代理+路由+过滤.还是老套路,建工程,pom,yml,@EnableZuulProxy; 访问的时候
+就不再是直接访问生产者的地址了,而是:  ttp://gateway-9527.com/ + 对应的Eureka中的服务比如是abc+ 调用地址xxx    
+```
+server: 
+  port: 9527
+spring: 
+  application:
+    name: microservicecloud-zuul-gateway  //注册进Eureka中的名称
+eureka: 
+  client: 
+    service-url: 
+      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka,http://eureka7003.com:7003/eureka  
+  instance:
+    instance-id: gateway-9527.com   //看到这个就记住,要改host文件做映射了,映射这个地址
+    prefer-ip-address: true  
+zuul:   
+  #ignored-services: microservicecloud-dept   //不让这个服务对外暴露,只能通过域名映射来访问它,但是只配置一个肯定不行
+  prefix: /xyz   //这个是访问地址前加的统一前缀.也就是ttp://gateway-9527.com/xyz+其他那些乱七八糟的 
+  ignored-services: "*"  //这个是隐藏,就是说你的哪个服务要对外屏蔽,不能直接通过该服务访问,*代表所有访问都要经过网关
+  routes:    
+    mydept.serviceId: microservicecloud-dept   //这个是域名映射,就是不让你看到原本服务的真实名称abc
+    mydept.path: /mydept/**    //访问的时候只能用这个路径来访问
+info:
+  app.name: atguigu-microcloud
+  company.name: www.atguigu.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
+```
