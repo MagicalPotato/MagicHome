@@ -247,3 +247,23 @@ info:
   build.artifactId: $project.artifactId$
   build.version: $project.version$
 ```
+* 配置中心config server本身就是一个微服务,它来管理其他所有服务的配置信息,它能和外部配置进行绑定.比如把它和github的某个仓库配置进行绑定,当一个人改了
+这个仓库的配置文件之后,config server能自动从github上面去拉取新的配置信息引用到各个服务上.它有服务端和客户端(就是页面);过程:
+```
+1. 在GitHub上新建一个配置仓库,获取到仓库的地址
+2. 在本地建一个文件夹把abc,进入到abc调出Git bash,通过clone命令将刚新建的仓库克隆下来.注意此时新仓库的文件夹是在abc下.
+   git status/git add ./git commit -m ''/git push origin master
+3. 在本地刚clone的仓库文件夹中创建你的配置文件.一定注意!!!!保存文件的格式是UTF_8!!!!!!,用记事本打开另存为,选择UTF_8,覆盖原有然后编辑
+4. 老套路,建模块,引依赖,改配置,@EnableConfigServer,改host(非必须,服务多了端口肯定记不住,改成地址好记)TransportConfigCallback,那是git插件问题,
+需要引入一个依赖.具体看工程中的依赖.
+server: 
+  port: 3344  
+spring:
+  application:
+    name:  microservicecloud-config
+  cloud:
+    config:
+      server:
+        git:   #下面的GitHub上面的git仓库名字,就是你clone的地址,当服务启动之后服务会自动去该地址获取相应的配置文件.git的配置可以通过三个杠---
+          uri: git@github.com:zzyybs/microservicecloud-config.git //来区分环境,服务启动后可以在地址中指定具体要用哪个环境的配置,不指定用默认
+```
